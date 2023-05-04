@@ -1,5 +1,7 @@
+import React from "react";
+
 import { Navbar } from "../components/Navbar.jsx";
 
-export function UsersPage() {
+export function HomePage() {
   return <Navbar />;
 }

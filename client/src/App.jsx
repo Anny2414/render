@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UsersPage } from "./pages/UsersPage";
-import { Navbar } from "./components/Navbar.jsx";
+import { HomePage } from "./pages/HomePage";
 
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
       <Routes>
-        <Route path="/" element={<Navigate to="/" />} />
+        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/users" element={<UsersPage />} />
       </Routes>
     </BrowserRouter>
