@@ -34,3 +34,45 @@ class User(models.Model):
 
     def __str__(self):
         return self.username
+
+class Supplies(models.Model):
+    name = models.CharField(max_length=50)
+    price = models.DecimalField()
+    status = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.name
+    
+class Products(models.Model):
+    name = models.CharField(max_length=50)
+    price = models.DecimalField()
+    description = models.TextField()
+    status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+    
+class Content(models.Model):
+    name = models.CharField(max_length=50)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
+    def __str__(self):
+        return self.name
+    
+class Order(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    total = models.DecimalField()
+    status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Order #{self.id}"
+
+class Detail(models.Model):
+    order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    amount = models.IntegerField()
+    price = models.DecimalField()
+
+    def __str__(self) -> str:
+        return f"Detail #{self.id}"
