@@ -37,7 +37,7 @@ class User(models.Model):
 
 class Supplies(models.Model):
     name = models.CharField(max_length=50)
-    price = models.DecimalField()
+    price = models.FloatField()
     status = models.BooleanField(default=True)
     
     def __str__(self):
@@ -45,7 +45,7 @@ class Supplies(models.Model):
     
 class Products(models.Model):
     name = models.CharField(max_length=50)
-    price = models.DecimalField()
+    price = models.FloatField()
     description = models.TextField()
     status = models.BooleanField(default=True)
 
@@ -62,7 +62,7 @@ class Content(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
-    total = models.DecimalField()
+    total = models.FloatField()
     status = models.BooleanField(default=True)
 
     def __str__(self):
@@ -72,7 +72,7 @@ class Detail(models.Model):
     order = models.ForeignKey(Order,on_delete=models.CASCADE)
     product = models.ForeignKey(Products, on_delete=models.CASCADE)
     amount = models.IntegerField()
-    price = models.DecimalField()
+    price = models.FloatField()
 
     def __str__(self) -> str:
         return f"Detail #{self.id}"
