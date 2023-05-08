@@ -3,6 +3,7 @@ import { Navbar } from "../components/Navbar.jsx";
 import { getData } from "../api/users.api";
 import { TableBar } from "../components/Table/TableBar.jsx"
 import { Table } from "../components/Table/Table.jsx"
+import { BaseModal } from "../components/BaseModal.jsx";
 
 export function UsersPage() {
   const [users, setUsers] = useState([])
@@ -22,6 +23,7 @@ export function UsersPage() {
       <div className="container is-fluid mt-5">
         <TableBar showPdfButton={true} />
         <Table headers={['id', 'role', 'username', 'email', 'date']} data={users} />
+        <BaseModal />
       </div>
     </div>);
 }

@@ -29,7 +29,7 @@ export function TableBar(props) {
             </div>
             {showAdminButton && (
                 <div className='column is-narrow'>
-                    <a href='adminProductos.html' className='button is-primary is-fullwidth'>Administrar Productos</a>
+                    <a className='button is-primary is-fullwidth'>Administrar Productos</a>
                 </div>
             )}
             {showPdfButton && (

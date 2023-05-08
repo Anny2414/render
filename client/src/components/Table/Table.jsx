@@ -1,5 +1,4 @@
 import { React } from "react";
-import { TableBar } from "./TableBar";
 import "../../assets/css/Switch.css";
 import "../../assets/css/ResponsiveTable.css";
 import "../../assets/js/fontawesome.js";
