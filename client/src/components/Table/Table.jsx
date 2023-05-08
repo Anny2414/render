@@ -26,7 +26,7 @@ export function Table(props) {
             {data.map((row) => (
               <tr key={row.id}>
                 {headers.map((header) => (
-                  <td key={row}>{row[header]}</td>
+                  <td key={header}>{row[header]}</td>
                 ))}
                 <td>
                   <label className="switch">
