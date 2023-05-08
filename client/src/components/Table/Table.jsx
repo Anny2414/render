@@ -1,5 +1,4 @@
-import { React, useEffect, useState } from "react";
-import { getData } from "../../api/users.api";
+import { React } from "react";
 import { TableBar } from "./TableBar";
 import "../../assets/css/Switch.css";
 import "../../assets/css/ResponsiveTable.css";
@@ -7,23 +6,10 @@ import "../../assets/js/fontawesome.js";
 
 export function Table(props) {
   // SE DEFINE PARA SABER SI LA TABLA DEBE MOSTRAR CIERTOS BOTONES Y HEADERS SON LAS COLUMNAS QUE APARECERAN
-  const { showPdfButton, showAdminButton, headers } = props;
-
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    async function loadData() {
-      const res = await getData("users");
-      setUsers(res.data);
-    }
-
-    loadData();
-  }, []);
+  const { headers, data } = props;
 
   return (
-    <div className="container is-fluid mt-5">
-      <TableBar {...props} />
-
+    
       <div style={{ overflowX: "auto" }}>
         <table className="table is-fullwidth">
           <thead>
@@ -31,21 +17,20 @@ export function Table(props) {
               {headers.map((header) => (
                 <th key={header}>{header}</th>
               ))}
+              <th>Estado</th>
               <th>Editar</th>
               <th>Eliminar</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.role}</td>
-                <td>{user.username}</td>
-                <td>{user.email}</td>
-                <td>{user.date}</td>
+            {data.map((row) => (
+              <tr key={row.id}>
+                {headers.map((header) => (
+                  <td key={row}>{row[header]}</td>
+                ))}
                 <td>
                   <label className="switch">
-                    <input type="checkbox" checked={!!user.status} />
+                    <input type="checkbox" checked={!!row.status} />
                     <span className="slider round"></span>
                   </label>
                 </td>
@@ -72,6 +57,5 @@ export function Table(props) {
           </tbody>
         </table>
       </div>
-    </div>
   );
 }

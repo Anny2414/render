@@ -5,11 +5,11 @@ export function TableBar(props) {
     // SEGUN LA URL DIRA EL TEXTO QUE SE MUESTRE EN EL BOTON Y SI SE DEBE MOSTRAR EL DE ADMINISTRAR O EL DE PDF
     const { showPdfButton, showAdminButton } = props;
     const url = useLocation()
-    let buttonsText = "None"
+    let buttonsText = 'None'
 
-    if (url.pathname === "/users") {
+    if (url.pathname === '/users') {
         buttonsText = 'usuario'
-    } else if (url.pathname === "/roles") {
+    } else if (url.pathname === '/roles') {
         buttonsText = 'rol'
     }
 
@@ -28,8 +28,8 @@ export function TableBar(props) {
                 </div>
             </div>
             {showAdminButton && (
-                <div class="column is-narrow">
-                    <a href="adminProductos.html" class="button is-primary is-fullwidth">Administrar Productos</a>
+                <div className='column is-narrow'>
+                    <a href='adminProductos.html' className='button is-primary is-fullwidth'>Administrar Productos</a>
                 </div>
             )}
             {showPdfButton && (
