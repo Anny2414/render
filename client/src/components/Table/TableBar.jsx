@@ -17,7 +17,7 @@ export function TableBar(props) {
     return (
         <div className='columns is-centered'>
             <div className='column'>
-                <button className='button is-success is-fullwidth'>Crear {buttonsText} +</button>
+                <button className='button is-success is-fullwidth'  >Crear {buttonsText} +</button>
             </div>
             <div className='column is-9'>
                 <div className='control has-icons-left'>

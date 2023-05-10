@@ -1,8 +1,14 @@
-import React from 'react';
+import { React, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export function BaseModal(props) {
   const { fields, data } = props;
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
 
   const url = useLocation();
   let buttonsText = 'None';
@@ -14,7 +20,7 @@ export function BaseModal(props) {
   }
 
   return (
-    <div className='modal modal-new'>
+    <div className={`modal modal-new ${isModalOpen ? "is-active" : ""}`}>
       <form className='form-new'>
         <div className='modal-background'></div>
         <div className='modal-card'>
@@ -46,7 +52,7 @@ export function BaseModal(props) {
                                 {
                                   field.type == 'select' ? (
                                     <div className="select" style={{ minWidth: '100%' }}>
-                                      <select  style={{ minWidth: '100%' }}>
+                                      <select style={{ minWidth: '100%' }}>
                                         {data.map((d) => (
                                           <option value={d.id} key={d.id}>{d.name} ({d.id})</option>
                                         ))}
