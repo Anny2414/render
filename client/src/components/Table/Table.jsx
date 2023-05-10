@@ -5,15 +5,15 @@ import "../../assets/js/fontawesome.js";
 
 export function Table(props) {
   // SE DEFINE PARA SABER SI LA TABLA DEBE MOSTRAR CIERTOS BOTONES Y HEADERS SON LAS COLUMNAS QUE APARECERAN
-  const { headers, data } = props;
+  const { headers, columns, data } = props;
 
   return (
     <div style={{ overflowX: "auto" }}>
       <table className="table is-fullwidth">
         <thead>
           <tr>
-            {headers.map((header) => (
-              <th key={header}>{header}</th>
+            {columns.map((column) => (
+              <th key={column}>{column}</th>
             ))}
             <th>Estado</th>
             <th>Editar</th>
