@@ -24,11 +24,11 @@ class User(models.Model):
     username = models.CharField(max_length=50)
     email = models.EmailField(max_length=254)
     password = models.CharField(max_length=50)
-    document = models.CharField(max_length=10)
-    name = models.CharField(max_length=50)
-    lastname = models.CharField(max_length=50)
+    document = models.CharField(max_length=10, null=True)
+    name = models.CharField(max_length=50, null=True)
+    lastname = models.CharField(max_length=50, null=True)
     address = models.TextField(blank=True)
-    phone = models.CharField(max_length=10)
+    phone = models.CharField(max_length=10, null=True)
     date = models.DateField(auto_now_add=True)
     status = models.BooleanField(default=True)
 
@@ -39,10 +39,10 @@ class Supplies(models.Model):
     name = models.CharField(max_length=50)
     price = models.FloatField()
     status = models.BooleanField(default=True)
-    
+
     def __str__(self):
         return self.name
-    
+
 class Products(models.Model):
     name = models.CharField(max_length=50)
     price = models.FloatField()
@@ -51,14 +51,14 @@ class Products(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class Content(models.Model):
     name = models.CharField(max_length=50)
     product = models.ForeignKey(Products, on_delete=models.CASCADE)
     status = models.BooleanField(default=True)
     def __str__(self):
         return self.name
-    
+
 class Order(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)

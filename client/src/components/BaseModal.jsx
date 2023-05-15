@@ -1,14 +1,28 @@
 import { React, useState } from "react";
+import { useForm } from "react-hook-form";
+
+import { createUser } from "../api/users.api";
 
 export function BaseModal(props) {
   const { fields, data, title, status, changeStatus } = props;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = handleSubmit(async (data) => {
+    const res = await createUser(data);
+    window.location.reload();
+  });
 
   return (
     <>
       {/* Si el estado es True se muestra, de lo contrario no */}
       {status && (
         <div className={`modal modal-new is-active`}>
-          <form className="form-new">
+          <form className="form-new" onSubmit={onSubmit}>
             <div className="modal-background"></div>
             <div className="modal-card">
               <header className="modal-card-head">
@@ -39,13 +53,16 @@ export function BaseModal(props) {
                               </div>
                               <div className="field-body">
                                 <div className="field">
-                                  <p className="control has-icons-left">
+                                  <div className="control has-icons-left">
                                     {field.type == "select" ? (
                                       <div
                                         className="select"
                                         style={{ minWidth: "100%" }}
                                       >
-                                        <select style={{ minWidth: "100%" }}>
+                                        <select
+                                          style={{ minWidth: "100%" }}
+                                          {...register(field.name)}
+                                        >
                                           {data.map((d) => (
                                             <option value={d.id} key={d.id}>
                                               {d.name} ({d.id})
@@ -57,13 +74,17 @@ export function BaseModal(props) {
                                       <input
                                         className="input"
                                         type={field.type}
-                                        disabled={field.disabled}
+                                        value={field.value}
+                                        readOnly={`field.readonly`}
+                                        {...register(field.name, {
+                                          required: field.required,
+                                        })}
                                       />
                                     )}
                                     <span className="icon is-small is-left">
                                       <i className={`fas fa-${field.icon}`}></i>
                                     </span>
-                                  </p>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -87,7 +108,13 @@ export function BaseModal(props) {
                   Confirmar
                 </button>
               </footer>
-              <div className="notifications"></div>
+              {/* <div className="notifications">
+                {errors && (
+                  <div className="notification has-text-centered is-primary mt-5">
+                    <b>Rellene todos los campos</b>
+                  </div>
+                )}
+              </div> */}
             </div>
           </form>
         </div>

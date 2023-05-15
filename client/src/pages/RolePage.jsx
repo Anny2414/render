@@ -4,6 +4,9 @@ import { getData } from "../api/users.api";
 import { Table } from "../components/Table/Table.jsx";
 import { BaseModal } from "../components/BaseModal";
 
+import { Button } from "../components/Buttons/Button.jsx";
+import { Input } from "../components/Buttons/Input.jsx";
+
 export function RolePage() {
   const [roles, setRoles] = useState([]);
 
@@ -31,7 +34,15 @@ export function RolePage() {
     <div>
       <Navbar />
       <div className="container is-fluid mt-5">
-        <TableBar showPdfButton={false} />
+        <div className="columns is-centered">
+          <Button
+            text="Crear rol +"
+            color="success"
+            col="fullwidth"
+            // action={() => toggleModal(!statusModal)}
+          />
+          <Input placeholder="Buscar rol" icon="magnifying-glass" />
+        </div>
         <Table
           headers={["id", "name", "created_at"]}
           columns={["ID", "Nombre", "Creado en"]}

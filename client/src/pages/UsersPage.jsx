@@ -18,9 +18,10 @@ export function UsersPage() {
     {
       title: "Usuario",
       type: "text",
-      name: "usuario",
+      name: "username",
       icon: "user",
       col: "half",
+      required: "true",
     },
     {
       title: "Email",
@@ -28,14 +29,16 @@ export function UsersPage() {
       name: "email",
       icon: "envelope",
       col: "half",
+      required: "true",
     },
     {
       title: "Contraseña",
       type: "password",
-      name: "contrasena",
+      name: "password",
       icon: "key",
       col: "half",
-      disabled: "true",
+      value: "yourburger123",
+      readonly: "true",
     },
     { title: "Rol", type: "select", name: "role", col: "half" },
   ];
