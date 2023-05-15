@@ -2,10 +2,19 @@ import { React } from "react";
 import "../../assets/css/Switch.css";
 import "../../assets/css/ResponsiveTable.css";
 import "../../assets/js/fontawesome.js";
+import { updateUserStatus } from "../../api/users.api"; // importamos la funcion updateUserStatus
 
 export function Table(props) {
   // SE DEFINE PARA SABER SI LA TABLA DEBE MOSTRAR CIERTOS BOTONES Y HEADERS SON LAS COLUMNAS QUE APARECERAN
   const { headers, columns, data } = props;
+
+  const handleStatusChange = async (userId, status) => {
+    // try {
+    await updateUserStatus(userId, status);
+    // } catch (error) {
+    // console.error(error);
+    // }
+  };
 
   return (
     <div style={{ overflowX: "auto" }}>
@@ -28,7 +37,13 @@ export function Table(props) {
               ))}
               <td>
                 <label className="switch">
-                  <input type="checkbox" checked={!!row.status} />
+                  <input
+                    type="checkbox"
+                    checked={!!row.status}
+                    onChange={(e) =>
+                      handleStatusChange(row.id, e.target.checked)
+                    }
+                  />
                   <span className="slider round"></span>
                 </label>
               </td>

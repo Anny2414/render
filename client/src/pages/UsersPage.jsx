@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar.jsx";
-import { getData } from "../api/users.api";
 import { Table } from "../components/Table/Table.jsx";
 import { BaseModal } from "../components/BaseModal.jsx";
 
 import { Button } from "../components/Buttons/Button.jsx";
 import { Input } from "../components/Buttons/Input.jsx";
+
+// CONEXION CON LA API DE USERS Y ROLES
+import { getUsers } from "../api/users.api";
+import { getRoles } from "../api/roles.api";
 
 export function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -46,8 +49,8 @@ export function UsersPage() {
   // Conexion a API y obtiene datos de Users y Roles
   useEffect(() => {
     async function fetchData() {
-      const res = await getData("users");
-      const resRoles = await getData("roles");
+      const res = await getUsers();
+      const resRoles = await getRoles();
       setUsers(res.data);
       setRoles(resRoles.data);
     }

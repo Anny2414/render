@@ -1,16 +1,20 @@
 import { React, useState, useEffect } from "react";
 import { Navbar } from "../components/Navbar";
-import { getData } from "../api/users.api";
 import { Table } from "../components/Table/Table.jsx";
 import { BaseModal } from "../components/BaseModal";
 
 import { Button } from "../components/Buttons/Button.jsx";
 import { Input } from "../components/Buttons/Input.jsx";
 
+// CONEXION CON LA API DE USERS
+import { getRoles } from "../api/roles.api";
+
 export function RolePage() {
   const [roles, setRoles] = useState([]);
 
-  const fields = [
+  const [statusModal, toggleModal] = useState(false);
+
+  const fieldsNew = [
     {
       title: "Nombre",
       type: "text",
@@ -19,11 +23,17 @@ export function RolePage() {
       col: "full",
       disabled: "false",
     },
+    { title: "Usuarios", type: "checkbox", name: "role", col: "4" },
+    { title: "Clientes", type: "checkbox", name: "role", col: "4" },
+    { title: "Productos", type: "checkbox", name: "role", col: "4" },
+    { title: "Pedidos", type: "checkbox", name: "role", col: "4" },
+    { title: "Roles", type: "checkbox", name: "role", col: "4" },
+    { title: "Ventas", type: "checkbox", name: "role", col: "4" },
   ];
 
   useEffect(() => {
     async function fetchData() {
-      const res = await getData("roles");
+      const res = await getRoles();
       setRoles(res.data);
     }
 
@@ -39,7 +49,7 @@ export function RolePage() {
             text="Crear rol +"
             color="success"
             col="fullwidth"
-            // action={() => toggleModal(!statusModal)}
+            action={() => toggleModal(!statusModal)}
           />
           <Input placeholder="Buscar rol" icon="magnifying-glass" />
         </div>
@@ -48,7 +58,13 @@ export function RolePage() {
           columns={["ID", "Nombre", "Creado en"]}
           data={roles}
         />
-        <BaseModal fields={fields} />
+        <BaseModal
+          fields={fieldsNew}
+          data={roles}
+          title={"Nuevo rol"}
+          status={statusModal}
+          changeStatus={toggleModal}
+        />
       </div>
     </div>
   );

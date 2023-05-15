@@ -1,12 +1,13 @@
 import axios from "axios";
 
-export const getData = (segment) => {
-  const apiUrl = "http://127.0.0.1:8000/yourburger/api/v1";
-  return axios.get(`${apiUrl}/${segment}/`);
-};
-
 const usersApi = axios.create({
   baseURL: "http://127.0.0.1:8000/yourburger/api/v1/users/",
 });
 
+export const getUsers = () => usersApi.get("/");
+
 export const createUser = (user) => usersApi.post("/", user);
+
+export const updateUserStatus = (userId, status) => {
+  return usersApi.patch(`/${userId}/`, { status });
+};

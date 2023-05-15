@@ -47,8 +47,8 @@ export function BaseModal(props) {
                           >
                             <div className="field is-vertical">
                               <div className="field-label">
-                                <label className="label has-text-centered">
-                                  {field.title}:
+                                <label className="label has-text-left">
+                                  {field.title}
                                 </label>
                               </div>
                               <div className="field-body">
@@ -70,12 +70,21 @@ export function BaseModal(props) {
                                           ))}
                                         </select>
                                       </div>
+                                    ) : field.type == "checkbox" ? (
+                                      <div class={`column is-${field.col}`}>
+                                        <div class="field is-centered has-text-centered">
+                                          <label class="switch">
+                                            <input type="checkbox" />
+                                            <span class="slider round"></span>
+                                          </label>
+                                        </div>
+                                      </div>
                                     ) : (
                                       <input
                                         className="input"
                                         type={field.type}
                                         value={field.value}
-                                        readOnly={`field.readonly`}
+                                        readOnly={field.readonly}
                                         {...register(field.name, {
                                           required: field.required,
                                         })}
