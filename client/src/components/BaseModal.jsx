@@ -1,7 +1,8 @@
 import { React, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import { useLocation } from "react-router-dom";
 import { createUser } from "../api/users.api";
+import { createOrder } from "../api/order.api";
 
 export function BaseModal(props) {
   const { fields, data, title, status, changeStatus } = props;
@@ -12,8 +13,23 @@ export function BaseModal(props) {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = handleSubmit(async (data) => {
+  const location = useLocation();
+  
+  const User = async (data) => {
     const res = await createUser(data);
+  };
+  const Order = async (data) => {
+    const res = await createOrder(data);
+  };
+
+  const onSubmit = handleSubmit(async (data) => {
+
+    if (location.pathname === "/user") {
+      await User(data);
+    } else if (location.pathname === "/sales") {
+      await Order(data);
+    }
+
     window.location.reload();
   });
 

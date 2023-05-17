@@ -61,8 +61,10 @@ class Content(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
+    create_at = models.DateField(auto_now_add=True)
+    update_at = models.DateField(auto_now=True)
     total = models.FloatField()
+    statu = models.CharField(max_length=50, default ="Por Pagar")
     status = models.BooleanField(default=True)
 
     def __str__(self):

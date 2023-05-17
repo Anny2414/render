@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Role
+from .models import User, Role, Order
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,4 +9,9 @@ class UserSerializer(serializers.ModelSerializer):
 class RoleSerializar(serializers.ModelSerializer):
     class Meta:
         model = Role
+        fields = '__all__'
+
+class OrderSerializar(serializers.ModelSerializer):
+    class Meta:
+        model = Order
         fields = '__all__'
