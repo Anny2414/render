@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .serializer import UserSerializer, RoleSerializar , OrderSerializar
-from .models import User, Role, Order
+from .serializer import UserSerializer, RoleSerializar , OrderSerializar, ProductSerializar
+from .models import User, Role, Order, Products
 
 # Create your views here.
 class UserView(viewsets.ModelViewSet):
@@ -14,3 +14,8 @@ class RoleView(viewsets.ModelViewSet):
 class OrderView(viewsets.ModelViewSet):
     serializer_class = OrderSerializar
     queryset = Order.objects.all()
+    
+    
+class ProductView(viewsets.ModelViewSet):
+    serializer_class = ProductSerializar
+    queryset = Products.objects.all()

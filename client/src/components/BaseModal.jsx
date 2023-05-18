@@ -24,7 +24,7 @@ export function BaseModal(props) {
 
   const onSubmit = handleSubmit(async (data) => {
 
-    if (location.pathname === "/user") {
+    if (location.pathname === "/users") {
       await User(data);
     } else if (location.pathname === "/sales") {
       await Order(data);
