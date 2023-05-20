@@ -4,8 +4,8 @@ import { getProducts } from "../api/products.api.js";
 import { ViewP } from "../components/ViewP.jsx";
 import { BaseModal } from "../components/BaseModal.jsx";
 
-import { Button } from "../components/Buttons/Button.jsx";
-import { Input } from "../components/Buttons/Input.jsx";
+import { Button } from "../components/Form/Button.jsx";
+import { Input } from "../components/Form/Input.jsx";
 
 export function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -38,7 +38,6 @@ export function ProductsPage() {
       readonly: true,
     },
     { title: "Estado", type: "select", name: "status", col: "half" },
-
   ];
 
   // Conexion a API y obtiene datos de Users y Roles
@@ -56,21 +55,22 @@ export function ProductsPage() {
       <Navbar />
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
-          <Button
-            text="Crear Producto +"
-            color="success"
-            col="fullwidth"
-            action={() => toggleModal(!statusModal)}
-          />
-          <Input placeholder="Buscar Producto" icon="magnifying-glass" />
-          <Button text="Generar PDF" color="primary" col="fullwidth" />
+          <div className="column is-fullwidth">
+            <Button
+              text="Crear Producto +"
+              color="success"
+              col="fullwidth"
+              action={() => toggleModal(!statusModal)}
+            />
+          </div>
+          <div className="column is-9">
+            <Input holder="Buscar Producto" icon="magnifying-glass" />
+          </div>
+          <div className="column is-fullwidth">
+            <Button text="Generar PDF" color="primary" col="fullwidth" />
+          </div>
         </div>
-        <ViewP
-          data={products}
-        />
-
-
-
+        <ViewP data={products} />
 
         <BaseModal
           fields={fieldsNew}

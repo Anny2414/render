@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
-import { BaseModal } from "../components/BaseModal.jsx";
 
-import { Button } from "../components/Buttons/Button.jsx";
-import { Input } from "../components/Buttons/Input.jsx";
+import { createModal } from "../components/CreateModal.jsx";
+
+import { Button } from "../components/Form/Button.jsx";
+import { Input } from "../components/Form/Input.jsx";
 
 // CONEXION CON LA API DE USERS Y ROLES
-import { getUsers } from "../api/users.api";
+import { getUsers, createUser, deleteUser } from "../api/users.api";
 import { getRoles } from "../api/roles.api";
 
 export function UsersPage() {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
-
-  const [statusModal, toggleModal] = useState(false);
 
   // Objeto para los campos de la ventana modal
   const fieldsNew = [
@@ -58,31 +57,46 @@ export function UsersPage() {
     fetchData();
   }, []);
 
+  const handleEditClick = (userId) => {
+    // Realizar la acción deseada, como abrir una modal con los datos del usuario correspondiente
+    console.log("Editar usuario con ID:", userId);
+  };
+
+  const handleDeleteClick = (userId) => {
+    deleteUser(userId);
+    window.location.reload();
+  };
+
   return (
     <div>
       <Navbar />
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
-          <Button
-            text="Crear usuario +"
-            color="success"
-            col="fullwidth"
-            action={() => toggleModal(!statusModal)}
-          />
-          <Input placeholder="Buscar usuario" icon="magnifying-glass" />
-          <Button text="Generar PDF" color="primary" col="fullwidth" />
+          <div className="column is-fullwidth">
+            {createModal(fieldsNew, roles, "Nuevo usuario")}
+            {/* <Button
+              text="Crear usuario +"
+              color="success"
+              col="fullwidth"
+              action={() => toggleModal(!statusModal)}
+            /> */}
+          </div>
+          <div className="column is-9">
+            <Input holder="Buscar usuario" icon="magnifying-glass" />
+          </div>
+          <div className="column is-fullwidth">
+            <Button text="Generar PDF" color="primary" col="fullwidth" />
+          </div>
         </div>
         <Table
           headers={["id", "role", "username", "email", "date"]}
           columns={["ID", "Rol", "Usuario", "Correo", "Creado en"]}
           data={users}
-        />
-        <BaseModal
-          fields={fieldsNew}
-          data={roles}
-          title={"Nuevo usuario"}
-          status={statusModal}
-          changeStatus={toggleModal}
+          status
+          edit
+          delete
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteClick}
         />
       </div>
     </div>

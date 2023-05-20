@@ -4,16 +4,27 @@ import "../../assets/css/ResponsiveTable.css";
 import "../../assets/js/fontawesome.js";
 import { updateUserStatus } from "../../api/users.api"; // importamos la funcion updateUserStatus
 
+// FORM COMPONENTS
+import { Button } from "../Form/Button.jsx";
+
 export function Table(props) {
-  // SE DEFINE PARA SABER SI LA TABLA DEBE MOSTRAR CIERTOS BOTONES Y HEADERS SON LAS COLUMNAS QUE APARECERAN
-  const { headers, columns, data } = props;
+  const {
+    headers,
+    columns,
+    data,
+    edit,
+    delete: showDelete,
+    status,
+    onEditClick,
+    onDeleteClick,
+  } = props;
 
   const handleStatusChange = async (userId, status) => {
-    // try {
-    await updateUserStatus(userId, status);
-    // } catch (error) {
-    // console.error(error);
-    // }
+    try {
+      await updateUserStatus(userId, status);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -24,9 +35,9 @@ export function Table(props) {
             {columns.map((column) => (
               <th key={column}>{column}</th>
             ))}
-            <th>Estado</th>
-            <th>Editar</th>
-            <th>Eliminar</th>
+            {status && <th>Estado</th>}
+            {edit && <th>Editar</th>}
+            {showDelete && <th>Eliminar</th>}
           </tr>
         </thead>
         <tbody>
@@ -35,36 +46,48 @@ export function Table(props) {
               {headers.map((header) => (
                 <td key={header}>{row[header]}</td>
               ))}
-              <td>
-                <label className="switch">
-                  <input
-                    type="checkbox"
-                    checked={!!row.status}
-                    onChange={(e) =>
-                      handleStatusChange(row.id, e.target.checked)
+              {status && (
+                <td>
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={!!row.status}
+                      onChange={(e) =>
+                        handleStatusChange(row.id, e.target.checked)
+                      }
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                </td>
+              )}
+              {edit && (
+                <td>
+                  <Button
+                    color="warning"
+                    type="button"
+                    text={
+                      <span className="icon">
+                        <i className="fa-solid fa-pencil"></i>
+                      </span>
                     }
+                    action={() => onEditClick(row.id)}
                   />
-                  <span className="slider round"></span>
-                </label>
-              </td>
-              <td>
-                <button
-                  className="button edit is-warning"
-                  type="button"
-                  name="edit"
-                >
-                  <span className="icon">
-                    <i className="fa-solid fa-pencil"></i>
-                  </span>
-                </button>
-              </td>
-              <td>
-                <button className="button is-primary" name="deleteUser">
-                  <span className="icon">
-                    <i className="fa-solid fa-trash"></i>
-                  </span>
-                </button>
-              </td>
+                </td>
+              )}
+              {showDelete && (
+                <td>
+                  <Button
+                    color="primary"
+                    type="button"
+                    text={
+                      <span className="icon">
+                        <i className="fa-solid fa-trash"></i>
+                      </span>
+                    }
+                    action={() => onDeleteClick(row.id)}
+                  />
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

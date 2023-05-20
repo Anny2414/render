@@ -3,8 +3,8 @@ import { Navbar } from "../components/Navbar";
 import { Table } from "../components/Table/Table.jsx";
 import { BaseModal } from "../components/BaseModal";
 
-import { Button } from "../components/Buttons/Button.jsx";
-import { Input } from "../components/Buttons/Input.jsx";
+import { Button } from "../components/Form/Button.jsx";
+import { Input } from "../components/Form/Input.jsx";
 
 // CONEXION CON LA API DE USERS
 import { getRoles } from "../api/roles.api";
@@ -45,13 +45,17 @@ export function RolePage() {
       <Navbar />
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
-          <Button
-            text="Crear rol +"
-            color="success"
-            col="fullwidth"
-            action={() => toggleModal(!statusModal)}
-          />
-          <Input placeholder="Buscar rol" icon="magnifying-glass" />
+          <div className="column is-fullwidth">
+            <Button
+              text="Crear rol +"
+              color="success"
+              col="fullwidth"
+              action={() => toggleModal(!statusModal)}
+            />
+          </div>
+          <div className="column is-10">
+            <Input holder="Buscar rol" icon="magnifying-glass" />
+          </div>
         </div>
         <Table
           headers={["id", "name", "created_at"]}

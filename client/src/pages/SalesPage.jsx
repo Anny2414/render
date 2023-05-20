@@ -3,8 +3,8 @@ import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
 import { BaseModal } from "../components/BaseModal.jsx";
 
-import { Button } from "../components/Buttons/Button.jsx";
-import { Input } from "../components/Buttons/Input.jsx";
+import { Button } from "../components/Form/Button.jsx";
+import { Input } from "../components/Form/Input.jsx";
 
 // CONEXION CON LA API DE USERS Y ROLES
 import { getUsers } from "../api/users.api";
@@ -46,18 +46,31 @@ export function SalesPage() {
       <Navbar />
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
-          <Button
-            text="Crear Venta +"
-            color="success"
-            col="fullwidth"
-            action={() => toggleModal(!statusModal)}
-          />
-          <Input placeholder="Buscar usuario" icon="magnifying-glass" />
-          <Button text="Generar PDF" color="primary" col="fullwidth" />
+          <div className="column is-fullwidth">
+            <Button
+              text="Crear Venta +"
+              color="success"
+              col="fullwidth"
+              action={() => toggleModal(!statusModal)}
+            />
+          </div>
+          <div className="column is-9">
+            <Input holder="Buscar usuario" icon="magnifying-glass" />
+          </div>
+          <div className="column is-fullwidth">
+            <Button text="Generar PDF" color="primary" col="fullwidth" />
+          </div>
         </div>
         <Table
           headers={["id", "user", "create_at", "update_at", "total", "statu"]}
-          columns={["ID", "Usuario", "Creado en","Actaulizado en", "Total", "Estado de venta"]}
+          columns={[
+            "ID",
+            "Usuario",
+            "Creado en",
+            "Actualizado en",
+            "Total",
+            "Estado de venta",
+          ]}
           data={order}
         />
         <BaseModal

@@ -1,11 +1,15 @@
 import { React, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
-import { createUser } from "../api/users.api";
+
 import { createOrder } from "../api/order.api";
 
+// FORM COMPONENTS
+import { Button } from "./Form/Button.jsx";
+import { Input } from "./Form/Input.jsx";
+
 export function BaseModal(props) {
-  const { fields, data, title, status, changeStatus } = props;
+  const { fields, data, title, status, changeStatus, onEditClick } = props;
 
   const {
     register,
@@ -14,16 +18,15 @@ export function BaseModal(props) {
   } = useForm();
 
   const location = useLocation();
-  
+
   const User = async (data) => {
-    const res = await createUser(data);
+    await createUser(data);
   };
   const Order = async (data) => {
-    const res = await createOrder(data);
+    await createOrder(data);
   };
 
   const onSubmit = handleSubmit(async (data) => {
-
     if (location.pathname === "/users") {
       await User(data);
     } else if (location.pathname === "/sales") {
@@ -96,14 +99,16 @@ export function BaseModal(props) {
                                         </div>
                                       </div>
                                     ) : (
-                                      <input
-                                        className="input"
+                                      <Input
+                                        name={field.name}
                                         type={field.type}
                                         value={field.value}
-                                        readOnly={field.readonly}
-                                        {...register(field.name, {
-                                          required: field.required,
-                                        })}
+                                        read_only={field.readonly}
+                                        action={{
+                                          ...register(field.name, {
+                                            required: field.required,
+                                          }),
+                                        }}
                                       />
                                     )}
                                     <span className="icon is-small is-left">
@@ -121,25 +126,21 @@ export function BaseModal(props) {
                 </div>
               </section>
               <footer className="modal-card-foot">
-                <button
-                  className="button cancel is-primary"
-                  name="new"
+                <Button
+                  text="Cancelar"
+                  color="primary"
                   type="button"
-                  onClick={() => changeStatus(false)}
-                >
-                  Cancelar
-                </button>
-                <button className="button is-success" type="submit">
-                  Confirmar
-                </button>
+                  action={() => changeStatus(false)}
+                />
+                <Button text="Confirmar" color="success" type="submit" />
               </footer>
-              {/* <div className="notifications">
+              <div className="notifications">
                 {errors && (
                   <div className="notification has-text-centered is-primary mt-5">
                     <b>Rellene todos los campos</b>
                   </div>
                 )}
-              </div> */}
+              </div>
             </div>
           </form>
         </div>
