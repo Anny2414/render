@@ -12,6 +12,9 @@ export const createUser = (user) => usersApi.post("/", user);
 
 export const deleteUser = (userId) => usersApi.delete(`/${userId}/`);
 
+export const editUser = (userId, updatedUser) =>
+  usersApi.patch(`/${userId}/`, updatedUser);
+
 export const updateUserStatus = (userId, status) => {
   return usersApi.patch(`/${userId}/`, { status });
 };

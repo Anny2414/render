@@ -9,7 +9,7 @@ export const Input = (props) => {
         className="input"
         type={type}
         placeholder={holder}
-        value={value}
+        defaultValue={value}
         name={name}
         readOnly={!!read_only}
         {...action}

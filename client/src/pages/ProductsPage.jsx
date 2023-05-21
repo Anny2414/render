@@ -2,14 +2,12 @@ import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar.jsx";
 import { getProducts } from "../api/products.api.js";
 import { ViewP } from "../components/ViewP.jsx";
-import { BaseModal } from "../components/BaseModal.jsx";
 
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
 
 export function ProductsPage() {
   const [products, setProducts] = useState([]);
-  const [statusModal, toggleModal] = useState(false);
 
   // Objeto para los campos de la ventana modal
   const fieldsNew = [

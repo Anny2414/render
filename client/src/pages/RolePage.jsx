@@ -1,7 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Navbar } from "../components/Navbar";
 import { Table } from "../components/Table/Table.jsx";
-import { BaseModal } from "../components/BaseModal";
 
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
@@ -11,8 +10,6 @@ import { getRoles } from "../api/roles.api";
 
 export function RolePage() {
   const [roles, setRoles] = useState([]);
-
-  const [statusModal, toggleModal] = useState(false);
 
   const fieldsNew = [
     {
@@ -46,12 +43,7 @@ export function RolePage() {
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
           <div className="column is-fullwidth">
-            <Button
-              text="Crear rol +"
-              color="success"
-              col="fullwidth"
-              action={() => toggleModal(!statusModal)}
-            />
+            <Button text="Crear rol +" color="success" col="fullwidth" />
           </div>
           <div className="column is-10">
             <Input holder="Buscar rol" icon="magnifying-glass" />
@@ -61,13 +53,6 @@ export function RolePage() {
           headers={["id", "name", "created_at"]}
           columns={["ID", "Nombre", "Creado en"]}
           data={roles}
-        />
-        <BaseModal
-          fields={fieldsNew}
-          data={roles}
-          title={"Nuevo rol"}
-          status={statusModal}
-          changeStatus={toggleModal}
         />
       </div>
     </div>

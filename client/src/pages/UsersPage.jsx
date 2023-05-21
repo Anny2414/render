@@ -2,18 +2,41 @@ import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
 
-import { createModal } from "../components/CreateModal.jsx";
-
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
 
+import { Modal } from "../components/Modal.jsx";
+
 // CONEXION CON LA API DE USERS Y ROLES
-import { getUsers, createUser, deleteUser } from "../api/users.api";
+import {
+  getUsers,
+  createUser,
+  deleteUser,
+  getUser,
+  editUser,
+} from "../api/users.api";
 import { getRoles } from "../api/roles.api";
 
 export function UsersPage() {
+  // ARREGLO DE USUARIOS Y ROLES
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
+
+  //
+  const [isOpen, setIsOpen] = useState(false);
+  const [modalConfig, setModalConfig] = useState({
+    title: "",
+    fields: [],
+  });
+
+  const openModal = (title, fields, dataSelect, submit) => {
+    setModalConfig({ title, fields, dataSelect, submit });
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
 
   // Objeto para los campos de la ventana modal
   const fieldsNew = [
@@ -57,9 +80,57 @@ export function UsersPage() {
     fetchData();
   }, []);
 
-  const handleEditClick = (userId) => {
-    // Realizar la acción deseada, como abrir una modal con los datos del usuario correspondiente
-    console.log("Editar usuario con ID:", userId);
+  const handleCreateUser = async (data) => {
+    try {
+      await createUser(data);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al crear el usuario:", error);
+    }
+  };
+
+  const handleEditClick = async (userId) => {
+    const res = await getUser(userId);
+    const user = res.data;
+
+    const fieldsEdit = [
+      {
+        title: "Usuario",
+        type: "text",
+        name: "username",
+        icon: "user",
+        col: "half",
+        required: "true",
+        value: user.username,
+      },
+      {
+        title: "Email",
+        type: "text",
+        name: "email",
+        icon: "envelope",
+        col: "half",
+        required: "true",
+        value: user.email,
+      },
+      {
+        title: "Rol",
+        type: "select",
+        name: "role",
+        col: "half",
+        value: user.role,
+      },
+    ];
+
+    const handleEditUser = async (data) => {
+      try {
+        await editUser(userId, data);
+        window.location.reload();
+      } catch (error) {
+        console.error("Error al editar el usuario:", error);
+      }
+    };
+
+    openModal("Editar usuario", fieldsEdit, roles, handleEditUser);
   };
 
   const handleDeleteClick = (userId) => {
@@ -73,13 +144,14 @@ export function UsersPage() {
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
           <div className="column is-fullwidth">
-            {createModal(fieldsNew, roles, "Nuevo usuario")}
-            {/* <Button
+            <Button
               text="Crear usuario +"
               color="success"
               col="fullwidth"
-              action={() => toggleModal(!statusModal)}
-            /> */}
+              action={() =>
+                openModal("Nuevo usuario", fieldsNew, roles, handleCreateUser)
+              }
+            />
           </div>
           <div className="column is-9">
             <Input holder="Buscar usuario" icon="magnifying-glass" />
@@ -99,6 +171,15 @@ export function UsersPage() {
           onDeleteClick={handleDeleteClick}
         />
       </div>
+      {isOpen && (
+        <Modal
+          title={modalConfig.title}
+          fields={modalConfig.fields}
+          dataSelect={modalConfig.dataSelect}
+          onClose={closeModal}
+          submit={modalConfig.submit}
+        />
+      )}
     </div>
   );
 }

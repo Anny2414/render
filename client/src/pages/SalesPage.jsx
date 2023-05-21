@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
-import { BaseModal } from "../components/BaseModal.jsx";
 
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
@@ -13,8 +12,6 @@ import { getOrder } from "../api/order.api";
 export function SalesPage() {
   const [users, setUsers] = useState([]);
   const [order, setOrder] = useState([]);
-
-  const [statusModal, toggleModal] = useState(false);
 
   // Objeto para los campos de la ventana modal
   const fieldsNew = [
