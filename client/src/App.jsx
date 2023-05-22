@@ -3,7 +3,10 @@ import { UsersPage } from "./pages/UsersPage";
 import { HomePage } from "./pages/HomePage";
 import { RolePage } from "./pages/RolePage";
 import { SalesPage } from "./pages/SalesPage";
-import { ProductsPage } from "./pages/ProductsPage"
+import { ProductsPage } from "./pages/ProductsPage";
+import { ClientPage } from "./pages/ClientPage";
+
+
 
 function App() {
   return (
@@ -15,7 +18,7 @@ function App() {
         <Route path="/roles" element={<RolePage />} />
         <Route path="/sales" element={<SalesPage />} />
         <Route path="/products" element={<ProductsPage />} />
-
+        <Route path="/clients" element={<ClientPage />} />
       </Routes>
     </BrowserRouter>
   );
