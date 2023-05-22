@@ -21,3 +21,8 @@ class ProductSerializar(serializers.ModelSerializer):
     class Meta:
         model = Products
         fields = '__all__'
+
+class ClientSerializar(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields ='__all__'

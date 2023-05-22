@@ -7,6 +7,8 @@ router.register(r'users', views.UserView, 'users')
 router.register(r'roles', views.RoleView, 'roles')
 router.register(r'order', views.OrderView, 'order')
 router.register(r'products', views.ProductView,'products')
+router.register(r'clients', views.ClientView, 'clients')
+
 
 urlpatterns = [
     path('api/v1/', include(router.urls))
