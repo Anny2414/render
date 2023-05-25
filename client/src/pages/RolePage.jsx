@@ -52,6 +52,9 @@ export function RolePage() {
         <Table
           headers={["id", "name", "created_at"]}
           columns={["ID", "Nombre", "Creado en"]}
+          edit
+          status
+          delete
           data={roles}
         />
       </div>

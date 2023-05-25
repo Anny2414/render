@@ -24,13 +24,10 @@ export function UsersPage() {
 
   //
   const [isOpen, setIsOpen] = useState(false);
-  const [modalConfig, setModalConfig] = useState({
-    title: "",
-    fields: [],
-  });
+  const [modalConfig, setModalConfig] = useState();
 
-  const openModal = (title, fields, dataSelect, submit) => {
-    setModalConfig({ title, fields, dataSelect, submit });
+  const openModal = (title, fields, dataSelect, nameSelect, submit) => {
+    setModalConfig({ title, fields, dataSelect, nameSelect, submit });
     setIsOpen(true);
   };
 
@@ -130,7 +127,7 @@ export function UsersPage() {
       }
     };
 
-    openModal("Editar usuario", fieldsEdit, roles, handleEditUser);
+    openModal("Editar usuario", fieldsEdit, roles, "name", handleEditUser);
   };
 
   const handleDeleteClick = (userId) => {
@@ -149,7 +146,7 @@ export function UsersPage() {
               color="success"
               col="fullwidth"
               action={() =>
-                openModal("Nuevo usuario", fieldsNew, roles, handleCreateUser)
+                openModal("Nuevo usuario", fieldsNew, roles, "name", handleCreateUser)
               }
             />
           </div>
@@ -176,6 +173,7 @@ export function UsersPage() {
           title={modalConfig.title}
           fields={modalConfig.fields}
           dataSelect={modalConfig.dataSelect}
+          nameSelect={modalConfig.nameSelect}
           onClose={closeModal}
           submit={modalConfig.submit}
         />

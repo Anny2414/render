@@ -1,8 +1,8 @@
-import { React } from "react";
+import React, {useState} from "react";
 import "../../assets/css/Switch.css";
 import "../../assets/css/ResponsiveTable.css";
 import "../../assets/js/fontawesome.js";
-import { updateUserStatus } from "../../api/users.api"; // importamos la funcion updateUserStatus
+import { updateUserStatus } from "../../api/users.api"; 
 
 // FORM COMPONENTS
 import { Button } from "../Form/Button.jsx";
@@ -20,12 +20,13 @@ export function Table(props) {
   } = props;
 
   const handleStatusChange = async (userId, status) => {
-    try {
-      await updateUserStatus(userId, status);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  try {
+    await updateUserStatus(userId, status);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
   return (
     <div style={{ overflowX: "auto" }}>
@@ -51,10 +52,11 @@ export function Table(props) {
                   <label className="switch">
                     <input
                       type="checkbox"
-                      checked={!!row.status}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         handleStatusChange(row.id, e.target.checked)
                       }
+                      }
+                      checked={row.status}
                     />
                     <span className="slider round"></span>
                   </label>

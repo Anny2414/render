@@ -1,12 +1,12 @@
 import React from "react";
 
 export const Input = (props) => {
-  const { holder, icon, type, value, read_only, name, action } = props;
+  const { holder, icon, type, value, read_only, name, action, error } = props;
 
   return (
     <div className="control has-icons-left">
       <input
-        className="input"
+        className={`input ${error && "is-error"}`}
         type={type}
         placeholder={holder}
         defaultValue={value}
