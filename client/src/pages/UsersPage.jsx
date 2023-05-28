@@ -14,7 +14,9 @@ import {
   deleteUser,
   getUser,
   editUser,
+  updateUserStatus,
 } from "../api/users.api";
+
 import { getRoles } from "../api/roles.api";
 
 export function UsersPage() {
@@ -62,7 +64,13 @@ export function UsersPage() {
       value: "yourburger123",
       readonly: "true",
     },
-    { title: "Rol", type: "select", name: "role", col: "half" },
+    {
+      title: "Rol",
+      type: "select",
+      name: "role",
+      icon: "lock-open",
+      col: "half",
+    },
   ];
 
   // Conexion a API y obtiene datos de Users y Roles
@@ -114,6 +122,7 @@ export function UsersPage() {
         type: "select",
         name: "role",
         col: "half",
+        icon: "lock-open",
         value: user.role,
       },
     ];
@@ -128,6 +137,14 @@ export function UsersPage() {
     };
 
     openModal("Editar usuario", fieldsEdit, roles, "name", handleEditUser);
+  };
+
+  const handleStatusChange = async (userId, status) => {
+    try {
+      await updateUserStatus(userId, !status);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleDeleteClick = (userId) => {
@@ -146,7 +163,13 @@ export function UsersPage() {
               color="success"
               col="fullwidth"
               action={() =>
-                openModal("Nuevo usuario", fieldsNew, roles, "name", handleCreateUser)
+                openModal(
+                  "Nuevo usuario",
+                  fieldsNew,
+                  roles,
+                  "name",
+                  handleCreateUser
+                )
               }
             />
           </div>
@@ -164,6 +187,7 @@ export function UsersPage() {
           status
           edit
           delete
+          onStatusClick={handleStatusChange}
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
         />
