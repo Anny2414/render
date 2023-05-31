@@ -24,7 +24,7 @@ export function UsersPage() {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
 
-  //
+  // CONFIGURACION MODAL
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
 
@@ -121,7 +121,7 @@ export function UsersPage() {
         title: "Rol",
         type: "select",
         name: "role",
-        col: "half",
+        col: "full",
         icon: "lock-open",
         value: user.role,
       },

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { Input } from "./Form/Input";
 import { Button } from "./Form/Button";
 import { Select } from "./Form/Select";
+import { Switch } from "./Form/Switch";
 
 export function Modal({ title, fields, onClose, dataSelect, nameSelect, submit }) {
   const {
@@ -30,50 +31,58 @@ export function Modal({ title, fields, onClose, dataSelect, nameSelect, submit }
           </header>
           <section className="modal-card-body">
             <div className="container">
-              {fields.map((field, index) => (
-                <div className="column" key={index}>
-                  <div className="field is-vertical">
-                    <div className="field-label">
-                      <label className="label has-text-centered">
-                        {field.title}
-                      </label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control has-icons-left">
-                          {field.type == "text" || field.type == "password" ? (
-                            <Input
-                              type={field.type}
-                              read_only={field.readonly}
-                              name={field.name}
-                              value={field.value}
-                              action={{
-                                ...register(field.name, {
-                                  required: field.required,
-                                }),
-                              }}
-                              error={errors[field.name]}
-                            />
-                          ) : (
-                            <Select
-                              action={{ ...register(field.name) }}
-                              fields={dataSelect}
-                              name={nameSelect}
-                              defaultValue={field.value}
-                            />
-                          )}
-
-                          <span className="icon is-small is-left">
-                            <i className={`fas fa-${field.icon}`}></i>
-                          </span>
+              <div className="columns is-multiline">
+                {fields.map((field, index) => (
+                  <div className={`column is-${field.col}`} key={index}>
+                    <div className="field is-vertical">
+                      <div className="field-label" style={{marginRight: 0}}>
+                        <label className="label has-text-centered">
+                          {field.title}
+                        </label>
+                      </div>
+                      <div className="field-body">
+                        <div className="field">
+                          <div className="control has-icons-left">
+                            {field.type === "text" || field.type === "password" ? (
+                              <Input
+                                type={field.type}
+                                read_only={field.readonly}
+                                name={field.name}
+                                value={field.value}
+                                action={{
+                                  ...register(field.name, {
+                                    required: field.required,
+                                  }),
+                                }}
+                                error={errors[field.name]}
+                              />
+                            ) : field.type === "checkbox" ? (
+                              <div className="field is-grouped is-grouped-centered">
+                                <div className="control">
+                                  <Switch checked={field.checked} />
+                                </div>
+                              </div>
+                            ) : (
+                              <Select
+                                action={{ ...register(field.name) }}
+                                fields={dataSelect}
+                                name={nameSelect}
+                                defaultValue={field.value}
+                              />
+                            )}
+                            <span className="icon is-small is-left">
+                              <i className={`fas fa-${field.icon}`}></i>
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </section>
+
           <footer className="modal-card-foot">
             <Button
               text="Cancelar"
