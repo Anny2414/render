@@ -70,7 +70,7 @@ export function RolePage() {
       {
         title: "Nombre",
         type: "text",
-        name: "nombre",
+        name: "name",
         icon: "user",
         col: "full",
         value: role.name,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../../assets/css/Switch.css";
 import "../../assets/css/ResponsiveTable.css";
 import "../../assets/js/fontawesome.js";
@@ -6,6 +6,56 @@ import "../../assets/js/fontawesome.js";
 // FORM COMPONENTS
 import { Button } from "../Form/Button.jsx";
 import { Switch } from "../Form/Switch";
+
+function TableRow({ row, headers, status, edit, showDelete, onStatusClick, onEditClick, onDeleteClick }) {
+  const [statusSlider, setStatus] = useState(row.status);
+
+  const handleSwitchChange = () => {
+    onStatusClick(row.id, statusSlider);
+    setStatus(!statusSlider);
+  };
+
+  return (
+    <tr key={row.id}>
+      {headers.map((header) => (
+        <td key={header}>{row[header]}</td>
+      ))}
+      {status && (
+        <td>
+          <Switch change={handleSwitchChange} checked={statusSlider} />
+        </td>
+      )}
+      {edit && (
+        <td>
+          <Button
+            color="warning"
+            type="button"
+            text={
+              <span className="icon">
+                <i className="fa-solid fa-pencil"></i>
+              </span>
+            }
+            action={() => onEditClick(row.id)}
+          />
+        </td>
+      )}
+      {showDelete && (
+        <td>
+          <Button
+            color="primary"
+            type="button"
+            text={
+              <span className="icon">
+                <i className="fa-solid fa-trash"></i>
+              </span>
+            }
+            action={() => onDeleteClick(row.id)}
+          />
+        </td>
+      )}
+    </tr>
+  );
+}
 
 export function Table(props) {
   const {
@@ -34,58 +84,19 @@ export function Table(props) {
           </tr>
         </thead>
         <tbody>
-          {data.map((row) => {
-            const [statusSlider, setStatus] = useState(row.status);
-
-            const handleSwitchChange = () => {
-              onStatusClick(row.id, statusSlider);
-              setStatus((statusSlider) => !statusSlider);
-            };
-
-            return (
-              <tr key={row.id}>
-                {headers.map((header) => (
-                  <td key={header}>{row[header]}</td>
-                ))}
-                {status && (
-                  <td>
-                    <Switch
-                      change={() => handleSwitchChange()}
-                      checked={statusSlider}
-                    />
-                  </td>
-                )}
-                {edit && (
-                  <td>
-                    <Button
-                      color="warning"
-                      type="button"
-                      text={
-                        <span className="icon">
-                          <i className="fa-solid fa-pencil"></i>
-                        </span>
-                      }
-                      action={() => onEditClick(row.id)}
-                    />
-                  </td>
-                )}
-                {showDelete && (
-                  <td>
-                    <Button
-                      color="primary"
-                      type="button"
-                      text={
-                        <span className="icon">
-                          <i className="fa-solid fa-trash"></i>
-                        </span>
-                      }
-                      action={() => onDeleteClick(row.id)}
-                    />
-                  </td>
-                )}
-              </tr>
-            );
-          })}
+          {data.map((row) => (
+            <TableRow
+              key={row.id}
+              row={row}
+              headers={headers}
+              status={status}
+              edit={edit}
+              showDelete={showDelete}
+              onStatusClick={onStatusClick}
+              onEditClick={onEditClick}
+              onDeleteClick={onDeleteClick}
+            />
+          ))}
         </tbody>
       </table>
     </div>

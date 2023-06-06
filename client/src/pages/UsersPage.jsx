@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
 
@@ -6,6 +7,8 @@ import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
 
 import { Modal } from "../components/Modal.jsx";
+
+import { Notification } from "../components/Notification.jsx";
 
 // CONEXION CON LA API DE USERS Y ROLES
 import {
@@ -27,6 +30,12 @@ export function UsersPage() {
   // CONFIGURACION MODAL
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
+
+  const reloadDataTable = async () => {
+    await setUsers([])
+    const res = await getUsers();
+    await setUsers(res.data)
+  }
 
   const openModal = (title, fields, dataSelect, nameSelect, submit) => {
     setModalConfig({ title, fields, dataSelect, nameSelect, submit });
@@ -88,7 +97,8 @@ export function UsersPage() {
   const handleCreateUser = async (data) => {
     try {
       await createUser(data);
-      window.location.reload();
+      reloadDataTable()
+      closeModal()
     } catch (error) {
       console.error("Error al crear el usuario:", error);
     }
