@@ -37,8 +37,8 @@ export function UsersPage() {
     await setUsers(res.data)
   }
 
-  const openModal = (title, fields, dataSelect, nameSelect, submit) => {
-    setModalConfig({ title, fields, dataSelect, nameSelect, submit });
+  const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
+    setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
     setIsOpen(true);
   };
 
@@ -146,7 +146,7 @@ export function UsersPage() {
       }
     };
 
-    openModal("Editar usuario", fieldsEdit, roles, "name", handleEditUser);
+    openModal("Editar usuario", fieldsEdit, roles, "name", true, handleEditUser);
   };
 
   const handleStatusChange = async (userId, status) => {
@@ -178,6 +178,7 @@ export function UsersPage() {
                   fieldsNew,
                   roles,
                   "name",
+                  true,
                   handleCreateUser
                 )
               }
@@ -208,6 +209,7 @@ export function UsersPage() {
           fields={modalConfig.fields}
           dataSelect={modalConfig.dataSelect}
           nameSelect={modalConfig.nameSelect}
+          buttonSubmit={modalConfig.buttonSubmit}
           onClose={closeModal}
           submit={modalConfig.submit}
         />

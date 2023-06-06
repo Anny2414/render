@@ -3,7 +3,6 @@ import "../assets/css/ViewProducts.css";
 import { Button } from "../components/Form/Button";
 import { Link } from "react-router-dom";
 import Logo from "../assets/img/burger.jpg";
-import { ProductDetails } from "../components/ProductDetails";
 import { SwitchP } from "../components/Form/SwitchP";
 
 
