@@ -4,6 +4,7 @@ from yourburger import views
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserView, 'users')
+router.register(r'permisos', views.PermissionView, 'permisos')
 router.register(r'roles', views.RoleView, 'roles')
 router.register(r'order', views.OrderView, 'order')
 router.register(r'products', views.ProductView,'products')

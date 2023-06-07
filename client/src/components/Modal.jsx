@@ -61,7 +61,7 @@ export function Modal (props) {
                             ) : field.type === "checkbox" ? (
                               <div className="field is-grouped is-grouped-centered">
                                 <div className="control">
-                                  <Switch checked={field.checked} />
+                                  <Switch checked={field.checked} action={{...register(field.title)}} />
                                 </div>
                               </div>
                             ) : (

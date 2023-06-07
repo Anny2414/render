@@ -10,14 +10,14 @@ class Role(models.Model):
         return self.name
 
 class Permission(models.Model):
-    module_name = models.CharField(max_length=50)
+    module_name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
 
 class DetallePermiso(models.Model):
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
+    permission = models.ForeignKey(Permission, on_delete=models.CASCADE, to_field='module_name')
 
 class User(models.Model):
     role = models.ForeignKey(Role, on_delete=models.CASCADE, to_field='name')

@@ -1,7 +1,7 @@
 import React from "react";
 
 export const Switch = (props) => {
-  const { change, checked, click } = props;
+  const { change, checked, click, action } = props;
 
   return (
     <label className="switch">
@@ -10,6 +10,7 @@ export const Switch = (props) => {
         onChange={change}
         defaultChecked={checked}
         onClick={click}
+        {...action}
       />
       <span className="slider round"></span>
     </label>

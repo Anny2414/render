@@ -17,8 +17,8 @@ export function RolePage() {
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
 
-  const openModal = (title, fields, dataSelect, nameSelect, submit) => {
-    setModalConfig({ title, fields, dataSelect, nameSelect, submit });
+  const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
+    setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
     setIsOpen(true);
   };
 
@@ -55,8 +55,8 @@ export function RolePage() {
 
   const handleCreateRole = async (data) => {
     try {
-      await createRole(data);
-      window.location.reload();
+      // await createRole(data);
+      console.log(data);
     } catch (error) {
       console.error("Error al crear el rol:", error);
     }
@@ -93,7 +93,7 @@ export function RolePage() {
       }
     };
 
-    openModal("Editar usuario", fieldsEdit, null, null, handleEditRole);
+    openModal("Editar usuario", fieldsEdit, null, null, true, handleEditRole);
   }
 
   const handleStatusChange = async (roleId, status) => {
@@ -115,7 +115,7 @@ export function RolePage() {
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
           <div className="column is-fullwidth">
-            <Button text="Crear rol +" color="success" col="fullwidth" action={() => openModal("Nuevo rol", fieldsNew, null, null, handleCreateRole)} />
+            <Button text="Crear rol +" color="success" col="fullwidth" action={() => openModal("Nuevo rol", fieldsNew, null, null, true, handleCreateRole)} />
           </div>
           <div className="column is-10">
             <Input holder="Buscar rol" icon="magnifying-glass" />
@@ -139,6 +139,7 @@ export function RolePage() {
           fields={modalConfig.fields}
           dataSelect={modalConfig.dataSelect}
           nameSelect={modalConfig.nameSelect}
+          buttonSubmit={modalConfig.buttonSubmit}
           onClose={closeModal}
           submit={modalConfig.submit}
         />
