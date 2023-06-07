@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Role(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     created_at = models.DateField(auto_now_add=True)
     status = models.BooleanField(default=True)
 
@@ -20,8 +20,8 @@ class DetallePermiso(models.Model):
     permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
 
 class User(models.Model):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
-    username = models.CharField(max_length=50)
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, to_field='name')
+    username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=254)
     password = models.CharField(max_length=50)
     document = models.CharField(max_length=10, null=True)
@@ -61,7 +61,7 @@ class Content(models.Model):
         return self.name
 
 class Order(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE, to_field='username')
     create_at = models.DateField(auto_now_add=True)
     update_at = models.DateField(auto_now=True)
     total = models.FloatField()

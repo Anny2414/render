@@ -7,7 +7,7 @@ export const Select = (props) => {
     <div className="select" style={{ minWidth: "100%" }}>
       <select style={{ minWidth: "100%" }} defaultValue={defaultValue} {...action}>
         {fields.map((field, index) => (
-          <option value={field.id} key={index}>
+          <option value={field.name} key={index}>
             {field[name]}
           </option>
         ))}
