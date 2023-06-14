@@ -14,6 +14,7 @@ import {
   deleteUser,
   getUser,
   editUser,
+  updateUserStatus,
 } from "../api/clients.api.js";
 import { getRoles } from "../api/roles.api";
 
@@ -29,10 +30,18 @@ export function ClientPage() {
     fields: [],
   });
 
-  const openModal = (title, fields, dataSelect, submit) => {
-    setModalConfig({ title, fields, dataSelect, submit });
+  const openModal = (title, fields, dataSelect, buttonSubmit,submit) => {
+    setModalConfig({ title, fields, dataSelect,buttonSubmit, submit });
     setIsOpen(true);
   };
+  const handleStatusChange = async (userId, status) => {
+    try {
+      await updateUserStatus(userId, !status);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 
   const closeModal = () => {
     setIsOpen(false);
@@ -41,31 +50,31 @@ export function ClientPage() {
   // Objeto para los campos de la ventana modal
   const fieldsNew = [
     {
-      title: "Usuario",
+      title: "Nombre",
       type: "text",
-      name: "username",
+      name: "Name",
       icon: "user",
       col: "half",
       required: "true",
     },
     {
-      title: "Email",
+      title: "Apellido",
       type: "text",
-      name: "email",
-      icon: "envelope",
+      name: "Lastname",
+      icon: "user",
       col: "half",
       required: "true",
     },
     {
-      title: "Contraseña",
-      type: "password",
-      name: "password",
-      icon: "key",
+      title: "Dirección",
+      type: "text",
+      name: "Adress",
+      icon: "location-dot",
       col: "half",
       value: "yourburger123",
       readonly: "true",
     },
-    { title: "Rol", type: "select", name: "role", col: "half" },
+    { title: "Rol", type: "Text", name: "role", col: "half" , value: "Cliente", readonly: "true" },
   ];
 
   // Conexion a API y obtiene datos de Users y Roles
@@ -114,9 +123,10 @@ export function ClientPage() {
       },
       {
         title: "Rol",
-        type: "number",
+        type: "select",
         name: "role",
-        col: "half",
+        col: "full",
+        icon: "lock-open",
         value: user.role,
       },
     ];
@@ -161,12 +171,13 @@ export function ClientPage() {
           </div>
         </div>
         <Table
-          headers={["id",  "username", "email", "date"]}
-          columns={["ID", "Usuario", "Correo", "Creado en"]}
+          headers={[ "document", "name", "lastname", "address","phone"]}
+          columns={["Documento", "Nombre", "Apellido", "Direccion","Telefono"]}
           data={users}
           status
           edit
           delete
+          onStatusClick={handleStatusChange}
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
         />
@@ -177,9 +188,11 @@ export function ClientPage() {
           fields={modalConfig.fields}
           dataSelect={modalConfig.dataSelect}
           onClose={closeModal}
+          buttonSubmit={modalConfig.buttonSubmit}
           submit={modalConfig.submit}
         />
       )}
+      
     </div>
   );
 }
