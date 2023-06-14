@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .serializer import UserSerializer, RoleSerializer , OrderSerializar, ProductSerializar, ClientSerializar, PermissionSerializer
-from .models import User, Role, Order, Products, Permission
+from .serializer import UserSerializer, RoleSerializer , OrderSerializar, ProductSerializar, ClientSerializar, PermissionSerializer, SuppliesSerializar
+from .models import User, Role, Order, Products, Permission, Supplies
 
 # Create your views here.
 class UserView(viewsets.ModelViewSet):
@@ -27,3 +27,8 @@ class ProductView(viewsets.ModelViewSet):
 class ClientView(viewsets.ModelViewSet):
     serializer_class = ClientSerializar
     queryset = User.objects.filter(role__name="Cliente")
+    
+
+class SupplesView(viewsets.ModelViewSet):
+    serializer_class = SuppliesSerializar
+    queryset = Supplies.objects.all()

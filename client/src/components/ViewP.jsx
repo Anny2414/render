@@ -13,8 +13,8 @@ export function ViewP(props) {
     <div className="product-grid">
       {data.map((product) => (
         <div className="card card-pedido p-5" key={product.id}>
-          <div class="is-flex is-justify-content-center">
-            <div class=" mx-2">
+          <div className="is-flex is-justify-content-center">
+            <div className=" mx-2">
               <Button
                 color="warning"
                 type="button"
@@ -48,7 +48,7 @@ export function ViewP(props) {
           <br />
           <br />
           {/* <Link to="/"> */}
-          <img src={Logo} width="150" />
+          <img className="image-product" src={product.image != null ? product.image : Logo } width="150" />
           {/* </Link> */}
           <b>
             <p>{product.name}</p>
@@ -62,13 +62,13 @@ export function ViewP(props) {
             defaultValue="1"
             min="0"
           />
-          <div class="is-flex is-justify-content-center">
-            <div class="is-justify-content-flex-start mt-3 mr-2">
+          <div className="is-flex is-justify-content-center">
+            <div className="is-justify-content-flex-start mt-3 mr-2">
               <Button
                 color="warning"
                 type="button"
                 text={
-                  <span class="icon">
+                  <span className="icon">
                     Ver mas
                   </span>
                 }

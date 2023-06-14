@@ -36,7 +36,7 @@ class User(models.Model):
         return self.username
 
 class Supplies(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     price = models.FloatField()
     status = models.BooleanField(default=True)
 
@@ -44,8 +44,9 @@ class Supplies(models.Model):
         return self.name
 
 class Products(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50,unique=True)
     price = models.FloatField()
+    image = models.ImageField(upload_to='media/', default= "")
     description = models.TextField()
     status = models.BooleanField(default=True)
 
@@ -54,8 +55,8 @@ class Products(models.Model):
         return self.name
 
 class Content(models.Model):
-    name = models.CharField(max_length=50)
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    supplies = models.ForeignKey(Supplies ,on_delete=models.CASCADE, to_field='name')
+    product = models.ForeignKey(Products, on_delete=models.CASCADE, to_field='name')
     status = models.BooleanField(default=True)
     def __str__(self):
         return self.name
@@ -73,9 +74,18 @@ class Order(models.Model):
 
 class Detail(models.Model):
     order = models.ForeignKey(Order,on_delete=models.CASCADE)
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE, to_field='name')
     amount = models.IntegerField()
     price = models.FloatField()
 
     def __str__(self) -> str:
         return f"Detail #{self.id}"
+    
+    
+class ContentOrder(models.Model):
+    supplies = models.ForeignKey(Supplies,on_delete=models.CASCADE, to_field='name')
+    order = models.ForeignKey(Detail,on_delete=models.CASCADE)
+    
+
+    def __str__(self):
+        return "content of order" + self.order

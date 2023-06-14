@@ -26,7 +26,7 @@ export function ProductsPage() {
     setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
     setIsOpen(true);
   };
-  
+
   const closeModal = () => {
     setIsOpen(false);
   };
@@ -47,6 +47,15 @@ export function ProductsPage() {
       icon: "dollar",
       col: "half",
       required: "true",
+    },
+    {
+      title: "Imagen",
+      type: "file",
+      name: "image",
+      icon: "dollar",
+      col: "half",
+      require: true,
+      multiple: false,
     },
     {
       title: "Descripción",
@@ -73,13 +82,23 @@ export function ProductsPage() {
 
   const handleCreateProduct = async (data) => {
     try {
-      await createProduct(data);
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("price", data.price);
+      formData.append("description", data.description);
+
+      // Agrega cada archivo individualmente
+      for (let i = 0; i < data.image.length; i++) {
+        formData.append("image", data.image[i]);
+      }
+
+      await createProduct(formData);
       window.location.reload();
     } catch (error) {
       console.error("Error al crear el Producto:", error);
     }
   };
-  
+
 
   const handleEditClick = async (productId) => {
     const res = await getProduct(productId);
@@ -106,6 +125,15 @@ export function ProductsPage() {
         value: product.price,
       },
       {
+        title: "Imagen",
+        type: "file",
+        name: "image",
+        icon: "image",
+        col: "half",
+        // value: product.image,   // Valor actual de la imagen del producto
+        multiple: false,
+      },
+      {
         title: "Descripción",
         type: "text",
         name: "description",
@@ -117,17 +145,32 @@ export function ProductsPage() {
 
 
     ];
-    
+
+
     const handleEditProduct = async (data) => {
+      const { name, price, description, image } = data;
+
       try {
-        await editProduct(productId, data);
-        window.location.reload();
+        const updateData = new FormData();
+        updateData.append("name", data.name);
+        updateData.append("price", data.price);
+        updateData.append("description", data.description);
+
+        if (image && image[0]) {
+          // Si se seleccionó una nueva imagen, obtenerla del formulario
+          for (let i = 0; i < image.length; i++) {
+            updateData.append("image", data.image[i]);
+          }
+        }
+
+        editProduct(productId,updateData)
+
       } catch (error) {
         console.error("Error al editar el Producto:", error);
       }
     };
-    
-    openModal("Editar producto", fieldsEdit, products ,"status", true, handleEditProduct);
+
+    openModal("Editar producto", fieldsEdit, products, "status", true, handleEditProduct);
   };
   const handleViewDetailsClicks = async (productId) => {
     const res = await getProduct(productId);
@@ -142,7 +185,7 @@ export function ProductsPage() {
         icon: "burger",
         col: "half",
         readonly: "true",
-        value: product.name,   
+        value: product.name,
       },
       {
         title: "Precio",
@@ -165,8 +208,8 @@ export function ProductsPage() {
 
 
     ];
-    
-    openModal("Ver producto", fieldsview,products ,"status", false);
+
+    openModal("Ver producto", fieldsview, products, "status", false);
   };
 
   const handleStatusChange = async (productId, status) => {
@@ -177,7 +220,7 @@ export function ProductsPage() {
     }
   };
 
-  const handleDeleteClick = async(productId) => {
+  const handleDeleteClick = async (productId) => {
     await deleteProduct(productId);
     window.location.reload();
   };
@@ -189,7 +232,7 @@ export function ProductsPage() {
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
           <div className="column is-fullwidth">
-          <Button
+            <Button
               text="Crear Producto +"
               color="success"
               col="fullwidth"
@@ -221,7 +264,7 @@ export function ProductsPage() {
           data={products} />
 
       </div>
-      
+
       {isOpen && (
         <Modal
           title={modalConfig.title}
@@ -229,7 +272,7 @@ export function ProductsPage() {
           dataSelect={modalConfig.dataSelect}
           nameSelect={modalConfig.nameSelect}
           onClose={closeModal}
-          buttonSubmit = {modalConfig.buttonSubmit}
+          buttonSubmit={modalConfig.buttonSubmit}
           submit={modalConfig.submit}
         />
       )}

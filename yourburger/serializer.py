@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Role, Order, Products, Permission
+from .models import User, Role, Order, Products, Permission, Supplies, Detail , ContentOrder, Content
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,4 +30,24 @@ class ProductSerializar(serializers.ModelSerializer):
 class ClientSerializar(serializers.ModelSerializer):
     class Meta:
         model = User
+        fields ='__all__'
+        
+class SuppliesSerializar(serializers.ModelSerializer):
+    class Meta:
+        model = Supplies
+        fields ='__all__'
+        
+class DetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Detail
+        fields ='__all__'
+        
+class ContetOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContentOrder
+        fields ='__all__'
+        
+class ContentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Content
         fields ='__all__'

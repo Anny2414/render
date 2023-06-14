@@ -7,8 +7,8 @@ import { Button } from "./Form/Button";
 import { Select } from "./Form/Select";
 import { Switch } from "./Form/Switch";
 
-export function Modal (props) {
-  const {title, fields, onClose, dataSelect, nameSelect, buttonSubmit, submit} = props
+export function Modal(props) {
+  const { title, fields, onClose, dataSelect, nameSelect, buttonSubmit, submit } = props
 
   const {
     register,
@@ -18,7 +18,7 @@ export function Modal (props) {
 
   return (
     <div className="modal is-active">
-      <form onSubmit={handleSubmit(submit)}>
+      <form onSubmit={handleSubmit(submit)} enctype="multipart/form-data">
         <div className="modal-background"></div>
         <div className="modal-card">
           <header className="modal-card-head">
@@ -37,7 +37,7 @@ export function Modal (props) {
                 {fields.map((field, index) => (
                   <div className={`column is-${field.col}`} key={index}>
                     <div className="field is-vertical">
-                      <div className="field-label" style={{marginRight: 0}}>
+                      <div className="field-label" style={{ marginRight: 0 }}>
                         <label className="label has-text-centered">
                           {field.title}
                         </label>
@@ -61,9 +61,26 @@ export function Modal (props) {
                             ) : field.type === "checkbox" ? (
                               <div className="field is-grouped is-grouped-centered">
                                 <div className="control">
-                                  <Switch checked={field.checked} action={{...register(field.title)}} />
+                                  <Switch checked={field.checked} action={{ ...register(field.title) }} />
                                 </div>
                               </div>
+                            ) : field.type === "file" ? (
+                              <Input
+                                type={field.type}
+                                name={field.name}
+                                value={field.value}
+                                action={{
+                                  ...register(field.name, {
+                                    required: field.required,
+                                  }),
+                                  onChange: (e) => {
+                                    // Actualiza el valor del campo de imagen
+                                    field.value = e.target.files[0];
+                                  },
+                                }}
+                                error={errors[field.name]}
+                              />
+
                             ) : (
                               <Select
                                 action={{ ...register(field.name) }}
