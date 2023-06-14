@@ -1,9 +1,14 @@
 from rest_framework import serializers
-from .models import User, Role, Order, Products, Permission
+from .models import User, Role, Order, Products, Permission, DetallePermiso
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
+        fields = '__all__'
+
+class DetailPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DetallePermiso
         fields = '__all__'
 
 class PermissionSerializer(serializers.ModelSerializer):
