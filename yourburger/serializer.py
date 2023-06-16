@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Role, Order, Products, Permission, DetallePermiso
+from .models import User, Role, Order, Products, Permission, DetallePermiso, Supplies, Detail,Content,ContentOrder
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
