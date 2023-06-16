@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .serializer import UserSerializer, RoleSerializer , OrderSerializar, ProductSerializar, ClientSerializar, PermissionSerializer, DetailPermissionSerializer
-from .models import User, Role, Order, Products, Permission,DetallePermiso
+from .serializer import UserSerializer, RoleSerializer , OrderSerializar, ProductSerializar, ClientSerializar, PermissionSerializer, DetailPermissionSerializer, SuppliesSerializar
+from .models import User, Role, Order, Products, Permission,DetallePermiso, Supplies
 
 # Create your views here.
 class UserView(viewsets.ModelViewSet):
