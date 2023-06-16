@@ -7,6 +7,8 @@ import "../../assets/js/fontawesome.js";
 import { Button } from "../Form/Button.jsx";
 import { Switch } from "../Form/Switch";
 
+import { getPermissions } from "../../api/permissions.api";
+
 function TableRow({ row, headers, status, edit, showDelete, onStatusClick, onEditClick, onDeleteClick }) {
   const [statusSlider, setStatus] = useState(row.status);
 
@@ -18,7 +20,13 @@ function TableRow({ row, headers, status, edit, showDelete, onStatusClick, onEdi
   return (
     <tr key={row.id}>
       {headers.map((header) => (
-        <td key={header}>{row[header]}</td>
+        <td key={header}>
+        {header === "permissions" ? (
+          <span>Permisos aqui</span>
+        ) : (
+          row[header]
+        )}
+      </td>
       ))}
       {status && (
         <td>

@@ -4,19 +4,22 @@ from django.db import models
 class Role(models.Model):
     name = models.CharField(max_length=50, unique=True)
     created_at = models.DateField(auto_now_add=True)
+    permissions = models.ManyToManyField('Permission', through='DetallePermiso')
+
     status = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.name
+        module_names = self.permissions.values_list('module_name', flat=True)
+        return f"{self.name} - Access to: {', '.join(module_names)}"
 
 class Permission(models.Model):
     module_name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
-        return self.name
+        return self.module_name
 
 class DetallePermiso(models.Model):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, to_field='name')
     permission = models.ForeignKey(Permission, on_delete=models.CASCADE, to_field='module_name')
 
 class User(models.Model):

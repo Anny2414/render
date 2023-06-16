@@ -32,9 +32,9 @@ export function UsersPage() {
   const [modalConfig, setModalConfig] = useState();
 
   const reloadDataTable = async () => {
-    await setUsers([])
+    setUsers([])
     const res = await getUsers();
-    await setUsers(res.data)
+    setUsers(res.data)
   }
 
   const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
@@ -140,7 +140,8 @@ export function UsersPage() {
     const handleEditUser = async (data) => {
       try {
         await editUser(userId, data);
-        window.location.reload();
+        reloadDataTable()
+        closeModal()
       } catch (error) {
         console.error("Error al editar el usuario:", error);
       }
