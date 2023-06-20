@@ -107,7 +107,7 @@ export function UsersPage() {
     {
       title: "Telefono",
       type: "text",
-      name: "username",
+      name: "phone",
       icon: "phone",
       col: "half",
       required: "true",
@@ -115,7 +115,7 @@ export function UsersPage() {
     {
       title: "Direccion",
       type: "text",
-      name: "username",
+      name: "address",
       icon: "location-dot",
       col: "full",
       required: "true",
