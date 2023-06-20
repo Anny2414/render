@@ -80,6 +80,46 @@ export function UsersPage() {
       icon: "lock-open",
       col: "half",
     },
+    {
+      title: "Documento",
+      type: "number",
+      name: "document",
+      icon: "id-card",
+      col: "half",
+      required: "true",
+    },
+    {
+      title: "Nombre",
+      type: "text",
+      name: "username",
+      icon: "signature",
+      col: "half",
+      required: "true",
+    },
+    {
+      title: "Apellido",
+      type: "text",
+      name: "lastname",
+      icon: "signature",
+      col: "half",
+      required: "true",
+    },
+    {
+      title: "Telefono",
+      type: "text",
+      name: "username",
+      icon: "phone",
+      col: "half",
+      required: "true",
+    },
+    {
+      title: "Direccion",
+      type: "text",
+      name: "username",
+      icon: "location-dot",
+      col: "full",
+      required: "true",
+    },
   ];
 
   // Conexion a API y obtiene datos de Users y Roles
