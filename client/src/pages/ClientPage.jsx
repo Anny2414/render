@@ -25,13 +25,16 @@ export function ClientPage() {
 
   //
   const [isOpen, setIsOpen] = useState(false);
-  const [modalConfig, setModalConfig] = useState({
-    title: "",
-    fields: [],
-  });
+  const [modalConfig, setModalConfig] = useState();
 
-  const openModal = (title, fields, dataSelect, buttonSubmit,submit) => {
-    setModalConfig({ title, fields, dataSelect,buttonSubmit, submit });
+  const reloadDataTable = async () => {
+    setUsers([])
+    const res = await getUsers();
+    setUsers(res.data)
+  }
+
+  const openModal = (title, fields, dataSelect, buttonSubmit, submit) => {
+    setModalConfig({ title, fields, dataSelect, buttonSubmit, submit });
     setIsOpen(true);
   };
   const handleStatusChange = async (userId, status) => {
@@ -74,7 +77,7 @@ export function ClientPage() {
       value: "yourburger123",
       readonly: "true",
     },
-    { title: "Rol", type: "Text", name: "role", col: "half" , value: "Cliente", readonly: "true" },
+    { title: "Rol", type: "Text", name: "role", col: "half", value: "Cliente", readonly: "true" },
   ];
 
   // Conexion a API y obtiene datos de Users y Roles
@@ -106,7 +109,7 @@ export function ClientPage() {
       {
         title: "Nombre",
         type: "text",
-        name: "username",
+        name: "name",
         icon: "signature",
         col: "half",
         required: "true",
@@ -123,7 +126,7 @@ export function ClientPage() {
       },
       {
         title: "Documento",
-        type: "text",
+        type: "number",
         name: "document",
         icon: "id-card",
         col: "half",
@@ -133,34 +136,36 @@ export function ClientPage() {
       {
         title: "Dirección",
         type: "text",
-        name: "adress",
+        name: "address",
         icon: "location-dot",
         col: "half",
         required: "true",
         value: user.address,
       },
-    {
-      title: "Telefono",
-      type: "text",
-      name: "phone",
-      icon: "phone",
-      col: "half",
-      required: "true",
-      value: user.phone,
-      col: "full"
-    },
+      {
+        title: "Telefono",
+        type: "number",
+        name: "phone",
+        icon: "phone",
+        required: "true",
+        value: user.phone,
+        col: "full"
+      },
     ];
+
 
     const handleEditUser = async (data) => {
       try {
         await editUser(userId, data);
-        window.location.reload();
+        reloadDataTable()
+        closeModal()
       } catch (error) {
         console.error("Error al editar el usuario:", error);
       }
     };
 
-    openModal("Editar Cliente", fieldsEdit, roles, handleEditUser);
+
+    openModal("Editar cliente", fieldsEdit, null, true, handleEditUser);
   };
 
   const handleDeleteClick = (userId) => {
@@ -191,8 +196,8 @@ export function ClientPage() {
           </div>
         </div>
         <Table
-          headers={[ "document", "name", "lastname", "address","phone"]}
-          columns={["Documento", "Nombre", "Apellido", "Direccion","Telefono"]}
+          headers={["document", "name", "lastname", "address", "phone"]}
+          columns={["Documento", "Nombre", "Apellido", "Direccion", "Telefono"]}
           data={users}
           status
           edit
@@ -212,7 +217,7 @@ export function ClientPage() {
           submit={modalConfig.submit}
         />
       )}
-      
+
     </div>
   );
 }
