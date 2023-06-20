@@ -30,6 +30,7 @@ class ProductView(viewsets.ModelViewSet):
 
 class ClientView(viewsets.ModelViewSet):
     serializer_class = ClientSerializar
+    queryset = User.objects.filter(role__name="Cliente")
     
 
 class SupplesView(viewsets.ModelViewSet):

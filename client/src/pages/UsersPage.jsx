@@ -91,7 +91,7 @@ export function UsersPage() {
     {
       title: "Nombre",
       type: "text",
-      name: "username",
+      name: "name",
       icon: "signature",
       col: "half",
       required: "true",

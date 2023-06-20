@@ -104,31 +104,51 @@ export function ClientPage() {
 
     const fieldsEdit = [
       {
-        title: "Usuario",
+        title: "Nombre",
         type: "text",
         name: "username",
-        icon: "user",
+        icon: "signature",
         col: "half",
         required: "true",
-        value: user.username,
+        value: user.name,
       },
       {
-        title: "Email",
+        title: "Apellido",
         type: "text",
-        name: "email",
-        icon: "envelope",
+        name: "lastname",
+        icon: "signature",
         col: "half",
         required: "true",
-        value: user.email,
+        value: user.lastname,
       },
       {
-        title: "Rol",
-        type: "select",
-        name: "role",
-        col: "full",
-        icon: "lock-open",
-        value: user.role,
+        title: "Documento",
+        type: "text",
+        name: "document",
+        icon: "id-card",
+        col: "half",
+        required: "true",
+        value: user.document,
       },
+      {
+        title: "Dirección",
+        type: "text",
+        name: "adress",
+        icon: "location-dot",
+        col: "half",
+        required: "true",
+        value: user.address,
+      },
+    {
+      title: "Telefono",
+      type: "text",
+      name: "phone",
+      icon: "phone",
+      col: "half",
+      required: "true",
+      value: user.phone,
+      col: "full"
+    },
     ];
 
     const handleEditUser = async (data) => {
@@ -140,7 +160,7 @@ export function ClientPage() {
       }
     };
 
-    openModal("Editar usuario", fieldsEdit, roles, handleEditUser);
+    openModal("Editar Cliente", fieldsEdit, roles, handleEditUser);
   };
 
   const handleDeleteClick = (userId) => {
