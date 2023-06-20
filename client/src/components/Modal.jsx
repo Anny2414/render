@@ -45,11 +45,7 @@ export function Modal(props) {
                       <div className="field-body">
                         <div className="field">
                           <div className="control has-icons-left">
-<<<<<<< HEAD
-                            {field.type === "text" || field.type === "number" || field.type === "password" ? (
-=======
                             {field.type === "text"|| field.type === "number"  || field.type === "password" ? (
->>>>>>> 776611a975d8dfcba06512b7f17e30726e2d29a1
                               <Input
                                 type={field.type}
                                 read_only={field.readonly}
