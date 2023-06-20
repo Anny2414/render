@@ -1,7 +1,7 @@
 import React from "react";
 
 export const Switch = (props) => {
-  const { change, checked, click, action } = props;
+  const { change, checked, click, action  } = props;
 
   return (
     <label className="switch">

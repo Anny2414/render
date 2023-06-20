@@ -5,6 +5,8 @@ import { RolePage } from "./pages/RolePage";
 import { SalesPage } from "./pages/SalesPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { ClientPage } from "./pages/ClientPage";
+import { SuppliesPage } from "./pages/Supplies";
+
 
 
 
@@ -19,6 +21,8 @@ function App() {
         <Route path="/sales" element={<SalesPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/clients" element={<ClientPage />} />
+        <Route path="/supplies" element={<SuppliesPage />} />
+
       </Routes>
     </BrowserRouter>
   );
