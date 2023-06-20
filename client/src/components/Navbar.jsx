@@ -46,6 +46,10 @@ export function Navbar() {
             Productos
           </Link>
 
+          <Link to="/supplies" className="navbar-item">
+            Ingredientes
+          </Link>
+
           <Link to="/orders" className="navbar-item">
             Pedidos
           </Link>

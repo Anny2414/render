@@ -1,0 +1,20 @@
+import axios from "axios";
+
+const SuppliesApi = axios.create({
+  baseURL: "http://127.0.0.1:8000/yourburger/api/v1/Supplies/",
+});
+
+export const getSupplie = (supplieId) => SuppliesApi.get(`/${supplieId}/`);
+
+export const getSupplies = () => SuppliesApi.get("/");
+
+export const createSupplie= (supplie) => SuppliesApi.post("/", supplie);
+
+export const deleteSupplie = (supplieId) => SuppliesApi.delete(`/${supplieId}/`);
+
+export const editSupplie = (supplieId, updatedSupplie) =>
+SuppliesApi.patch(`/${supplieId}/`, updatedSupplie);
+
+export const updateSupplieStatus = (supplieId, status) => {
+  return SuppliesApi.patch(`/${supplieId}/`, { status });
+};

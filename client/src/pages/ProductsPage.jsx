@@ -42,7 +42,7 @@ export function ProductsPage() {
     },
     {
       title: "Precio",
-      type: "text",
+      type: "number",
       name: "price",
       icon: "dollar",
       col: "half",
@@ -86,6 +86,8 @@ export function ProductsPage() {
       formData.append("name", data.name);
       formData.append("price", data.price);
       formData.append("description", data.description);
+      formData.append("status", true);
+
 
       // Agrega cada archivo individualmente
       for (let i = 0; i < data.image.length; i++) {
@@ -117,7 +119,7 @@ export function ProductsPage() {
       },
       {
         title: "Precio",
-        type: "text",
+        type: "number",
         name: "price",
         icon: "dollar",
         col: "half",
@@ -130,7 +132,7 @@ export function ProductsPage() {
         name: "image",
         icon: "image",
         col: "half",
-        // value: product.image,   // Valor actual de la imagen del producto
+        //value:product.image,   // Valor actual de la imagen del producto
         multiple: false,
       },
       {
@@ -149,26 +151,50 @@ export function ProductsPage() {
 
     const handleEditProduct = async (data) => {
       const { name, price, description, image } = data;
-
+    
       try {
         const updateData = new FormData();
         updateData.append("name", data.name);
         updateData.append("price", data.price);
         updateData.append("description", data.description);
-
+      
+    
         if (image && image[0]) {
           // Si se seleccionó una nueva imagen, obtenerla del formulario
           for (let i = 0; i < image.length; i++) {
             updateData.append("image", data.image[i]);
           }
         }
-
-        editProduct(productId,updateData)
-
+    
+        const res = await editProduct(productId, updateData);
+        const updatedProduct = res.data;
+    
+        closeModal();
+    
+        // Actualizar la lista de productos sin recargar la página
+        setProducts((prevProducts) => {
+          const updatedProducts = prevProducts.map((product) => {
+            if (product.id === productId) {
+              // Actualizar los datos del producto editado
+              return {
+                ...product,
+                name: name,
+                price: price,
+                image: updatedProduct.image, // Actualizar el campo "image" con la URL de la nueva imagen
+                description: description,
+                // Actualizar otros campos si es necesario
+              };
+            }
+            return product;
+          });
+          return updatedProducts;
+        });
       } catch (error) {
         console.error("Error al editar el Producto:", error);
       }
     };
+    
+    
 
     openModal("Editar producto", fieldsEdit, products, "status", true, handleEditProduct);
   };
@@ -190,8 +216,8 @@ export function ProductsPage() {
       {
         title: "Precio",
         type: "text",
-        name: "dollar",
-        icon: "envelope",
+        name: "price",
+        icon: "dollar",
         col: "half",
         readonly: "true",
         value: product.price,
