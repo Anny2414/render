@@ -87,6 +87,7 @@ export function Modal(props) {
                                 fields={dataSelect}
                                 name={nameSelect}
                                 defaultValue={field.value}
+                                keySelect = {field.keySelect}
                               />
                             )}
                             <span className="icon is-small is-left">

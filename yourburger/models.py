@@ -40,7 +40,8 @@ class User(models.Model):
 
 class Supplies(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    price = models.FloatField()
+    price = models.FloatField(default = 0)
+    stock = models.IntegerField(default = 0)
     status = models.BooleanField(default=True)
 
     def __str__(self):
@@ -60,6 +61,7 @@ class Products(models.Model):
 class Content(models.Model):
     supplies = models.ForeignKey(Supplies ,on_delete=models.CASCADE, to_field='name')
     product = models.ForeignKey(Products, on_delete=models.CASCADE, to_field='name')
+    count = models.IntegerField(default = 0)
     status = models.BooleanField(default=True)
     def __str__(self):
         return self.name

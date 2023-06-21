@@ -77,7 +77,7 @@ export function ClientPage() {
       value: "yourburger123",
       readonly: "true",
     },
-    { title: "Rol", type: "Text", name: "role", col: "half", value: "Cliente", readonly: "true" },
+   
   ];
 
   // Conexion a API y obtiene datos de Users y Roles
@@ -168,9 +168,9 @@ export function ClientPage() {
     openModal("Editar cliente", fieldsEdit, null, true, handleEditUser);
   };
 
-  const handleDeleteClick = (userId) => {
-    deleteUser(userId);
-    window.location.reload();
+  const handleDeleteClick = async(userId) => {
+    await deleteUser(userId);
+    reloadDataTable()
   };
 
   return (

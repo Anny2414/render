@@ -68,9 +68,9 @@ export function Navbar() {
             <a className="navbar-link">Yeiner Naranjo</a>
 
             <div className="navbar-dropdown">
-              <a className="navbar-item">Cerrar sesión</a>
+              <Link to= "/home" className="navbar-item">Cerrar sesión</Link>
             </div>
-          </div>
+          </div>s
         </div>
       </div>
     </nav>

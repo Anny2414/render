@@ -131,9 +131,9 @@ export function SuppliesPage() {
     }
   };
 
-  const handleDeleteClick = (supplieId) => {
-    deleteSupplie(supplieId);
-    window.location.reload();
+  const handleDeleteClick = async(supplieId) => {
+    await deleteSupplie(supplieId);
+    reloadDataTable()
   };
 
   return (

@@ -248,7 +248,7 @@ export function ProductsPage() {
 
   const handleDeleteClick = async (productId) => {
     await deleteProduct(productId);
-    window.location.reload();
+    reloadDataTable()
   };
 
 

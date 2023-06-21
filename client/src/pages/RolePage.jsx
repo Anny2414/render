@@ -131,9 +131,9 @@ export function RolePage() {
     }
   };
 
-  const handleDeleteClick = (roleId) => {
-    deleteRole(roleId);
-    window.location.reload();
+  const handleDeleteClick = async(roleId) => {
+    await deleteRole(roleId);
+    reloadDataTable()
   };
 
   return (

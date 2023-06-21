@@ -17,8 +17,14 @@ export function SalesPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
 
-  const openModal = (title, fields, dataSelect, nameSelect, submit) => {
-    setModalConfig({ title, fields, dataSelect, nameSelect, submit });
+  const reloadDataTable = async () => {
+    setUsers([])
+    const res = await getUsers();
+    setUsers(res.data)
+  }
+
+  const openModal = (title, fields, dataSelect, nameSelect,buttonSubmit, submit) => {
+    setModalConfig({ title, fields, dataSelect, nameSelect,buttonSubmit, submit });
     setIsOpen(true);
   };
 
@@ -40,7 +46,8 @@ export function SalesPage() {
       type: "select", 
       name: "user", 
       icon: "user", 
-      col: "half" 
+      col: "half",
+      keySelect: "username"
     },
   ];
 
@@ -77,9 +84,27 @@ export function SalesPage() {
         icon: "dollar",
         col: "half",
         required: "true",
-        value: order.total
+        value: order.total,
+        
       },
-      { title: "Usuario", type: "select", name: "user", icon: "user",value : order.user },
+      { 
+        title: "Usuario",
+        type: "select", 
+        name: "user", 
+        icon: "user",
+        col:"half",
+        keySelect: "username",
+        value : order.user, },
+      {
+        title: "Usuario",
+        type: "text", 
+        name: "user", 
+        icon: "user",
+        col:"half",
+        keySelect: "username",
+        value : order.user, 
+      },
+      
     ];
 
     const handleEditUser = async (data) => {
@@ -91,12 +116,12 @@ export function SalesPage() {
       }
     };
 
-    openModal("Editar venta", fieldsEdit, users,'username' ,  handleEditUser);
+    openModal("Editar venta", fieldsEdit, users,'username' ,true,  handleEditUser);
   };
 
-  const handleDeleteClick = (userId) => {
-    deleteOrder(userId);
-    window.location.reload();
+  const handleDeleteClick = async(userId) => {
+    await deleteOrder(userId);
+    reloadDataTable()
   };
 
 
@@ -112,7 +137,7 @@ export function SalesPage() {
               color="success"
               col="fullwidth"
               action={() =>
-                openModal("Nueva venta", fieldsNew, users, 'username', handleCreateOrder)
+                openModal("Nueva venta", fieldsNew, users, 'username', true, handleCreateOrder)
               }
               
             />
@@ -146,6 +171,7 @@ export function SalesPage() {
           fields={modalConfig.fields}
           dataSelect={modalConfig.dataSelect}
           nameSelect={modalConfig.nameSelect}
+          buttonSubmit={modalConfig.buttonSubmit}
           onClose={closeModal}
           submit={modalConfig.submit}
         />

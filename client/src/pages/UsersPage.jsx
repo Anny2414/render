@@ -79,6 +79,7 @@ export function UsersPage() {
       name: "role",
       icon: "lock-open",
       col: "half",
+      keySelect: "name"
     },
     {
       title: "Documento",
@@ -198,9 +199,9 @@ export function UsersPage() {
     }
   };
 
-  const handleDeleteClick = (userId) => {
-    deleteUser(userId);
-    window.location.reload();
+  const handleDeleteClick = async(userId) => {
+    await deleteUser(userId);
+    reloadDataTable()
   };
 
   return (
