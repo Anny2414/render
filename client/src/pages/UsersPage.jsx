@@ -211,7 +211,7 @@ export function UsersPage() {
         <div className="columns is-centered">
           <div className="column is-fullwidth">
             <Button
-              text="Crear usuario +"
+              text="Crear Usuario +"
               color="success"
               col="fullwidth"
               action={() =>

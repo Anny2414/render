@@ -5,7 +5,8 @@ from .models import User, Role, Order, Products, Permission,DetallePermiso, Supp
 # Create your views here.
 class UserView(viewsets.ModelViewSet):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset = User.objects.exclude(role__name = "Cliente")
+
 
 class PermissionView(viewsets.ModelViewSet):
     serializer_class = PermissionSerializer
@@ -31,7 +32,6 @@ class ProductView(viewsets.ModelViewSet):
 class ClientView(viewsets.ModelViewSet):
     serializer_class = ClientSerializar
     queryset = User.objects.filter(role__name="Cliente")
-    
 
 class SupplesView(viewsets.ModelViewSet):
     serializer_class = SuppliesSerializar

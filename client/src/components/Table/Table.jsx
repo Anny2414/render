@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../../assets/css/Switch.css";
 import "../../assets/css/ResponsiveTable.css";
 import "../../assets/js/fontawesome.js";
@@ -11,18 +11,28 @@ import { getPermissions } from "../../api/permissions.api";
 
 function TableRow({ row, headers, status, edit, showDelete, onStatusClick, onEditClick, onDeleteClick }) {
   const [statusSlider, setStatus] = useState(row.status);
+  const [permisos, setPermisos] = useState(null);
 
-  const handleSwitchChange = () => {
+  const mostrarPermisos = async (id) => {
+    const permisos = await getPermissions(id);
+    setPermisos(permisos);
+  };
+
+  const handleSwitchChange = async () => {
     onStatusClick(row.id, statusSlider);
     setStatus(!statusSlider);
   };
+
+  useEffect(() => {
+    mostrarPermisos(row.id);
+  }, [row.id]);
 
   return (
     <tr key={row.id}>
       {headers.map((header) => (
         <td key={header}>
         {header === "permissions" ? (
-          <span>Permisos aqui</span>
+          <span>{permisos}</span>
         ) : (
           row[header]
         )}

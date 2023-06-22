@@ -142,7 +142,7 @@ export function RolePage() {
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
           <div className="column is-fullwidth">
-            <Button text="Crear rol +" color="success" col="fullwidth" action={() => openModal("Nuevo rol", fieldsNew, null, null, true, handleCreateRole)} />
+            <Button text="Crear Rol +" color="success" col="fullwidth" action={() => openModal("Nuevo rol", fieldsNew, null, null, true, handleCreateRole)} />
           </div>
           <div className="column is-10">
             <Input holder="Buscar rol" icon="magnifying-glass" />
