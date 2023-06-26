@@ -23,8 +23,8 @@ function TableRow({
   const [statusSlider, setStatus] = useState(row.status);
   const [permisos, setPermisos] = useState([]);
 
-  const mostrarPermisos = async (name) => {
-    const permisos = await getPermissions(name);
+  const mostrarPermisos = async (id) => {
+    const permisos = await getPermissions(id);
     setPermisos(permisos);
   };
 
@@ -34,8 +34,8 @@ function TableRow({
   };
 
   useEffect(() => {
-    mostrarPermisos(row.name);
-  }, [row.name]);
+    mostrarPermisos(row.id);
+  }, [row.id]);
 
   return (
     <tr key={row.id}>
