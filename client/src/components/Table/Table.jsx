@@ -9,7 +9,17 @@ import { Switch } from "../Form/Switch";
 
 import { getPermissions } from "../../api/permissions.api";
 
-function TableRow({ row, headers, status, edit, showDelete, onStatusClick, onEditClick, onDeleteClick }) {
+function TableRow({
+  row,
+  headers,
+  status,
+  edit,
+  showDelete,
+  onStatusClick,
+  onEditClick,
+  onDeleteClick,
+  count,
+}) {
   const [statusSlider, setStatus] = useState(row.status);
   const [permisos, setPermisos] = useState(null);
 
@@ -31,12 +41,14 @@ function TableRow({ row, headers, status, edit, showDelete, onStatusClick, onEdi
     <tr key={row.id}>
       {headers.map((header) => (
         <td key={header}>
-        {header === "permissions" ? (
-          <span>{permisos}</span>
-        ) : (
-          row[header]
-        )}
-      </td>
+          {header === "#" ? (
+            <span>{count}</span>
+          ) : header === "permissions" ? (
+            <span>{permisos}</span>
+          ) : (
+            row[header]
+          )}
+        </td>
       ))}
       {status && (
         <td>
@@ -88,6 +100,8 @@ export function Table(props) {
     onDeleteClick,
   } = props;
 
+  const [count] = useState(1);
+
   return (
     <div style={{ overflowX: "auto" }}>
       <table className="table is-fullwidth">
@@ -102,7 +116,7 @@ export function Table(props) {
           </tr>
         </thead>
         <tbody>
-          {data.map((row) => (
+          {data.map((row, index) => (
             <TableRow
               key={row.id}
               row={row}
@@ -113,6 +127,7 @@ export function Table(props) {
               onStatusClick={onStatusClick}
               onEditClick={onEditClick}
               onDeleteClick={onDeleteClick}
+              count={count + index}
             />
           ))}
         </tbody>

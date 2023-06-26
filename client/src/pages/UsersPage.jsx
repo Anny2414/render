@@ -32,13 +32,27 @@ export function UsersPage() {
   const [modalConfig, setModalConfig] = useState();
 
   const reloadDataTable = async () => {
-    setUsers([])
+    setUsers([]);
     const res = await getUsers();
-    setUsers(res.data)
-  }
+    setUsers(res.data);
+  };
 
-  const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
-    setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
+  const openModal = (
+    title,
+    fields,
+    dataSelect,
+    nameSelect,
+    buttonSubmit,
+    submit
+  ) => {
+    setModalConfig({
+      title,
+      fields,
+      dataSelect,
+      nameSelect,
+      buttonSubmit,
+      submit,
+    });
     setIsOpen(true);
   };
 
@@ -79,7 +93,7 @@ export function UsersPage() {
       name: "role",
       icon: "lock-open",
       col: "half",
-      keySelect: "name"
+      keySelect: "name",
     },
     {
       title: "Documento",
@@ -138,8 +152,8 @@ export function UsersPage() {
   const handleCreateUser = async (data) => {
     try {
       await createUser(data);
-      reloadDataTable()
-      closeModal()
+      reloadDataTable();
+      closeModal();
     } catch (error) {
       console.error("Error al crear el usuario:", error);
     }
@@ -181,14 +195,21 @@ export function UsersPage() {
     const handleEditUser = async (data) => {
       try {
         await editUser(userId, data);
-        reloadDataTable()
-        closeModal()
+        reloadDataTable();
+        closeModal();
       } catch (error) {
         console.error("Error al editar el usuario:", error);
       }
     };
 
-    openModal("Editar usuario", fieldsEdit, roles, "name", true, handleEditUser);
+    openModal(
+      "Editar usuario",
+      fieldsEdit,
+      roles,
+      "name",
+      true,
+      handleEditUser
+    );
   };
 
   const handleStatusChange = async (userId, status) => {
@@ -199,9 +220,9 @@ export function UsersPage() {
     }
   };
 
-  const handleDeleteClick = async(userId) => {
+  const handleDeleteClick = async (userId) => {
     await deleteUser(userId);
-    reloadDataTable()
+    reloadDataTable();
   };
 
   return (
@@ -234,8 +255,24 @@ export function UsersPage() {
           </div>
         </div>
         <Table
-          headers={["id", "role", "username", "email", "date"]}
-          columns={["ID", "Rol", "Usuario", "Correo", "Creado en"]}
+          headers={[
+            "#",
+            "role",
+            "username",
+            "email",
+            "phone",
+            "address",
+            "date",
+          ]}
+          columns={[
+            "#",
+            "Rol",
+            "Usuario",
+            "Correo",
+            "Telefono",
+            "Direccion",
+            "Creado en",
+          ]}
           data={users}
           status
           edit

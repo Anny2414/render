@@ -9,7 +9,14 @@ import { Modal } from "../components/Modal.jsx";
 
 // CONEXION CON LA API DE ROLES
 import { savePermissions, getPermissions } from "../api/permissions.api";
-import { getRoles, createRole, deleteRole, getRole, editRole, updateRoleStatus } from "../api/roles.api";
+import {
+  getRoles,
+  createRole,
+  deleteRole,
+  getRole,
+  editRole,
+  updateRoleStatus,
+} from "../api/roles.api";
 
 export function RolePage() {
   const [roles, setRoles] = useState([]);
@@ -18,8 +25,22 @@ export function RolePage() {
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
 
-  const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
-    setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
+  const openModal = (
+    title,
+    fields,
+    dataSelect,
+    nameSelect,
+    buttonSubmit,
+    submit
+  ) => {
+    setModalConfig({
+      title,
+      fields,
+      dataSelect,
+      nameSelect,
+      buttonSubmit,
+      submit,
+    });
     setIsOpen(true);
   };
 
@@ -28,10 +49,10 @@ export function RolePage() {
   };
 
   const reloadDataTable = async () => {
-    setRoles([])
+    setRoles([]);
     const res = await getRoles();
-    setRoles(res.data)
-  }
+    setRoles(res.data);
+  };
 
   const fieldsNew = [
     {
@@ -61,7 +82,7 @@ export function RolePage() {
   }, []);
 
   const handleCreateRole = async (data) => {
-    const { name } = data
+    const { name } = data;
 
     try {
       await createRole({ name: name });
@@ -71,22 +92,25 @@ export function RolePage() {
 
     try {
       const selectedModules = Object.entries(data) // Convertir los permisos en un arreglo de [módulo, valor booleano]
-        .filter(([module, value]) => value && module !== 'name') // Filtrar los permisos que tienen valor true
+        .filter(([module, value]) => value && module !== "name") // Filtrar los permisos que tienen valor true
         .map(([module]) => module); // Obtener solo los nombres de los módulos
 
       for (const module of selectedModules) {
         try {
-          await savePermissions(name, module)
+          await savePermissions(name, module);
         } catch (error) {
-          console.error(`Error al crear permiso para el modulo ${module} y el rol ${name}: `, error)
+          console.error(
+            `Error al crear permiso para el modulo ${module} y el rol ${name}: `,
+            error
+          );
         }
       }
     } catch (error) {
       console.error("Error al guardar los permisos:", error);
     }
 
-    reloadDataTable()
-    closeModal()
+    reloadDataTable();
+    closeModal();
   };
 
   const handleEditClick = async (roleId) => {
@@ -121,7 +145,7 @@ export function RolePage() {
     };
 
     openModal("Editar usuario", fieldsEdit, null, null, true, handleEditRole);
-  }
+  };
 
   const handleStatusChange = async (roleId, status) => {
     try {
@@ -131,9 +155,9 @@ export function RolePage() {
     }
   };
 
-  const handleDeleteClick = async(roleId) => {
+  const handleDeleteClick = async (roleId) => {
     await deleteRole(roleId);
-    reloadDataTable()
+    reloadDataTable();
   };
 
   return (
@@ -142,15 +166,29 @@ export function RolePage() {
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
           <div className="column is-fullwidth">
-            <Button text="Crear Rol +" color="success" col="fullwidth" action={() => openModal("Nuevo rol", fieldsNew, null, null, true, handleCreateRole)} />
+            <Button
+              text="Crear Rol +"
+              color="success"
+              col="fullwidth"
+              action={() =>
+                openModal(
+                  "Nuevo rol",
+                  fieldsNew,
+                  null,
+                  null,
+                  true,
+                  handleCreateRole
+                )
+              }
+            />
           </div>
           <div className="column is-10">
             <Input holder="Buscar rol" icon="magnifying-glass" />
           </div>
         </div>
         <Table
-          headers={["id", "name", "created_at", "permissions"]}
-          columns={["ID", "Nombre", "Creado en", "Permisos"]}
+          headers={["#", "name", "created_at", "permissions"]}
+          columns={["#", "Nombre", "Creado en", "Permisos"]}
           data={roles}
           edit
           status
