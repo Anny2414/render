@@ -21,10 +21,10 @@ function TableRow({
   count,
 }) {
   const [statusSlider, setStatus] = useState(row.status);
-  const [permisos, setPermisos] = useState(null);
+  const [permisos, setPermisos] = useState([]);
 
-  const mostrarPermisos = async (id) => {
-    const permisos = await getPermissions(id);
+  const mostrarPermisos = async (name) => {
+    const permisos = await getPermissions(name);
     setPermisos(permisos);
   };
 
@@ -34,8 +34,8 @@ function TableRow({
   };
 
   useEffect(() => {
-    mostrarPermisos(row.id);
-  }, [row.id]);
+    mostrarPermisos(row.name);
+  }, [row.name]);
 
   return (
     <tr key={row.id}>
@@ -44,7 +44,7 @@ function TableRow({
           {header === "#" ? (
             <span>{count}</span>
           ) : header === "permissions" ? (
-            <span>{permisos}</span>
+            <span>{permisos.join(" - ")}</span>
           ) : (
             row[header]
           )}
