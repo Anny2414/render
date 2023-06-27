@@ -218,6 +218,7 @@ export function RolePage() {
 
   const handleDeleteClick = async (roleId) => {
     await deleteRole(roleId);
+    await deletePermissionsByRole(roleId);
     reloadDataTable();
   };
 

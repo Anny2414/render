@@ -15,7 +15,8 @@ router.register(r'clients', views.ClientView, 'clients')
 router.register(r'Supplies', views.SupplesView, 'supplies')
 
 urlpatterns = [
-    path('api/v1/', include(router.urls))
+    path('api/v1/', include(router.urls)),
+    path('api/v1/detallepermiso/delete/<int:roleId>/', views.DeletePermissionsByRole.as_view(), name='delete_permissions_by_role'),
 ]
 
 if settings.DEBUG:
