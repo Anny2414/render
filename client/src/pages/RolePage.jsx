@@ -8,7 +8,12 @@ import { Input } from "../components/Form/Input.jsx";
 import { Modal } from "../components/Modal.jsx";
 
 // CONEXION CON LA API DE ROLES
-import { savePermissions, getPermissions } from "../api/permissions.api";
+import {
+  savePermissions,
+  checkPermission,
+  deletePermissionsByRole,
+} from "../api/permissions.api";
+
 import {
   getRoles,
   createRole,
@@ -82,31 +87,26 @@ export function RolePage() {
   }, []);
 
   const handleCreateRole = async (data) => {
-    const { name } = data;
-
     try {
-      await createRole({ name: name });
-    } catch (error) {
-      console.error("Error al crear el rol:", error);
-    }
+      const res = await createRole({ name: data.name });
+      const roleId = res.data.id; // Obtener el ID del rol creado
 
-    try {
-      const selectedModules = Object.entries(data) // Convertir los permisos en un arreglo de [módulo, valor booleano]
-        .filter(([module, value]) => value && module !== "name") // Filtrar los permisos que tienen valor true
-        .map(([module]) => module); // Obtener solo los nombres de los módulos
+      const selectedModules = Object.entries(data)
+        .filter(([module, value]) => value && module !== "name")
+        .map(([module]) => module);
 
       for (const module of selectedModules) {
         try {
-          await savePermissions(name, module);
+          await savePermissions(roleId, module);
         } catch (error) {
           console.error(
-            `Error al crear permiso para el modulo ${module} y el rol ${name}: `,
+            `Error al crear permiso para el modulo ${module} y el rol ${roleId}: `,
             error
           );
         }
       }
     } catch (error) {
-      console.error("Error al guardar los permisos:", error);
+      console.error("Error al crear el rol:", error);
     }
 
     reloadDataTable();
@@ -127,21 +127,82 @@ export function RolePage() {
         value: role.name,
         disabled: "false",
       },
-      { title: "Usuarios", type: "checkbox", name: "role", col: "4" },
-      { title: "Clientes", type: "checkbox", name: "role", col: "4" },
-      { title: "Productos", type: "checkbox", name: "role", col: "4" },
-      { title: "Pedidos", type: "checkbox", name: "role", col: "4" },
-      { title: "Roles", type: "checkbox", name: "role", col: "4" },
-      { title: "Ventas", type: "checkbox", name: "role", col: "4" },
+      {
+        title: "Usuarios",
+        type: "checkbox",
+        name: "role",
+        col: "4",
+        checked: await checkPermission(role.id, "Usuarios"),
+      },
+      {
+        title: "Clientes",
+        type: "checkbox",
+        name: "role",
+        col: "4",
+        checked: await checkPermission(role.id, "Clientes"),
+      },
+      {
+        title: "Productos",
+        type: "checkbox",
+        name: "role",
+        col: "4",
+        checked: await checkPermission(role.id, "Productos"),
+      },
+      {
+        title: "Pedidos",
+        type: "checkbox",
+        name: "role",
+        col: "4",
+        checked: await checkPermission(role.id, "Pedidos"),
+      },
+      {
+        title: "Roles",
+        type: "checkbox",
+        name: "role",
+        col: "4",
+        checked: await checkPermission(role.id, "Roles"),
+      },
+      {
+        title: "Ventas",
+        type: "checkbox",
+        name: "role",
+        col: "4",
+        checked: await checkPermission(role.id, "Ventas"),
+      },
     ];
 
     const handleEditRole = async (data) => {
+      const { name } = data;
+
       try {
-        await editRole(roleId, data);
-        window.location.reload();
+        await editRole(roleId, { name: name });
       } catch (error) {
-        console.error("Error al editar el usuario:", error);
+        console.error("Error al editar el rol:", error);
       }
+
+      try {
+        await deletePermissionsByRole(roleId);
+      } catch (error) {
+        console.error("Error al eliminar los permisos del rol:", error);
+      }
+
+      const selectedModules = Object.entries(data)
+        .filter(([module, value]) => value && module !== "name")
+        .map(([module]) => module);
+
+      for (const module of selectedModules) {
+        try {
+          await savePermissions(roleId, module);
+        } catch (error) {
+          console.error(
+            `Error al crear permiso para el modulo ${module} y el rol ${roleId}: `,
+            error
+          );
+        }
+      }
+
+      reloadDataTable();
+      closeModal();
     };
 
     openModal("Editar usuario", fieldsEdit, null, null, true, handleEditRole);
@@ -157,6 +218,7 @@ export function RolePage() {
 
   const handleDeleteClick = async (roleId) => {
     await deleteRole(roleId);
+    await deletePermissionsByRole(roleId);
     reloadDataTable();
   };
 

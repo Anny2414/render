@@ -19,7 +19,7 @@ class Permission(models.Model):
         return self.module_name
 
 class DetallePermiso(models.Model):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE, to_field='name')
+    roleId = models.ForeignKey(Role, on_delete=models.CASCADE)
     permission = models.ForeignKey(Permission, on_delete=models.CASCADE, to_field='module_name')
 
 class User(models.Model):
@@ -85,12 +85,12 @@ class Detail(models.Model):
 
     def __str__(self) -> str:
         return f"Detail #{self.id}"
-    
-    
+
+
 class ContentOrder(models.Model):
     supplies = models.ForeignKey(Supplies,on_delete=models.CASCADE, to_field='name')
     order = models.ForeignKey(Detail,on_delete=models.CASCADE)
-    
+
 
     def __str__(self):
         return "content of order" + self.order

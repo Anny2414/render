@@ -1,5 +1,7 @@
+from rest_framework import viewsets, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from django.db.models import Q
-from rest_framework import viewsets
 from .serializer import UserSerializer, RoleSerializer , OrderSerializar, ProductSerializar, ClientSerializar, PermissionSerializer, DetailPermissionSerializer, SuppliesSerializar
 from .models import User, Role, Order, Products, Permission,DetallePermiso, Supplies
 
@@ -8,7 +10,6 @@ class UserView(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.exclude(role__name = "Cliente")
 
-
 class PermissionView(viewsets.ModelViewSet):
     serializer_class = PermissionSerializer
     queryset = Permission.objects.all()
@@ -16,6 +17,13 @@ class PermissionView(viewsets.ModelViewSet):
 class DetailPermissionView(viewsets.ModelViewSet):
     serializer_class = DetailPermissionSerializer
     queryset = DetallePermiso.objects.all()
+    
+class DeletePermissionsByRole(APIView):
+    def delete(self, request, roleId):
+        # Eliminar los registros que cumplan con la condición roleId=5
+        DetallePermiso.objects.filter(roleId=roleId).delete()
+        
+        return Response("Permisos eliminados exitosamente.", status=status.HTTP_204_NO_CONTENT)
 
 class RoleView(viewsets.ModelViewSet):
     serializer_class = RoleSerializer
