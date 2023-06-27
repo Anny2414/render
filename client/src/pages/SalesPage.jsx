@@ -7,7 +7,7 @@ import { Input } from "../components/Form/Input.jsx";
 
 // CONEXION CON LA API DE USERS Y ROLES
 import { getUsers } from "../api/users.api";
-import { createOrder, deleteOrder, editOrder, getOrder , getOrders } from "../api/order.api";
+import { createOrder, deleteOrder, editOrder, getOrder, getOrders } from "../api/order.api";
 import { Modal } from "../components/Modal.jsx";
 
 export function SalesPage() {
@@ -23,14 +23,15 @@ export function SalesPage() {
     setUsers(res.data)
   }
 
-  const openModal = (title, fields, dataSelect, nameSelect,buttonSubmit, submit) => {
-    setModalConfig({ title, fields, dataSelect, nameSelect,buttonSubmit, submit });
+  const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
+    setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
     setIsOpen(true);
   };
 
   const closeModal = () => {
     setIsOpen(false);
   };
+
 
   // Objeto para los campos de la ventana modal
   const fieldsNew = [
@@ -40,14 +41,15 @@ export function SalesPage() {
       name: "total",
       icon: "dollar",
       required: "true",
-    },  
-    { 
-      title: "Usuario", 
-      type: "select", 
-      name: "user", 
-      icon: "user", 
+    },
+    {
+      title: "Usuario",
+      type: "select",
+      name: "user",
+      icon: "user",
       col: "half",
-      keySelect: "username"
+      keySelect: "username",
+      data: users,
     },
   ];
 
@@ -75,7 +77,13 @@ export function SalesPage() {
   const handleEditClick = async (OrderId) => {
     const res = await getOrder(OrderId);
     const order = res.data;
-
+    const customOptions = [
+      { "id": 1,"statu": "Por pagar" },
+      { "id": 2,"statu": "Pago" },
+      { "id": 3,"statu": "Cancelado" },
+    ];
+    console.log(customOptions[0]['statu']);
+    console.log(users);
     const fieldsEdit = [
       {
         title: "Total",
@@ -85,26 +93,29 @@ export function SalesPage() {
         col: "half",
         required: "true",
         value: order.total,
-        
+
       },
-      { 
-        title: "Usuario",
-        type: "select", 
-        name: "user", 
-        icon: "user",
-        col:"half",
-        keySelect: "username",
-        value : order.user, },
       {
         title: "Usuario",
-        type: "text", 
-        name: "user", 
+        type: "select",
+        name: "user",
         icon: "user",
-        col:"half",
+        col: "half",
         keySelect: "username",
-        value : order.user, 
+        value: order.user,
       },
-      
+      {
+        title: "Estado",
+        type: "select",
+        name: "statu",
+        col: "full",
+        icon: "lock-open",
+        keySelect: "statu",
+        nameSelect: "statu",
+        value: order.statu,
+        customOptions: customOptions
+      },
+
     ];
 
     const handleEditUser = async (data) => {
@@ -116,10 +127,10 @@ export function SalesPage() {
       }
     };
 
-    openModal("Editar venta", fieldsEdit, users,'username' ,true,  handleEditUser);
+    openModal("Editar venta", fieldsEdit, users, 'username', true, handleEditUser);
   };
 
-  const handleDeleteClick = async(userId) => {
+  const handleDeleteClick = async (userId) => {
     await deleteOrder(userId);
     reloadDataTable()
   };
@@ -139,7 +150,7 @@ export function SalesPage() {
               action={() =>
                 openModal("Nueva venta", fieldsNew, users, 'username', true, handleCreateOrder)
               }
-              
+
             />
           </div>
           <div className="column is-9">
@@ -166,16 +177,16 @@ export function SalesPage() {
           data={order}
         />
         {isOpen && (
-        <Modal
-          title={modalConfig.title}
-          fields={modalConfig.fields}
-          dataSelect={modalConfig.dataSelect}
-          nameSelect={modalConfig.nameSelect}
-          buttonSubmit={modalConfig.buttonSubmit}
-          onClose={closeModal}
-          submit={modalConfig.submit}
-        />
-      )}
+          <Modal
+            title={modalConfig.title}
+            fields={modalConfig.fields}
+            dataSelect={modalConfig.dataSelect}
+            nameSelect={modalConfig.nameSelect}
+            buttonSubmit={modalConfig.buttonSubmit}
+            onClose={closeModal}
+            submit={modalConfig.submit}
+          />
+        )}
       </div>
     </div>
   );

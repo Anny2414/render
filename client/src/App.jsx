@@ -6,7 +6,8 @@ import { SalesPage } from "./pages/SalesPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { ClientPage } from "./pages/ClientPage";
 import { SuppliesPage } from "./pages/Supplies";
-import { OrderPage } from "./pages/OrderPAge";
+import { OrderPage } from "./pages/OrderOnePage";
+import { OrdersPage } from "./pages/OrdersPage";  
 
 
 
@@ -23,7 +24,8 @@ function App() {
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/clients" element={<ClientPage />} />
         <Route path="/supplies" element={<SuppliesPage />} />
-        <Route path="/orders" element={<OrderPage />} />
+        <Route path="/order" element={<OrderPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
 
       </Routes>
     </BrowserRouter>
