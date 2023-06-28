@@ -102,7 +102,19 @@ export function Table(props) {
 
   const [count] = useState(1);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const offset = (currentPage - 1) * itemsPerPage;
+  const currentData = data.slice(offset, offset + itemsPerPage);
+
+  const pageCount = Math.ceil(data.length / itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
+    <div>
     <div style={{ overflowX: "auto" }}>
       <table className="table is-fullwidth">
         <thead>
@@ -116,7 +128,7 @@ export function Table(props) {
           </tr>
         </thead>
         <tbody>
-          {data.map((row, index) => (
+          {currentData.map((row, index) => (
             <TableRow
               key={row.id}
               row={row}
@@ -132,6 +144,28 @@ export function Table(props) {
           ))}
         </tbody>
       </table>
+    </div>
+    {/* Paginador */}
+    <div className="mt-5">
+      <nav className="pagination is-centered" role="navigation" aria-label="pagination">
+        <ul className="pagination-list">
+          {Array.from({ length: pageCount }, (_, index) => {
+            const page = index + 1;
+            return (
+              <li key={page}>
+                <a
+                  className={`pagination-link${currentPage === page ? " is-current" : ""}`}
+                  aria-label={`Ir a la página ${page}`}
+                  onClick={() => handlePageChange(page)}
+                >
+                <b>{page}</b>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </div>
     </div>
   );
 }
