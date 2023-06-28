@@ -205,7 +205,7 @@ export function RolePage() {
       closeModal();
     };
 
-    openModal("Editar usuario", fieldsEdit, null, null, true, handleEditRole);
+    openModal("Editar rol", fieldsEdit, null, null, true, handleEditRole);
   };
 
   const handleStatusChange = async (roleId, status) => {
