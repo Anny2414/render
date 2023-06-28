@@ -100,7 +100,7 @@ export function Table(props) {
     onDeleteClick,
   } = props;
 
-  const [count] = useState(1);
+  const [count, setCount] = useState(1);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -139,7 +139,7 @@ export function Table(props) {
               onStatusClick={onStatusClick}
               onEditClick={onEditClick}
               onDeleteClick={onDeleteClick}
-              count={count + index}
+              count={count + index + offset}
             />
           ))}
         </tbody>
