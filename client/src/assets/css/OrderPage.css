@@ -9,7 +9,6 @@
 .none {
     display: none;
 }
-
 .card-info {
     background-color: hsl(0deg, 0%, 100%);
     border-radius: 5px;
@@ -51,7 +50,10 @@
 
 
 .h1 {
-    font-size: 40px;
+    font-size: 40px !important;
+}
+.h2 {
+    font-size: 30px !important;
 }
 
 .hr {

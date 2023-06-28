@@ -11,9 +11,12 @@ router.register(r'detallepermiso', views.DetailPermissionView, 'detallepermiso')
 router.register(r'roles', views.RoleView, 'roles')
 router.register(r'order',   views.OrderView, 'order')
 router.register(r'sales',   views.SalesView, 'sales')
+router.register(r'detail',   views.DetailView, 'detail')
+router.register(r'contentorder',   views.ContentOrderView, 'contentorder')
 router.register(r'products', views.ProductView,'products')
 router.register(r'clients', views.ClientView, 'clients')
 router.register(r'Supplies', views.SupplesView, 'supplies')
+router.register(r'content', views.ContentView, 'content')
 
 urlpatterns = [
     path('api/v1/', include(router.urls)),

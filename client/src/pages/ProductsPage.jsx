@@ -4,6 +4,8 @@ import { ViewP } from "../components/ViewP.jsx";
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
 import { Modal } from "../components/Modal.jsx";
+import Cookies from 'js-cookie';
+
 
 
 // CONEXION CON LA API DE USERS Y ROLES
@@ -16,13 +18,44 @@ import {
   updateProductStatus,
 
 } from "../api/products.api.js";
+import { getSupplies, } from "../api/supplies.api.js";
+
+// import {createContent} from "../api/"
+
+
+
 export function ProductsPage() {
   const [products, setProducts] = useState([]);
+  const [supplies, setSupplies] = useState([]);
+  const [selectedOption, setSelectedOption] = useState('');
+
+
+  useEffect(() => {
+    if (selectedOption !== '') {
+      Cookies.set('selectedOption', selectedOption);
+    }
+  }, [selectedOption]);
+
+
+
 
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
 
+  const reloadDataTable = async () => {
+    setProducts([])
+    const res = await getProducts();
+    setProducts(res.data)
+  }
   const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
+    // Agrega las supplies como opción de selección en el campo correspondiente
+    if (nameSelect === "supplies") {
+      dataSelect = supplies.map((supplie) => ({
+        value: supplie.id,
+        label: supplie.name,
+      }));
+    }
+
     setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
     setIsOpen(true);
   };
@@ -65,6 +98,17 @@ export function ProductsPage() {
       col: "half",
       required: "true",
     },
+    {
+      title: "Supplies",
+      type: "select",
+      name: "supplies",
+      icon: "list",
+      col: "full",
+      required: "false",
+      value: selectedOption,
+      onChange: (e) => setSelectedOption(e.target.value),
+    }
+
 
 
   ];
@@ -77,34 +121,63 @@ export function ProductsPage() {
       setProducts(res.data);
     }
 
+    async function fetchSupplies() {
+      const res = await getSupplies();
+      setSupplies(res.data);
+    }
+
+    const storedOption = Cookies.get('selectedOption');
+    if (storedOption) {
+      setSelectedOption(storedOption);
+    }
+
+    fetchSupplies();
     fetchData();
   }, []);
 
+  const añadirIngrediente = (data) => {
+    setSupplies((prevSupplie) => {
+      const newsupplie = [...prevSupplie, data];
+      Cookies.set("Supplies", JSON.stringify(newsupplie));
+      return console.log(newsupplie);
+    });
+  }
   const handleCreateProduct = async (data) => {
     try {
+      añadirIngrediente(data)
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("price", data.price);
       formData.append("description", data.description);
       formData.append("status", true);
 
-
       // Agrega cada archivo individualmente
       for (let i = 0; i < data.image.length; i++) {
         formData.append("image", data.image[i]);
       }
 
-      await createProduct(formData);
-      window.location.reload();
+
+      const produc = await createProduct(formData);
+      const formData1 = new FormData();
+      formData1.append("product", produc.data.id)
+      formData1.append("supplies", data.supplies)
+      formData1.append("count", 1)
+
+
+      await createContent(formData1);
+      reloadDataTable()
+      closeModal()
     } catch (error) {
       console.error("Error al crear el Producto:", error);
     }
   };
 
 
+
   const handleEditClick = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
+
 
 
     const fieldsEdit = [
@@ -141,36 +214,38 @@ export function ProductsPage() {
         name: "description",
         icon: "comment",
         col: "half",
-        required: "false",
+        required: "true",
         value: product.description,
       },
+      {
+        title: "Supplies",
+        type: "select",
+        name: "supplies",
+        icon: "list",
+        col: "full",
+        required: "false",
+      },
+
 
 
     ];
 
 
     const handleEditProduct = async (data) => {
-      const { name, price, description, image } = data;
-    
+      const { name, price, description} = data;
+
       try {
         const updateData = new FormData();
         updateData.append("name", data.name);
         updateData.append("price", data.price);
         updateData.append("description", data.description);
-      
-    
-        if (image && image[0]) {
-          // Si se seleccionó una nueva imagen, obtenerla del formulario
-          for (let i = 0; i < image.length; i++) {
-            updateData.append("image", data.image[i]);
-          }
-        }
-    
+
+
         const res = await editProduct(productId, updateData);
         const updatedProduct = res.data;
-    
+
         closeModal();
-    
+
         // Actualizar la lista de productos sin recargar la página
         setProducts((prevProducts) => {
           const updatedProducts = prevProducts.map((product) => {
@@ -193,8 +268,8 @@ export function ProductsPage() {
         console.error("Error al editar el Producto:", error);
       }
     };
-    
-    
+
+
 
     openModal("Editar producto", fieldsEdit, products, "status", true, handleEditProduct);
   };
@@ -266,8 +341,8 @@ export function ProductsPage() {
                 openModal(
                   "Nuevo producto",
                   fieldsNew,
-                  null,
-                  null,
+                  supplies,
+                  "name",
                   true,
                   handleCreateProduct,
                 )

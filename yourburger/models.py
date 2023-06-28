@@ -1,4 +1,5 @@
 from django.db import models
+from PIL import Image
 
 # Create your models here.
 class Role(models.Model):
@@ -77,7 +78,7 @@ class Order(models.Model):
         return f"Order #{self.id}"
 
 class Detail(models.Model):
-    order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Products, on_delete=models.CASCADE, to_field='name')
     amount = models.IntegerField()
     price = models.FloatField()
@@ -87,9 +88,8 @@ class Detail(models.Model):
 
 
 class ContentOrder(models.Model):
-    supplies = models.ForeignKey(Supplies,on_delete=models.CASCADE, to_field='name')
-    order = models.ForeignKey(Detail,on_delete=models.CASCADE)
-
+    supplies = models.ForeignKey(Supplies, on_delete=models.CASCADE)
+    detail = models.ForeignKey(Detail, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "content of order" + self.order
+        return "Content of detail " + str(self.detail)

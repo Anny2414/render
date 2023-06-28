@@ -81,6 +81,24 @@ export function Modal(props) {
                                 error={errors[field.name]}
                               />
 
+                            ) : field.type === 'list' ? (
+                              <table className="table is-fullwidth">
+                                <thead>
+                                  <tr>
+                                    {field.array.headers.map((header) => (
+                                      <th key={header}>{header}</th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {field.array.data.detail.map((item, itemIndex) => (
+                                    <tr key={itemIndex}>
+                                      <td>{item.name}</td>
+                                      <td>{item.price}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
                             ) : (
                               <Select
                                 action={{ ...register(field.name) }}
@@ -88,7 +106,7 @@ export function Modal(props) {
                                 name={nameSelect}
                                 defaultValue={field.value}
                                 customOptions={field.customOptions}
-                                nameSelect = { field.nameSelect}
+                                nameSelect={field.nameSelect}
                               />
                             )}
                             <span className="icon is-small is-left">

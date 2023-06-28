@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Role, Order, Products, Permission, DetallePermiso, Supplies, Detail,Content,ContentOrder
+from .models import User, Role, Order, Products, Permission, DetallePermiso, Supplies, Detail, Content ,ContentOrder
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,8 +25,11 @@ class OrderSerializar(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
-        
-        
+
+class SaleSerializar(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__' 
 class ProductSerializar(serializers.ModelSerializer):
     class Meta:
         model = Products
@@ -45,8 +48,8 @@ class SuppliesSerializar(serializers.ModelSerializer):
 class DetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Detail
-        fields ='__all__'
-        
+        fields = '__all__'
+  
 class ContetOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContentOrder

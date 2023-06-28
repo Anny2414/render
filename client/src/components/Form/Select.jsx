@@ -11,7 +11,6 @@ export const Select = (props) => {
       <select style={{ minWidth: "100%" }} defaultValue={defaultValue} {...action}>
         {options.map((option, index) => (
           <option value={option.keySelect} key={index}>
-            {console.log(nameOption)}
             {option[nameOption]}
           </option>
         ))}

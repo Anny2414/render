@@ -65,8 +65,8 @@ function TableRow({
                 <i className="fa-solid fa-pencil"></i>
               </span>
             }
-            action={() => onEditClick(row.id)}
-          />
+            action={() => onEditClick(row ,row.indexer)||onEditClick(row.id)}
+            />
         </td>
       )}
       {showDelete && (
@@ -79,7 +79,7 @@ function TableRow({
                 <i className="fa-solid fa-trash"></i>
               </span>
             }
-            action={() => onDeleteClick(row.id)}
+            action={() => onDeleteClick(row.indexer) || onDeleteClick(row.id)}
           />
         </td>
       )}

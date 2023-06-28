@@ -7,18 +7,21 @@ import { Input } from "../components/Form/Input.jsx";
 
 // CONEXION CON LA API DE USERS Y ROLES
 import { getUsers } from "../api/users.api";
-import { createOrder, deleteOrder, editOrder, getOrder, getOrders } from "../api/order.api";
+import { createSale, deleteSale, editSale, getSale, getSales } from "../api/sales.api.js";
 import { Modal } from "../components/Modal.jsx";
+import { Link } from "react-router-dom";
 
 export function SalesPage() {
   const [users, setUsers] = useState([]);
-  const [order, setOrder] = useState([]);
+  const [sales, setSales] = useState([]);
   //
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
 
+
+
   const reloadDataTable = async () => {
-    setUsers([])
+    setSales([])
     const res = await getUsers();
     setUsers(res.data)
   }
@@ -33,57 +36,65 @@ export function SalesPage() {
   };
 
 
+
   // Objeto para los campos de la ventana modal
-  const fieldsNew = [
-    {
-      title: "Total",
-      type: "text",
-      name: "total",
-      icon: "dollar",
-      required: "true",
-    },
-    {
-      title: "Usuario",
-      type: "select",
-      name: "user",
-      icon: "user",
-      col: "half",
-      keySelect: "username",
-      data: users,
-    },
-  ];
+  // const fieldsNew = [
+  //   {
+  //     title: "Total",
+  //     type: "text",
+  //     name: "total",
+  //     icon: "dollar",
+  //     required: "true",
+  //   },
+  //   {
+  //     title: "Usuario",
+  //     type: "select",
+  //     name: "user",
+  //     icon: "user",
+  //     col: "half",
+  //     keySelect: "username",
+  //     data: users,
+  //   },
+  //   {
+  //     title: "Estado",
+  //     type: "text",
+  //     name: "status",
+  //     icon: "user",
+  //     col: "half",
+  //     value : "Por pagar",
+  //     readonly : true
+  //   },
+  // ];
 
   // Conexion a API y obtiene datos de Users y Roles
   useEffect(() => {
     async function fetchData() {
       const resUser = await getUsers();
-      const res = await getOrders();
-      setOrder(res.data);
+      const res = await getSales();
+      setSales(res.data);
       setUsers(resUser.data);
     }
 
     fetchData();
   }, []);
 
-  const handleCreateOrder = async (data) => {
+  const handleCreateSales = async (data) => {
     try {
-      await createOrder(data);
+      await createSale(data);
       window.location.reload();
     } catch (error) {
       console.error("Error al crear la venta:", error);
     }
   };
 
-  const handleEditClick = async (OrderId) => {
-    const res = await getOrder(OrderId);
-    const order = res.data;
+  const handleEditClick = async (SalesId) => {
+    const res = await getSale(SalesId);
+    const sales = res.data;
     const customOptions = [
-      { "id": 1,"statu": "Por pagar" },
-      { "id": 2,"statu": "Pago" },
-      { "id": 3,"statu": "Cancelado" },
+      { "id": 1, "status": "Por pagar" },
+      { "id": 2, "status": "Pago" },
+      { "id": 3, "status": "Cancelado" },
     ];
-    console.log(customOptions[0]['statu']);
-    console.log(users);
     const fieldsEdit = [
       {
         title: "Total",
@@ -92,7 +103,7 @@ export function SalesPage() {
         icon: "dollar",
         col: "half",
         required: "true",
-        value: order.total,
+        value: sales.total,
 
       },
       {
@@ -102,17 +113,17 @@ export function SalesPage() {
         icon: "user",
         col: "half",
         keySelect: "username",
-        value: order.user,
+        value: sales.user,
       },
       {
         title: "Estado",
         type: "select",
-        name: "statu",
+        name: "status",
         col: "full",
         icon: "lock-open",
-        keySelect: "statu",
-        nameSelect: "statu",
-        value: order.statu,
+        keySelect: "status",
+        nameSelect: "status",
+        value: sales.status,
         customOptions: customOptions
       },
 
@@ -120,7 +131,7 @@ export function SalesPage() {
 
     const handleEditUser = async (data) => {
       try {
-        await editOrder(OrderId, data);
+        await editSale(SalesId, data);
         window.location.reload();
       } catch (error) {
         console.error("Error al editar la venta:", error);
@@ -131,7 +142,7 @@ export function SalesPage() {
   };
 
   const handleDeleteClick = async (userId) => {
-    await deleteOrder(userId);
+    await deleteSale(userId);
     reloadDataTable()
   };
 
@@ -143,15 +154,7 @@ export function SalesPage() {
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
           <div className="column is-fullwidth">
-            <Button
-              text="Crear Venta +"
-              color="success"
-              col="fullwidth"
-              action={() =>
-                openModal("Nueva venta", fieldsNew, users, 'username', true, handleCreateOrder)
-              }
-
-            />
+            <Link to="/sale" className="button is-success is-fullwidth">Crear Venta +</Link>
           </div>
           <div className="column is-9">
             <Input holder="Buscar usuario" icon="magnifying-glass" />
@@ -161,7 +164,7 @@ export function SalesPage() {
           </div>
         </div>
         <Table
-          headers={["id", "user", "create_at", "update_at", "total", "statu"]}
+          headers={["id", "user", "create_at", "update_at", "total", "status"]}
           columns={[
             "ID",
             "Usuario",
@@ -174,7 +177,7 @@ export function SalesPage() {
           delete
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
-          data={order}
+          data={sales}
         />
         {isOpen && (
           <Modal
