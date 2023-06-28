@@ -50,7 +50,7 @@ export function Navbar() {
             Ingredientes
           </Link>
 
-          <Link to="/orders" className="navbar-item">
+          <Link to="/order" className="navbar-item">
             Pedidos
           </Link>
 

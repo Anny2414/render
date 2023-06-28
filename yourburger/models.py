@@ -71,8 +71,7 @@ class Order(models.Model):
     create_at = models.DateField(auto_now_add=True)
     update_at = models.DateField(auto_now=True)
     total = models.FloatField()
-    statu = models.CharField(max_length=50, default ="Por Pagar")
-    status = models.BooleanField(default=True)
+    status = models.CharField(max_length=50, default ="Por Pagar")
 
     def __str__(self):
         return f"Order #{self.id}"

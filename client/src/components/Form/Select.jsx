@@ -1,14 +1,18 @@
 import React from "react";
 
 export const Select = (props) => {
-  const { fields, action, name, defaultValue, keySelect } = props;
+  const { fields, action, name, defaultValue, customOptions, nameSelect } = props;
+
+  const options = customOptions || fields;
+  const nameOption = nameSelect || name;
 
   return (
     <div className="select" style={{ minWidth: "100%" }}>
       <select style={{ minWidth: "100%" }} defaultValue={defaultValue} {...action}>
-        {fields.map((field, index) => (
-          <option value={field.keySelect} key={index}>
-            {field[name]}
+        {options.map((option, index) => (
+          <option value={option.keySelect} key={index}>
+            {console.log(nameOption)}
+            {option[nameOption]}
           </option>
         ))}
       </select>

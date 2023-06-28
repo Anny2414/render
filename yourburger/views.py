@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.db.models import Q
 from .serializer import UserSerializer, RoleSerializer , OrderSerializar, ProductSerializar, ClientSerializar, PermissionSerializer, DetailPermissionSerializer, SuppliesSerializar
 from .models import User, Role, Order, Products, Permission,DetallePermiso, Supplies
 
@@ -31,6 +32,12 @@ class RoleView(viewsets.ModelViewSet):
 class OrderView(viewsets.ModelViewSet):
     serializer_class = OrderSerializar
     queryset = Order.objects.all()
+
+class SalesView(viewsets.ModelViewSet):
+    serializer_class = OrderSerializar
+    def get_queryset(self):
+        queryset = Order.objects.filter(Q(statu="Cancelado") | Q(statu="Pago"))
+        return queryset
     
 class ProductView(viewsets.ModelViewSet):
     serializer_class = ProductSerializar
