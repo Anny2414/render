@@ -7,6 +7,9 @@
 
 
 }
+.search{
+    position: fixed;
+}
 .input {
     width: 30;
 }

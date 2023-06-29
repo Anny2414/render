@@ -12,13 +12,16 @@ export function ViewP(props) {
   return (
     <div className="product-grid">
       {data.map((product) => {
+
+
+
         const [statusSlider, setStatus] = useState(product.status);
 
         const handleSwitchChange = (productId, status) => {
           onStatusClick(productId, status);
-          setStatus(!status);
+          setStatus(!statusSlider);
         };
-
+        
         return (
           <div className="card card-pedido p-5" key={product.id}>
             <div className="is-flex is-justify-content-center">

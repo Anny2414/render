@@ -7,22 +7,30 @@ import { Input } from "./Form/Input";
 export function ListProducts(props) {
   const { products, add } = props;
   const [count, setCount] = useState(0);
-  const [quantity, setQuantity] = useState(1); // Estado para almacenar la cantidad
+  const [quantities, setQuantities] = useState([]); // Estado para almacenar las cantidades
+ 
+
   useEffect(() => {
     const counts = 0;
     setCount(counts);
   }, []);
-  
 
-const indexered = () => {
+  const indexered = () => {
     setCount((prevCount) => prevCount + 1);
   };
-  const handleQuantityChange = (event) => {
-    setQuantity(parseInt(event.target.value)); // Actualiza el estado de la cantidad al cambiar el valor del campo de entrada
+
+  const handleQuantityChange = (event, index) => {
+    const newQuantities = [...quantities];
+    newQuantities[index] = parseInt(event.target.value);
+    setQuantities(newQuantities);
   };
+  
+
+
+
   return (
     <div className="list-products">
-      <table className="table is-fullwidth">
+      <table className="table is-fullwidth header-list">
         <thead>
           {Array.isArray(products) ? (
             <tr>
@@ -35,7 +43,8 @@ const indexered = () => {
           ) : null}
         </thead>
         <tbody>
-          {products.length > 0  ? (
+          {products.length > 0 ? (
+
             products.map((product, index) => (
               <tr key={index}>
                 <td>
@@ -52,8 +61,8 @@ const indexered = () => {
                   <input
                     className="input"
                     type="number"
-                    value={quantity}
-                    onChange={handleQuantityChange}
+                    value={quantities[index] || 1}
+                    onChange={(event) => handleQuantityChange(event, index)}
                     min={1}
                   />
                 </td>
@@ -66,9 +75,14 @@ const indexered = () => {
                     }
                     color="success"
                     action={() => {
-                        indexered();
-                        add({ ...product, indexer: count + index + 1, amount: quantity, contentOrder: [] });
-                      }}
+                      indexered();
+                      add({
+                        ...product,
+                        indexer: count + index + 1,
+                        amount: quantities[index] || 1,
+                        contentOrder: [{ "name": "Tomate", "price": 2000 }],
+                      });
+                    }}
                   />
                 </td>
               </tr>

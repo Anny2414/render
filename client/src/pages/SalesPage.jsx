@@ -22,8 +22,8 @@ export function SalesPage() {
 
   const reloadDataTable = async () => {
     setSales([])
-    const res = await getUsers();
-    setUsers(res.data)
+    const res = await getSales();
+    setSales(res.data)
   }
 
   const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
@@ -81,7 +81,8 @@ export function SalesPage() {
   const handleCreateSales = async (data) => {
     try {
       await createSale(data);
-      window.location.reload();
+      reloadDataTable()
+      closeModal()
     } catch (error) {
       console.error("Error al crear la venta:", error);
     }
@@ -96,25 +97,6 @@ export function SalesPage() {
       { "id": 3, "status": "Cancelado" },
     ];
     const fieldsEdit = [
-      {
-        title: "Total",
-        type: "text",
-        name: "total",
-        icon: "dollar",
-        col: "half",
-        required: "true",
-        value: sales.total,
-
-      },
-      {
-        title: "Usuario",
-        type: "select",
-        name: "user",
-        icon: "user",
-        col: "half",
-        keySelect: "username",
-        value: sales.user,
-      },
       {
         title: "Estado",
         type: "select",
@@ -141,9 +123,16 @@ export function SalesPage() {
     openModal("Editar venta", fieldsEdit, users, 'username', true, handleEditUser);
   };
 
+
   const handleDeleteClick = async (userId) => {
-    await deleteSale(userId);
-    reloadDataTable()
+    try {
+      const data = await getSale(userId)
+      data.status = "Cancelado" 
+      await editSale(userId, data);
+      reloadDataTable()
+    } catch (error) {
+      console.error("Error al editar el pedido: ", error);
+    }
   };
 
 

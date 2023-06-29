@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 
 // CONEXION CON LA API DE USERS Y ROLES
 import { getUsers } from "../api/users.api";
-import { createOrder, deleteOrder, editOrder, getOrder, getOrders } from "../api/order.api";
+import { editOrder, getOrder, getOrders } from "../api/order.api";
 import { Modal } from "../components/Modal.jsx";
 
 export function OrdersPage() {
@@ -17,13 +17,14 @@ export function OrdersPage() {
   //
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
-  const rol = "Admiistrador"; // Corrected role value
+  // const rol = "Cliente"; 
+  const rol = "Administrador"; 
   const user = "Yei";
 
   const reloadDataTable = async () => {
-    setUsers([])
-    const res = await getUsers();
-    setUsers(res.data)
+    setOrder([])
+    const res = await getOrders();
+    setOrder(res.data)
   }
   const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
     setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
@@ -33,27 +34,6 @@ export function OrdersPage() {
   const closeModal = () => {
     setIsOpen(false);
   };
-
-
-  // Objeto para los campos de la ventana modal
-  const fieldsNew = [
-    {
-      title: "Total",
-      type: "text",
-      name: "total",
-      icon: "dollar",
-      required: "true",
-    },
-    {
-      title: "Usuario",
-      type: "select",
-      name: "user",
-      icon: "user",
-      col: "half",
-      keySelect: "username",
-      data: users,
-    },
-  ];
 
   // Conexion a API y obtiene datos de Users y Roles
   useEffect(() => {
@@ -67,45 +47,18 @@ export function OrdersPage() {
     fetchData();
   }, []);
 
-  const handleCreateOrder = async (data) => {
-    try {
-      await createOrder(data);
-      window.location.reload();
-    } catch (error) {
-      console.error("Error al crear la venta:", error);
-    }
-  };
 
-  const handleEditClick = async (OrderId) => {
-    const res = await getOrder(OrderId);
-    const order = res.data;
+
+
+  const handleEditClick = async (SalesId) => {
+    const res = await getOrder(SalesId);
+    const sales = res.data;
     const customOptions = [
-      { "id": 1,"status": "Por pagar" },
-      { "id": 2,"status": "Pago" },
-      { "id": 3,"status": "Cancelado" },
+      { "id": 1, "status": "Por pagar" },
+      { "id": 2, "status": "Pago" },
+      { "id": 3, "status": "Cancelado" },
     ];
-    console.log(customOptions[0]['status']);
-    console.log(users);
     const fieldsEdit = [
-      {
-        title: "Total",
-        type: "text",
-        name: "total",
-        icon: "dollar",
-        col: "half",
-        required: "true",
-        value: order.total,
-
-      },
-      {
-        title: "Usuario",
-        type: "select",
-        name: "user",
-        icon: "user",
-        col: "half",
-        keySelect: "username",
-        value: order.user,
-      },
       {
         title: "Estado",
         type: "select",
@@ -114,7 +67,7 @@ export function OrdersPage() {
         icon: "lock-open",
         keySelect: "status",
         nameSelect: "status",
-        value: order.status,
+        value: sales.status,
         customOptions: customOptions
       },
 
@@ -122,10 +75,11 @@ export function OrdersPage() {
 
     const handleEditUser = async (data) => {
       try {
-        await editOrder(OrderId, data);
-        window.location.reload();
+        await editOrder(SalesId, data);
+        reloadDataTable()
+        closeModal()
       } catch (error) {
-        console.error("Error al editar la venta:", error);
+        console.error("Error al editar el pedido:", error);
       }
     };
 
@@ -133,8 +87,14 @@ export function OrdersPage() {
   };
 
   const handleDeleteClick = async (userId) => {
-    await deleteOrder(userId);
-    reloadDataTable()
+    try {
+      const data = await getOrder(userId)
+      data.status = "Cancelado" 
+      await editOrder(userId, data);
+      reloadDataTable()
+    } catch (error) {
+      console.error("Error al editar el pedido: ", error);
+    }
   };
 
 
@@ -169,8 +129,8 @@ export function OrdersPage() {
               "Total",
               "Estado de venta",
             ]}
-            edit
-            delete
+            edit = {true}
+            delete = {true}
             onEditClick={handleEditClick}
             onDeleteClick={handleDeleteClick}
             data={order}
@@ -181,7 +141,8 @@ export function OrdersPage() {
             headers={["id", "create_at", "update_at", "total", "status"]}
             columns={["ID", "Creado en", "Actualizado en", "Total", "Estado de venta"]}
             edit={false}
-            delete={handleDeleteClick}
+            delete={true}
+            onDeleteClick={handleDeleteClick}
             data={order.filter((item) => item.user === user)}
           />
         )}

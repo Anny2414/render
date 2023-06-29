@@ -65,7 +65,8 @@ function TableRow({
                 <i className="fa-solid fa-pencil"></i>
               </span>
             }
-            action={() => onEditClick(row ,row.indexer)||onEditClick(row.id)}
+            action={() => {
+              row.indexer != undefined ? ( onEditClick(row,  row.indexer) ) : ( onEditClick(row.id) ) }}
             />
         </td>
       )}
@@ -79,7 +80,7 @@ function TableRow({
                 <i className="fa-solid fa-trash"></i>
               </span>
             }
-            action={() => onDeleteClick(row.indexer) || onDeleteClick(row.id)}
+            action={() => {row.indexer != undefined ? ( onDeleteClick(row.indexer) ) : ( onDeleteClick(row.id) ) }}
           />
         </td>
       )}

@@ -85,22 +85,36 @@ export function Modal(props) {
                               <table className="table is-fullwidth">
                                 <thead>
                                   <tr>
-                                    {field.array.headers.map((header) => (
+                                    {field.headers.map((header) => (
                                       <th key={header}>{header}</th>
                                     ))}
                                   </tr>
                                 </thead>
-                                <tbody>
-                                  {field.array.data.detail.map((item, itemIndex) => (
-                                    <tr key={itemIndex}>
-                                      <td>{item.name}</td>
-                                      <td>{item.price}</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
+                                {field.data.map((item, itemIndex) => (
+                                  <tbody>
+                                    {
+                                      item.contentOrder.map((content, itemIndex) => (
+                                        <tr key={itemIndex}>
+                                          <td>
+                                            <span>
+                                              {content.name}
+                                            </span>
+                                          </td>
+                                          <td>
+                                            <span>
+                                              {content.price}
+                                            </span>
+                                          </td>
+                                        </tr>
+                                      ))
+                                    }
+                                  </tbody>
+                                ))}
                               </table>
                             ) : (
-                              <Select
+                              
+                              <div>
+                                <Select
                                 action={{ ...register(field.name) }}
                                 fields={dataSelect}
                                 name={nameSelect}
@@ -108,6 +122,7 @@ export function Modal(props) {
                                 customOptions={field.customOptions}
                                 nameSelect={field.nameSelect}
                               />
+                              </div>
                             )}
                             <span className="icon is-small is-left">
                               <i className={`fas fa-${field.icon}`}></i>

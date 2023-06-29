@@ -32,6 +32,35 @@ export function SalePage() {
     const closeModal = () => {
         setIsOpen(false);
     };
+    useEffect(() => {
+        async function fetchData() {
+            const resProduct = await getProducts();
+            const resContent = await getContents()
+            setProducts(resProduct.data);
+            setContents(resContent.data)
+        }
+        const storedDetail = Cookies.get("saleDetail");
+        if (storedDetail) {
+            setDetail(JSON.parse(storedDetail));
+        }
+        
+        fetchData();
+    }, []);
+
+    const reloadDataTable = async () => {
+        setDetail([])
+        const storedDetail = await Cookies.get("saleDetail");
+        if (storedDetail) {
+            await setDetail(JSON.parse(storedDetail));
+        }
+    }
+
+    const handleSearchChange = (event) => {
+        const value = event.target.value.toLowerCase();
+        setSearchValue(value);
+      };
+      
+
 
     const handleCreateProduct = async (data) => {
         try {
@@ -75,24 +104,36 @@ export function SalePage() {
     const handleEditClick = async (selectedProduct, selectIndexer) => {
 
         const content = contents.filter(content => content.product === selectedProduct.name)
-        const arr = { headers: ["Nombre", "Precio"], key: ["name", "Price"], data: { detail } }
+        const headers = ["Nombre", "Precio"]
+        const key = ["name", "Price"]
+        const detai = detail.filter(detail => detail.indexer === selectIndexer)
+        console.log(detai);
+        console.log(content);
         const fieldsEdit = [
             {
                 type: "list",
-                array: arr
+                headers,
+                key,
+                data: detai,
+                content,
+                col: "full"
             },
             {
-                title: "Contenido",
+                title: "Ingrediente",
                 type: "select",
-                name: "content",
-                col: "full",
-                icon: "box",
+                name: "contentOrder",
+                col: "col",
+                icon: "lock-open",
                 keySelect: "supplies",
                 nameSelect: "supplies",
-
-                value: "", // Valor seleccionado (opcional)
                 customOptions: content
-            }
+            },
+            //   {
+            //     title: "Ingrediente",
+            //     type: "button",
+
+            //   },
+
         ];
         const handleEditUser = async (data) => {
             try {
@@ -103,42 +144,11 @@ export function SalePage() {
             }
         };
 
-        openModal("Editar venta", fieldsEdit, false, 'name', true, handleEditUser);
+        openModal("Editar venta", fieldsEdit, content, 'supplies', true, handleEditUser);
     };
 
-    useEffect(() => {
-        async function fetchData() {
-            const resContents = await getContents();
-            setContents(resContents.data);
-        }
-
-        fetchData();
-    }, []);
 
 
-    useEffect(() => {
-        async function fetchData() {
-            const resProduct = await getProducts();
-            setProducts(resProduct.data);
-        }
-
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        const storedDetail = Cookies.get("saleDetail");
-        if (storedDetail) {
-            setDetail(JSON.parse(storedDetail));
-        }
-    }, []);
-
-    const reloadDataTable = async () => {
-        setDetail([])
-        const storedDetail = await Cookies.get("saleDetail");
-        if (storedDetail) {
-            await setDetail(JSON.parse(storedDetail));
-        }
-    }
     const editarContenido = (indexer, nuevoContenido) => {
         setDetail((prevDetail) => {
             const updatedDetail = prevDetail.map((product) => {
@@ -157,8 +167,9 @@ export function SalePage() {
     const añadirProducto = (data) => {
         const subtotal = data.price * data.amount;
         const productWithSubtotal = { ...data, subtotal }; // Añade el subtotal al objeto de producto
-
+        console.log(data);
         setDetail((prevDetail) => {
+            Cookies.remove("saleDetail")
             const newDetail = [...prevDetail, productWithSubtotal];
             Cookies.set("saleDetail", JSON.stringify(newDetail));
             return newDetail;
@@ -178,49 +189,47 @@ export function SalePage() {
                 <div className="columns is-centered ">
                     <div className="column is-three-quarters card-venta list-detail">
                         <div className="has-text-centered">
-                        <h1 className="h2 ">Crear Venta</h1>
+                            <h1 className="h2 ">Crear Venta</h1>
                         </div>
                         <div className="hr"></div>
                         <h1 className="h2">Detalle</h1>
                         <Table
-                            headers={["id", "name", "price", "amount", "subtotal"]}
-                            columns={["ID", "Nombre", "Precio", "Cantidad", "Subtotal",]}
+                            headers={["#", "name", "price", "amount", "subtotal"]}
+                            columns={["#", "Nombre", "Precio", "Cantidad", "Subtotal",]}
                             delete
                             edit
                             onEditClick={handleEditClick}
                             onDeleteClick={handleDeleteClick}
                             data={detail}
-                            itemsPorPage = {3}
+                            itemsPorPage={3}
                         />
                         <div className="is-flex footer">
-                        <div className="is-justify-content-flex-start mr-auto">
-                            <Button
-                                text="Borrar Detalle"
-                                color="danger"
-                                action={borrarDetalle}
-                                className="mt-5"
-                            />
+                            <div className="is-justify-content-flex-start mr-auto">
+                                <Button
+                                    text="Borrar Detalle"
+                                    color="danger"
+                                    action={borrarDetalle}
+                                    className="mt-5"
+                                />
+                            </div>
+                            <div className="is-justify-content-flex-end ml-auto">
+                                {detail.map((product) => {
+                                    total = total + product.subtotal
+                                })}
+                                <h1 className="h1 ">
+                                    {total} $
+                                </h1>
+                            </div>
                         </div>
-                        <div className="is-justify-content-flex-end ml-auto">
-                            {detail.map((product) => {
-                                total = total + product.subtotal
-                            })}
-                            <h1 className="h1 ">
-                                {total} $
-                            </h1>
-                        </div>
-                    </div>
                     </div>
                     <div className="column card-venta2">
                         <h1 className="h2">Productos</h1>
-                        <div className="column is-9 mx-auto">
-                            <Input holder="Buscar usuario" icon="magnifying-glass" />
-                        </div>
+
                         <ListProducts products={products} add={añadirProducto} />
                     </div>
                 </div>
                 <div>
-                    
+
                 </div>
                 {isOpen && (
                     <Modal
@@ -230,7 +239,6 @@ export function SalePage() {
                         nameSelect={modalConfig.nameSelect}
                         buttonSubmit={modalConfig.buttonSubmit}
                         onClose={closeModal}
-                        submit={modalConfig.submit}
                     />
                 )}
             </div>
