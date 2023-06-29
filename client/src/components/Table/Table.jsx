@@ -98,12 +98,13 @@ export function Table(props) {
     onStatusClick,
     onEditClick,
     onDeleteClick,
+    itemsPorPage
   } = props;
 
   const [count, setCount] = useState(1);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = itemsPorPage || 5;
   const offset = (currentPage - 1) * itemsPerPage;
   const currentData = data.slice(offset, offset + itemsPerPage);
 

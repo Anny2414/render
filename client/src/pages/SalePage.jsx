@@ -3,6 +3,7 @@ import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
 import { Button } from "../components/Form/Button.jsx";
 import { ListProducts } from "../components/ListProducts.jsx";
+import { Input } from "../components/Form/Input.jsx";
 import Cookies from "js-cookie";
 import "../assets/css/ViewProducts.css";
 import "../assets/css/OrderPage.css";
@@ -77,7 +78,7 @@ export function SalePage() {
         const arr = { headers: ["Nombre", "Precio"], key: ["name", "Price"], data: { detail } }
         const fieldsEdit = [
             {
-                type : "list",
+                type: "list",
                 array: arr
             },
             {
@@ -174,12 +175,13 @@ export function SalePage() {
         <div>
             <Navbar />
             <div className="container mt-5">
-                <div className="columns is-centered">
+                <div className="columns is-centered ">
                     <div className="column is-three-quarters card-venta list-detail">
-                <h1 className="h2">Crear Venta</h1>
-                <div className="hr"></div>
+                        <div className="has-text-centered">
+                        <h1 className="h2 ">Crear Venta</h1>
+                        </div>
+                        <div className="hr"></div>
                         <h1 className="h2">Detalle</h1>
-
                         <Table
                             headers={["id", "name", "price", "amount", "subtotal"]}
                             columns={["ID", "Nombre", "Precio", "Cantidad", "Subtotal",]}
@@ -188,30 +190,37 @@ export function SalePage() {
                             onEditClick={handleEditClick}
                             onDeleteClick={handleDeleteClick}
                             data={detail}
+                            itemsPorPage = {3}
                         />
+                        <div className="is-flex footer">
+                        <div className="is-justify-content-flex-start mr-auto">
+                            <Button
+                                text="Borrar Detalle"
+                                color="danger"
+                                action={borrarDetalle}
+                                className="mt-5"
+                            />
+                        </div>
+                        <div className="is-justify-content-flex-end ml-auto">
+                            {detail.map((product) => {
+                                total = total + product.subtotal
+                            })}
+                            <h1 className="h1 ">
+                                {total} $
+                            </h1>
+                        </div>
+                    </div>
                     </div>
                     <div className="column card-venta2">
                         <h1 className="h2">Productos</h1>
+                        <div className="column is-9 mx-auto">
+                            <Input holder="Buscar usuario" icon="magnifying-glass" />
+                        </div>
                         <ListProducts products={products} add={añadirProducto} />
                     </div>
                 </div>
                 <div>
-                    <div className="is-flex">
-                        <Button
-                            text="Borrar Detalle"
-                            color="danger"
-                            action={borrarDetalle}
-                            className="mt-5"
-                        />
-                        <div>
-                            {detail.map((product) => {
-                                total = total + product.subtotal
-                            })}
-                            <h1 className="h1">
-                                {total}
-                            </h1>
-                        </div>
-                    </div>
+                    
                 </div>
                 {isOpen && (
                     <Modal
