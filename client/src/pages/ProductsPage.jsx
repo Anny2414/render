@@ -19,6 +19,7 @@ import {
 
 } from "../api/products.api.js";
 import { getSupplies, } from "../api/supplies.api.js";
+import { createContent, } from "../api/content.api.js";
 
 // import {createContent} from "../api/"
 
@@ -137,11 +138,12 @@ export function ProductsPage() {
 
   const añadirIngrediente = (data) => {
     setSupplies((prevSupplie) => {
-      const newsupplie = [...prevSupplie, data];
-      Cookies.set("Supplies", JSON.stringify(newsupplie));
-      return console.log(newsupplie);
+      const newSupplie = prevSupplie ? [...prevSupplie, data] : [data];
+      Cookies.set("Supplies", JSON.stringify(newSupplie));
+      return console.log(newSupplie);
     });
-  }
+  };
+  
   const handleCreateProduct = async (data) => {
     try {
       añadirIngrediente(data)
@@ -159,14 +161,16 @@ export function ProductsPage() {
 
       const produc = await createProduct(formData);
       const formData1 = new FormData();
-      formData1.append("product", produc.data.id)
+      formData1.append("product", produc.data.name)
       formData1.append("supplies", data.supplies)
       formData1.append("count", 1)
 
 
       await createContent(formData1);
+
       reloadDataTable()
       closeModal()
+
     } catch (error) {
       console.error("Error al crear el Producto:", error);
     }
