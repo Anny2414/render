@@ -7,8 +7,18 @@ import { Button } from "./Form/Button";
 import { Select } from "./Form/Select";
 import { Switch } from "./Form/Switch";
 
+import { Table } from "./Table/Table";
+
 export function Modal(props) {
-  const { title, fields, onClose, dataSelect, nameSelect, buttonSubmit, submit } = props
+  const {
+    title,
+    fields,
+    onClose,
+    dataSelect,
+    nameSelect,
+    buttonSubmit,
+    submit,
+  } = props;
 
   const {
     register,
@@ -42,94 +52,73 @@ export function Modal(props) {
                           {field.title}
                         </label>
                       </div>
-                      <div className="field-body">
-                        <div className="field">
-                          <div className="control has-icons-left">
-                            {field.type === "text" || field.type === "number" || field.type === "password" ? (
-                              <Input
-                                type={field.type}
-                                read_only={field.readonly}
-                                name={field.name}
-                                value={field.value}
-                                action={{
-                                  ...register(field.name, {
-                                    required: field.required,
-                                  }),
-                                }}
-                                error={errors[field.name]}
-                              />
-                            ) : field.type === "checkbox" ? (
-                              <div className="field is-grouped is-grouped-centered">
-                                <div className="control">
-                                  <Switch checked={field.checked} action={{ ...register(field.title) }} />
-                                </div>
-                              </div>
-                            ) : field.type === "file" ? (
-                              <Input
-                                type={field.type}
-                                name={field.name}
-                                value={field.value}
-                                action={{
-                                  ...register(field.name, {
-                                    required: field.required,
-                                  }),
-                                  onChange: (e) => {
-                                    // Actualiza el valor del campo de imagen
-                                    field.value = e.target.files[0];
-                                  },
-                                }}
-                                error={errors[field.name]}
-                              />
-
-                            ) : field.type === 'list' ? (
-                              <table className="table is-fullwidth">
-                                <thead>
-                                  <tr>
-                                    {field.headers.map((header) => (
-                                      <th key={header}>{header}</th>
-                                    ))}
-                                  </tr>
-                                </thead>
-                                {field.data.map((item, itemIndex) => (
-                                  <tbody>
-                                    {
-                                      item.contentOrder.map((content, itemIndex) => (
-                                        <tr key={itemIndex}>
-                                          <td>
-                                            <span>
-                                              {content.name}
-                                            </span>
-                                          </td>
-                                          <td>
-                                            <span>
-                                              {content.price}
-                                            </span>
-                                          </td>
-                                        </tr>
-                                      ))
-                                    }
-                                  </tbody>
-                                ))}
-                              </table>
-                            ) : (
-                              
-                              <div>
-                                <Select
-                                action={{ ...register(field.name) }}
-                                fields={dataSelect}
-                                name={nameSelect}
-                                defaultValue={field.value}
-                                customOptions={field.customOptions}
-                                nameSelect={field.nameSelect}
-                              />
-                              </div>
-                            )}
-                            <span className="icon is-small is-left">
-                              <i className={`fas fa-${field.icon}`}></i>
-                            </span>
+                      {field.type === "text" ||
+                      field.type === "number" ||
+                      field.type === "password" ? (
+                        <Input
+                          type={field.type}
+                          read_only={field.readonly}
+                          name={field.name}
+                          value={field.value}
+                          icon={field.icon}
+                          action={{
+                            ...register(field.name, {
+                              required: field.required,
+                            }),
+                          }}
+                          error={errors[field.name]}
+                        />
+                      ) : field.type === "checkbox" ? (
+                        <div className="field is-grouped is-grouped-centered">
+                          <div className="control">
+                            <Switch
+                              checked={field.checked}
+                              action={{ ...register(field.title) }}
+                            />
                           </div>
                         </div>
-                      </div>
+                      ) : field.type === "file" ? (
+                        <Input
+                          type={field.type}
+                          name={field.name}
+                          value={field.value}
+                          icon={field.icon}
+                          action={{
+                            ...register(field.name, {
+                              required: field.required,
+                            }),
+                            onChange: (e) => {
+                              // Actualiza el valor del campo de imagen
+                              field.value = e.target.files[0];
+                            },
+                          }}
+                          error={errors[field.name]}
+                        />
+                      ) : field.type === "list" ? (
+                        <div>
+                          <Table
+                            columns={field.headers}
+                            key={field.key}
+                            data={field.data}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <Select
+                            action={{ ...register(field.name) }}
+                            fields={dataSelect}
+                            name={nameSelect}
+                            defaultValue={field.value}
+                            customOptions={field.customOptions}
+                            nameSelect={field.nameSelect}
+                            hasButton={field.hasButton}
+                            textButton={field.textButton}
+                            icon={field.icon}
+                            actionButton={field.actionButton}
+                            handleOptionChange={field.handleOptionChange}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -144,7 +133,9 @@ export function Modal(props) {
               action={onClose}
               type="button"
             />
-            {buttonSubmit && <Button text="Confirmar" color="success" type="submit" />}
+            {buttonSubmit && (
+              <Button text="Confirmar" color="success" type="submit" />
+            )}
           </footer>
           <div className="notifications">
             {Object.keys(errors).length > 0 && (

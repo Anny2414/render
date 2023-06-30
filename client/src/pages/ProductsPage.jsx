@@ -4,9 +4,10 @@ import { ViewP } from "../components/ViewP.jsx";
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
 import { Modal } from "../components/Modal.jsx";
-import Cookies from 'js-cookie';
 
+import { useRef } from "react";
 
+import Cookies from "js-cookie";
 
 // CONEXION CON LA API DE USERS Y ROLES
 import {
@@ -16,40 +17,48 @@ import {
   getProduct,
   editProduct,
   updateProductStatus,
-
 } from "../api/products.api.js";
-import { getSupplies, } from "../api/supplies.api.js";
-import { createContent, } from "../api/content.api.js";
+import { getSupplies } from "../api/supplies.api.js";
+import { createContent } from "../api/content.api.js";
 
 // import {createContent} from "../api/"
-
-
 
 export function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [supplies, setSupplies] = useState([]);
-  const [selectedOption, setSelectedOption] = useState('');
-
-
-  useEffect(() => {
-    if (selectedOption !== '') {
-      Cookies.set('selectedOption', selectedOption);
-    }
-  }, [selectedOption]);
-
-
-
+  // const [ingredientes, setIngredientes] = useState([]);
+  const ingredientes = useRef([]);
+  const selectedOptionRef = useRef();
 
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
 
   const reloadDataTable = async () => {
-    setProducts([])
+    setProducts([]);
     const res = await getProducts();
-    setProducts(res.data)
-  }
-  const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
-    // Agrega las supplies como opción de selección en el campo correspondiente
+    setProducts(res.data);
+  };
+
+  const handleOptionChange = (event) => {
+    const option = supplies.find(
+      (supplie) => supplie.name === event.target.value
+    );
+    selectedOptionRef.current = option;
+  };
+
+  const anadirIngrediente = () => {
+    ingredientes.current.push(selectedOptionRef.current);
+    console.log(ingredientes.current);
+  };
+
+  const openModal = (
+    title,
+    fields,
+    dataSelect,
+    nameSelect,
+    buttonSubmit,
+    submit
+  ) => {
     if (nameSelect === "supplies") {
       dataSelect = supplies.map((supplie) => ({
         value: supplie.id,
@@ -57,14 +66,21 @@ export function ProductsPage() {
       }));
     }
 
-    setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
+    setModalConfig({
+      title,
+      fields,
+      dataSelect,
+      nameSelect,
+      buttonSubmit,
+      submit,
+    });
     setIsOpen(true);
   };
 
   const closeModal = () => {
     setIsOpen(false);
   };
-  // Objeto para los campos de la ventana modal
+
   const fieldsNew = [
     {
       title: "Producto",
@@ -100,20 +116,23 @@ export function ProductsPage() {
       required: "true",
     },
     {
-      title: "Supplies",
+      title: "Ingredientes",
+      hasButton: true,
+      textButton: "+",
       type: "select",
       name: "supplies",
       icon: "list",
-      col: "full",
       required: "false",
-      value: selectedOption,
-      onChange: (e) => setSelectedOption(e.target.value),
-    }
-
-
-
+      handleOptionChange: handleOptionChange,
+      actionButton: anadirIngrediente,
+    },
+    {
+      type: "list",
+      headers: ["Nombre", "Precio"],
+      key: ["name", "price"],
+      data: ingredientes.current,
+    },
   ];
-
 
   // Conexion a API y obtiene datos de Users y Roles
   useEffect(() => {
@@ -127,26 +146,13 @@ export function ProductsPage() {
       setSupplies(res.data);
     }
 
-    const storedOption = Cookies.get('selectedOption');
-    if (storedOption) {
-      setSelectedOption(storedOption);
-    }
-
     fetchSupplies();
     fetchData();
   }, []);
 
-  const añadirIngrediente = (data) => {
-    setSupplies((prevSupplie) => {
-      const newSupplie = prevSupplie ? [...prevSupplie, data] : [data];
-      Cookies.set("Supplies", JSON.stringify(newSupplie));
-      return console.log(newSupplie);
-    });
-  };
-  
   const handleCreateProduct = async (data) => {
     try {
-      añadirIngrediente(data)
+      anadirIngrediente(data);
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("price", data.price);
@@ -158,31 +164,27 @@ export function ProductsPage() {
         formData.append("image", data.image[i]);
       }
 
-
       const produc = await createProduct(formData);
       const formData1 = new FormData();
-      formData1.append("product", produc.data.name)
-      formData1.append("supplies", data.supplies)
-      formData1.append("count", 1)
-
+      formData1.append("product", produc.data.name);
+      formData1.append(
+        "supplies",
+        ingredientes.map((ingrediente) => ingrediente.value).join(",")
+      );
+      formData1.append("count", 1);
 
       await createContent(formData1);
 
-      reloadDataTable()
-      closeModal()
-
+      reloadDataTable();
+      closeModal();
     } catch (error) {
       console.error("Error al crear el Producto:", error);
     }
   };
 
-
-
   const handleEditClick = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
-
-
 
     const fieldsEdit = [
       {
@@ -229,21 +231,16 @@ export function ProductsPage() {
         col: "full",
         required: "false",
       },
-
-
-
     ];
 
-
     const handleEditProduct = async (data) => {
-      const { name, price, description} = data;
+      const { name, price, description } = data;
 
       try {
         const updateData = new FormData();
         updateData.append("name", data.name);
         updateData.append("price", data.price);
         updateData.append("description", data.description);
-
 
         const res = await editProduct(productId, updateData);
         const updatedProduct = res.data;
@@ -273,14 +270,18 @@ export function ProductsPage() {
       }
     };
 
-
-
-    openModal("Editar producto", fieldsEdit, products, "status", true, handleEditProduct);
+    openModal(
+      "Editar producto",
+      fieldsEdit,
+      products,
+      "status",
+      true,
+      handleEditProduct
+    );
   };
   const handleViewDetailsClicks = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
-
 
     const fieldsview = [
       {
@@ -310,8 +311,6 @@ export function ProductsPage() {
         col: "half",
         value: product.description,
       },
-
-
     ];
 
     openModal("Ver producto", fieldsview, products, "status", false);
@@ -327,9 +326,8 @@ export function ProductsPage() {
 
   const handleDeleteClick = async (productId) => {
     await deleteProduct(productId);
-    reloadDataTable()
+    reloadDataTable();
   };
-
 
   return (
     <div>
@@ -348,11 +346,10 @@ export function ProductsPage() {
                   supplies,
                   "name",
                   true,
-                  handleCreateProduct,
+                  handleCreateProduct
                 )
               }
             />
-
           </div>
           <div className="column is-9">
             <Input holder="Buscar Producto" icon="magnifying-glass" />
@@ -366,8 +363,8 @@ export function ProductsPage() {
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
           onViewDetails={handleViewDetailsClicks}
-          data={products} />
-
+          data={products}
+        />
       </div>
 
       {isOpen && (
@@ -381,7 +378,6 @@ export function ProductsPage() {
           submit={modalConfig.submit}
         />
       )}
-
     </div>
   );
 }
