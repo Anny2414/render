@@ -20,7 +20,6 @@ class DetailPermissionView(viewsets.ModelViewSet):
     
 class DeletePermissionsByRole(APIView):
     def delete(self, request, roleId):
-        # Eliminar los registros que cumplan con la condición roleId=5
         DetallePermiso.objects.filter(roleId=roleId).delete()
         
         return Response("Permisos eliminados exitosamente.", status=status.HTTP_204_NO_CONTENT)

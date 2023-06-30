@@ -10,6 +10,7 @@ export const Select = (props) => {
     name,
     defaultValue,
     customOptions,
+    keySelect,
     nameSelect,
     hasButton,
     textButton,
@@ -63,7 +64,7 @@ export const Select = (props) => {
               {...action}
             >
               {options.map((option, index) => (
-                <option value={option.keySelect} key={index}>
+                <option value={option[keySelect]} key={index}>
                   {option[nameOption]}
                 </option>
               ))}

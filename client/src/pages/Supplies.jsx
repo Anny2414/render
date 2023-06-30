@@ -118,6 +118,17 @@ export function SuppliesPage() {
         required: "true",
         value: supplie.price,
       },
+      {
+        title: "Stock",
+        type: "number",
+        name: "stock",
+        icon: "dollar",
+        col: "half",
+        required: "true",
+        value:supplie.stock,
+  
+  
+      },
 
     ];
 

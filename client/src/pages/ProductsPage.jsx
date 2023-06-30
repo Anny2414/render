@@ -142,6 +142,7 @@ export function ProductsPage() {
       name: "supplies",
       icon: "list",
       required: "false",
+      col : "full",
       handleOptionChange: handleOptionChange,
       actionButton: anadirIngrediente,
     },
@@ -411,7 +412,7 @@ export function ProductsPage() {
                 openModal(
                   "Nuevo producto",
                   fieldsNew,
-                  [{id: 0, name: 'No selecionado', price: 0, stock: 0, status: true}, ...supplies],
+                  [{id: 0, name: 'No seleccionado', price: 0, stock: 0, status: true}, ...supplies],
                   "name",
                   true,
                   handleCreateProduct

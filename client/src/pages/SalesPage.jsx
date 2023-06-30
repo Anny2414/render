@@ -152,7 +152,6 @@ export function SalesPage() {
             <Button text="Generar PDF" color="primary" col="fullwidth" />
           </div>
         </div>
-        {console.log(sales)}
         <Table
           headers={["id", "user", "create_at", "update_at", "total", "status"]}
           columns={[

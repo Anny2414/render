@@ -93,7 +93,8 @@ export function UsersPage() {
       name: "role",
       icon: "lock-open",
       col: "half",
-      keySelect: "name",
+      nameSelect: "name",
+      keySelect: "id"
     },
     {
       title: "Documento",

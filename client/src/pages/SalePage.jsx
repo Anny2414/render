@@ -95,11 +95,11 @@ export function SalePage() {
     fetchData();
   }, []);
 
-  const reloadDataTable = async () => {
+  const reloadDataTable = () => {
     setDetail([]);
-    const storedDetail = await Cookies.get("saleDetail");
+    const storedDetail = Cookies.get("saleDetail");
     if (storedDetail) {
-      await setDetail(JSON.parse(storedDetail));
+      setDetail(JSON.parse(storedDetail));
     }
   };
 
@@ -107,6 +107,7 @@ export function SalePage() {
     const value = event.target.value.toLowerCase();
     setSearchValue(value);
   };
+
   const handleCreateProduct = async (data) => {
     try {
       const users = (await getUsers()).data;
@@ -173,9 +174,7 @@ export function SalePage() {
     const content = contents.filter(
       (content) => content.product === selectedProduct.name
     );
-    const headers = ["Nombre", "Precio"];
-    const key = ["name", "Price"];
-    const detai = detail.filter((detail) => detail.indexer === selectIndexer);
+
     const fieldsEdit = [
       {
         title: "Producto",
@@ -188,32 +187,27 @@ export function SalePage() {
         readonly: true
       },
       {
-        type: "list",
-        headers: ["Nombre", "Precio"],
-        key: ["name", "price"],
-        data: ingredientes,
-      },
-      {
         title: "Ingredientes",
         hasButton: true,
         textButton: "+",
         type: "select",
         name: "supplies",
         icon: "list",
-        required: "false",
+        col: "full",
         handleOptionChange: handleOptionChange,
         actionButton: anadirIngrediente,
       },
-      //   {
-      //     title: "Ingrediente",
-      //     type: "button",
-
-      //   },
+      {
+        type: "list",
+        headers: ["Nombre", "Precio"],
+        key: ["name", "price"],
+        data: ingredientes,
+      },
     ];
     const handleEditSale = async (data) => {
       try {
-
-        closeModal(); // Close the modal after updating
+        console.log(data);
+        // closeModal(); // Close the modal after updating
       } catch (error) {
         console.error("Error al editar la venta:", error);
       }
@@ -223,12 +217,11 @@ export function SalePage() {
     openModal(
       "Editar venta",
       fieldsEdit,
-      [{ id: 0, supplies: 'No selecionado', price: 0, stock: 0, status: true }, ...content],
+      content,
+      // [{ id: 0, supplies: 'No selecionado', price: 0, stock: 0, status: true }, ...content],
       "supplies",
       true,
-      true,
       handleEditSale,
-
     );
   };
 
@@ -247,6 +240,7 @@ export function SalePage() {
       return updatedDetail;
     });
   };
+
   const añadirProducto = (data) => {
     const subtotal = data.price * data.amount;
     const productWithSubtotal = { ...data, subtotal }; // Añade el subtotal al objeto de producto
@@ -285,7 +279,7 @@ export function SalePage() {
               data={detail}
               itemsPorPage={3}
             />
-            <div className="is-flex footer">
+            <div className="is-flex footer mb-3">
               <div className="is-justify-content-flex-start mr-auto">
                 <Button
                   text="Borrar Detalle"
@@ -302,6 +296,7 @@ export function SalePage() {
                   text={total + " $"}
                   color="success"
                   type="button"
+                  className="pago"
                   action={handleCreateProduct}
                 />
               </div>

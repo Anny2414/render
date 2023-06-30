@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import { useForm } from "react-hook-form";
 
@@ -34,7 +34,7 @@ export function Modal(props) {
     formState: { errors },
   } = useForm();
 
-  
+
 
   return (
     <div className="modal is-active">
@@ -106,14 +106,13 @@ export function Modal(props) {
                         />
                       ) : field.type === "list" ? (
                         <div>
-                          {field.data == undefined ? (
+                          {field.data === undefined ? (
                             <span>no valido</span>
-                          ) : field.data && field.data.length > 0 ? ( // Check if data exists and is not empty
-                            field.data.map((ingrediente) => (
-                              <span key={ingrediente?.name || ingrediente?.supplies}>
+                          ) : field.data && field.data.length > 0 ? (
+                            field.data.map((ingrediente, index) => (
+                              <span key={index}>
                                 {ingrediente?.supplies || ingrediente?.name}
                               </span>
-
                             ))
                           ) : (
                             <span>No ingredients available.</span>
@@ -129,6 +128,7 @@ export function Modal(props) {
                             customOptions={field.customOptions}
                             nameSelect={field.nameSelect}
                             hasButton={field.hasButton}
+                            keySelect={field.keySelect}
                             textButton={field.textButton}
                             icon={field.icon}
                             actionButton={field.actionButton}
@@ -150,10 +150,8 @@ export function Modal(props) {
               action={onClose}
               type="button"
             />
-            <Button text="Confirmar" color="success" type="button" action={submit} />
-             
-            {buttonSubmit && 
-             (<Button text="Confirmar" color="success" type="submit" />)
+            {buttonSubmit &&
+              (<Button text="Confirmar" color="success" type="submit" />)
             }
           </footer>
           <div className="notifications">
