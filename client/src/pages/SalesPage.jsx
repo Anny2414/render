@@ -127,7 +127,7 @@ export function SalesPage() {
   const handleDeleteClick = async (userId) => {
     try {
       const data = await getSale(userId)
-      data.status = "Cancelado" 
+      data.status = "Cancelado"
       await editSale(userId, data);
       reloadDataTable()
     } catch (error) {
@@ -152,6 +152,7 @@ export function SalesPage() {
             <Button text="Generar PDF" color="primary" col="fullwidth" />
           </div>
         </div>
+        {console.log(sales)}
         <Table
           headers={["id", "user", "create_at", "update_at", "total", "status"]}
           columns={[
@@ -166,7 +167,14 @@ export function SalesPage() {
           delete
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
-          data={sales}
+          data={[{
+            create_at: "2023-06-28",
+            id:16,
+            status:"Cancelado",
+            total:24,
+            update_at:"2023-06-29",
+            user:"Yei"
+          }]}
         />
         {isOpen && (
           <Modal
