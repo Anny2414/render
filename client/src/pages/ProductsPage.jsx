@@ -55,9 +55,14 @@ export function ProductsPage() {
   };
 
   const anadirIngrediente = () => {
-    ingredientes.push(selectedOptionRef.current);
-    setIngredientes([...ingredientes]); // Actualiza el estado de ingredientes
-    console.log(ingredientes);
+    if (selectedOptionRef.current != undefined) {
+      ingredientes.push(selectedOptionRef.current);
+      setIngredientes([...ingredientes]); // Actualiza el estado de ingredientes
+      console.log(ingredientes);
+      
+    } else {
+      console.log("error al añadir");
+    }
   };
   
 
@@ -362,7 +367,7 @@ export function ProductsPage() {
                 openModal(
                   "Nuevo producto",
                   fieldsNew,
-                  supplies,
+                  [{id: 0, name: 'No selecionado', price: 0, stock: 0, status: true}, ...supplies],
                   "name",
                   true,
                   handleCreateProduct

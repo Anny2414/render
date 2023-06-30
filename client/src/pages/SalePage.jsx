@@ -26,6 +26,7 @@ import {
 } from "../api/detail.api.js";
 import { getContent, getContents } from "../api/content.api.js";
 import { Modal } from "../components/Modal.jsx";
+import { useRef } from "react";
 
 export function SalePage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,6 +34,28 @@ export function SalePage() {
   const [products, setProducts] = useState([]);
   const [detail, setDetail] = useState([]);
   const [contents, setContents] = useState([]);
+  const [ingredientes, setIngredientes] = useState([]);
+  // const ingredientes = useRef([]);
+  const selectedOptionRef = useRef();
+
+  
+  useEffect(() => {
+    const currentIngredients = ingredientes;
+    console.log(currentIngredients);
+  }, [ingredientes]);
+  
+  const handleOptionChange = (event) => {
+    const option = supplies.find(
+      (supplie) => supplie.name === event.target.value
+    );
+    selectedOptionRef.current = option;
+  };
+
+  const anadirIngrediente = () => {
+    ingredientes.push(selectedOptionRef.current);
+    setIngredientes([...ingredientes]); // Actualiza el estado de ingredientes
+    console.log(ingredientes);
+  };
 
   let total = 0;
 
@@ -139,21 +162,20 @@ export function SalePage() {
     const fieldsEdit = [
       {
         type: "list",
-        headers,
-        key,
-        data: detai,
-        content,
-        col: "full",
+        headers: ["Nombre", "Precio"],
+        key: ["name", "price"],
+        data: ingredientes,
       },
       {
-        title: "Ingrediente",
+        title: "Ingredientes",
+        hasButton: true,
+        textButton: "+",
         type: "select",
-        name: "contentOrder",
-        col: "col",
-        icon: "lock-open",
-        keySelect: "supplies",
-        nameSelect: "supplies",
-        customOptions: content,
+        name: "supplies",
+        icon: "list",
+        required: "false",
+        handleOptionChange: handleOptionChange,
+        actionButton: anadirIngrediente,
       },
       //   {
       //     title: "Ingrediente",
@@ -173,7 +195,7 @@ export function SalePage() {
     openModal(
       "Editar venta",
       fieldsEdit,
-      content,
+      [{id: 0, supplies: 'No selecionado', price: 0, stock: 0, status: true}, ...content],
       "supplies",
       true,
       handleEditUser
