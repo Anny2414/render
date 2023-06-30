@@ -88,7 +88,7 @@ class Detail(models.Model):
 
 
 class ContentOrder(models.Model):
-    supplies = models.ForeignKey(Supplies, on_delete=models.CASCADE)
+    supplies = models.ForeignKey(Supplies, on_delete=models.CASCADE, to_field="name")
     detail = models.ForeignKey(Detail, on_delete=models.CASCADE)
 
     def __str__(self):

@@ -24,7 +24,8 @@ import {
   editDetail,
   getDetails,
 } from "../api/detail.api.js";
-import { getContent, getContents } from "../api/content.api.js";
+import { getContent, getContents, deleteContent } from "../api/content.api.js";
+import { createContentO } from "../api/contentdetail.api.js";
 import { Modal } from "../components/Modal.jsx";
 import { useRef } from "react";
 
@@ -38,23 +39,21 @@ export function SalePage() {
   // const ingredientes = useRef([]);
   const selectedOptionRef = useRef();
 
-  
+
   useEffect(() => {
     const currentIngredients = ingredientes;
-    console.log(currentIngredients);
   }, [ingredientes]);
-  
+
   const handleOptionChange = (event) => {
-    const option = supplies.find(
-      (supplie) => supplie.name === event.target.value
+    const option = contents.find(
+      (supplie) => supplie.supplies === event.target.value
     );
     selectedOptionRef.current = option;
   };
 
   const anadirIngrediente = () => {
     ingredientes.push(selectedOptionRef.current);
-    setIngredientes([...ingredientes]); // Actualiza el estado de ingredientes
-    console.log(ingredientes);
+    setIngredientes([...ingredientes]);
   };
 
   let total = 0;
@@ -108,38 +107,56 @@ export function SalePage() {
     const value = event.target.value.toLowerCase();
     setSearchValue(value);
   };
-
   const handleCreateProduct = async (data) => {
     try {
-      const users = await getUsers();
+      const users = (await getUsers()).data;
       const user = users[0];
-      const orderData = { user: user.name, total: total, status: "Pago" };
+      const orderData = { user: user.username, total: total, status: "Pago" };
       const respOrder = await createSale(orderData);
-      const detailData = data.map((product) => ({
-        order: respOrder.data.id,
-        product: product.product,
-        amount: product.amount,
-        price: product.price,
-        contentOrder: [], // Inicializar el array contentOrder vacío
-      }));
-
-      for (let i = 0; i < detailData.length; i++) {
-        const detail = detailData[i];
-        const respDetail = await createDetail(detail);
-        const contentOrderData = detail.contentOrder.map((content) => ({
-          order: respDetail.data.id,
-          supplies: content.supplies,
-        }));
-
-        for (let j = 0; j < contentOrderData.length; j++) {
-          const content = contentOrderData[j];
-          await createContentOrder(content);
+  
+      const formDataDetails = [];
+  
+      for (let i = 0; i < detail.length; i++) {
+        const product = detail[i];
+        const contentsO = contents.filter(
+          (content) => content.product === product.name
+        );
+  
+        const formDataDetail = new FormData();
+        formDataDetail.append("order", respOrder.data.id);
+        formDataDetail.append("product", product.name);
+        formDataDetail.append("amount", product.amount);
+        formDataDetail.append("price", product.price);
+        formDataDetail.append("contentOrder", JSON.stringify(contentsO));
+  
+        formDataDetails.push(formDataDetail);
+      }
+  
+      const createdDetails = [];
+  
+      for (const formDataDetail of formDataDetails) {
+        const respDetail = await createDetail(formDataDetail);
+        createdDetails.push(respDetail.data);
+  
+        const contentOrder = JSON.parse(formDataDetail.get("contentOrder"));
+  
+        for (const content of contentOrder) {
+          const formData = new FormData();
+          formData.append("detail", respDetail.data.id);
+          formData.append("supplies", content.supplies);
+  
+          await createContentO(formData);
         }
       }
+  
+      setDetail([]);
+      setIngredientes([]);
+      Cookies.remove("saleDetail");
     } catch (error) {
       console.error("Error al crear la venta:", error);
     }
   };
+  
   const handleDeleteClick = (productId) => {
     setDetail((prevDetail) => {
       const updatedDetail = prevDetail.filter(
@@ -151,15 +168,25 @@ export function SalePage() {
     reloadDataTable();
   };
   const handleEditClick = async (selectedProduct, selectIndexer) => {
+    setIngredientes([])
+
     const content = contents.filter(
       (content) => content.product === selectedProduct.name
     );
     const headers = ["Nombre", "Precio"];
     const key = ["name", "Price"];
     const detai = detail.filter((detail) => detail.indexer === selectIndexer);
-    console.log(detai);
-    console.log(content);
     const fieldsEdit = [
+      {
+        title: "Producto",
+        type: "text",
+        name: "name",
+        icon: "burger",
+        col: "full",
+        required: "true",
+        value: selectedProduct.name,
+        readonly: true
+      },
       {
         type: "list",
         headers: ["Nombre", "Precio"],
@@ -183,22 +210,25 @@ export function SalePage() {
 
       //   },
     ];
-    const handleEditUser = async (data) => {
+    const handleEditSale = async (data) => {
       try {
-        console.log(data);
-        editarContenido(selectIndexer, data); // Actualiza el contenido del producto en la cookie
+
+        closeModal(); // Close the modal after updating
       } catch (error) {
         console.error("Error al editar la venta:", error);
       }
     };
 
+
     openModal(
       "Editar venta",
       fieldsEdit,
-      [{id: 0, supplies: 'No selecionado', price: 0, stock: 0, status: true}, ...content],
+      [{ id: 0, supplies: 'No selecionado', price: 0, stock: 0, status: true }, ...content],
       "supplies",
       true,
-      handleEditUser
+      true,
+      handleEditSale,
+
     );
   };
 
@@ -220,7 +250,6 @@ export function SalePage() {
   const añadirProducto = (data) => {
     const subtotal = data.price * data.amount;
     const productWithSubtotal = { ...data, subtotal }; // Añade el subtotal al objeto de producto
-    console.log(data);
     setDetail((prevDetail) => {
       Cookies.remove("saleDetail");
       const newDetail = [...prevDetail, productWithSubtotal];
@@ -231,6 +260,7 @@ export function SalePage() {
 
   const borrarDetalle = () => {
     setDetail([]);
+    setIngredientes([]);
     Cookies.remove("saleDetail");
   };
 
@@ -268,7 +298,12 @@ export function SalePage() {
                 {detail.map((product) => {
                   total = total + product.subtotal;
                 })}
-                <h1 className="h1 ">{total} $</h1>
+                <Button
+                  text={total + " $"}
+                  color="success"
+                  type="button"
+                  action={handleCreateProduct}
+                />
               </div>
             </div>
           </div>
@@ -286,6 +321,7 @@ export function SalePage() {
             dataSelect={modalConfig.dataSelect}
             nameSelect={modalConfig.nameSelect}
             buttonSubmit={modalConfig.buttonSubmit}
+            isOpen={isOpen}
             onClose={closeModal}
           />
         )}

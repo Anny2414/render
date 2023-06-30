@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 
 import { useForm } from "react-hook-form";
 
@@ -10,6 +10,13 @@ import { Switch } from "./Form/Switch";
 import { Table } from "./Table/Table";
 
 export function Modal(props) {
+  const [ingredientes, setIngredientes] = useState([]);
+
+  useEffect(() => {
+    setIngredientes([]); // Reset ingredientes when the modal is opened
+  }, [props.isOpen]);
+
+
   const {
     title,
     fields,
@@ -17,7 +24,8 @@ export function Modal(props) {
     dataSelect,
     nameSelect,
     buttonSubmit,
-    submit,
+    button,
+    submit
   } = props;
 
   const {
@@ -25,6 +33,8 @@ export function Modal(props) {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  
 
   return (
     <div className="modal is-active">
@@ -53,8 +63,8 @@ export function Modal(props) {
                         </label>
                       </div>
                       {field.type === "text" ||
-                      field.type === "number" ||
-                      field.type === "password" ? (
+                        field.type === "number" ||
+                        field.type === "password" ? (
                         <Input
                           type={field.type}
                           read_only={field.readonly}
@@ -96,13 +106,18 @@ export function Modal(props) {
                         />
                       ) : field.type === "list" ? (
                         <div>
-                          {console.log(field.data)}
-                          {field.data.map((ingrediente) => (
+                          {field.data == undefined ? (
+                            <span>no valido</span>
+                          ) : field.data && field.data.length > 0 ? ( // Check if data exists and is not empty
+                            field.data.map((ingrediente) => (
+                              <span key={ingrediente?.name || ingrediente?.supplies}>
+                                {ingrediente?.supplies || ingrediente?.name}
+                              </span>
 
-                            <span>
-                              {console.log(ingrediente)}
-                              {ingrediente.name}</span>
-                          ))}
+                            ))
+                          ) : (
+                            <span>No ingredients available.</span>
+                          )}
                         </div>
                       ) : (
                         <div>
@@ -135,9 +150,11 @@ export function Modal(props) {
               action={onClose}
               type="button"
             />
-            {buttonSubmit && (
-              <Button text="Confirmar" color="success" type="submit" />
-            )}
+            <Button text="Confirmar" color="success" type="button" action={submit} />
+             
+            {buttonSubmit && 
+             (<Button text="Confirmar" color="success" type="submit" />)
+            }
           </footer>
           <div className="notifications">
             {Object.keys(errors).length > 0 && (

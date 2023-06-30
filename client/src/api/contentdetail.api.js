@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const contentOApi = axios.create({
-    baseURL: "http://127.0.0.1:8000/yourburger/api/v1/contentO/",
+    baseURL: "http://127.0.0.1:8000/yourburger/api/v1/contentorder/",
 });
 
 export const getContentOs = () => contentOApi.get("/");

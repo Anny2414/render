@@ -62,6 +62,17 @@ export function SuppliesPage() {
       col: "half",
       required: "true",
     },
+    {
+      title: "Stock",
+      type: "number",
+      name: "stock",
+      icon: "dollar",
+      col: "half",
+      required: "true",
+      value:0,
+
+
+    },
   ];
 
   // Conexion a API y obtiene datos de Users y Roles
@@ -166,8 +177,8 @@ export function SuppliesPage() {
           </div>
         </div>
         <Table
-          headers={["id", "name", "price"]}
-          columns={["ID", "Nombre", "Costo Adicional"]}
+          headers={["id", "name", "price","stock"]}
+          columns={["ID", "Nombre", "Costo Adicional","Stock"]}
           data={Supplies}
           status
           edit

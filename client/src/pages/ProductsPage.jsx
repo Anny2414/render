@@ -20,13 +20,14 @@ import {
   updateProductStatus,
 } from "../api/products.api.js";
 import { getSupplies } from "../api/supplies.api.js";
-import { createContent } from "../api/content.api.js";
+import { createContent, editContent, getContents } from "../api/content.api.js";
 
 // import {createContent} from "../api/"
 
 export function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [supplies, setSupplies] = useState([]);
+  const [contents, setContents] = useState([]);
   const [ingredientes, setIngredientes] = useState([]);
   // const ingredientes = useRef([]);
   const selectedOptionRef = useRef();
@@ -38,6 +39,8 @@ export function ProductsPage() {
     const currentIngredients = ingredientes;
     console.log(currentIngredients);
   }, [ingredientes]);
+
+
   
   const reloadDataTable = async () => {
     setProducts([]);
@@ -154,6 +157,8 @@ export function ProductsPage() {
   useEffect(() => {
     async function fetchData() {
       const res = await getProducts();
+      const resContent = await getContents();
+      setContents(resContent.data)
       setProducts(res.data);
     }
 
@@ -168,7 +173,7 @@ export function ProductsPage() {
 
   const handleCreateProduct = async (data) => {
     try {
-      anadirIngrediente(data);
+      // anadirIngrediente(data);
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("price", data.price);
@@ -195,6 +200,7 @@ export function ProductsPage() {
       }
 
       reloadDataTable();
+      setIngredientes([])
       closeModal();
     } catch (error) {
       console.error("Error al crear el Producto:", error);
@@ -204,7 +210,7 @@ export function ProductsPage() {
   const handleEditClick = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
-
+    console.log("entra a click");
     const fieldsEdit = [
       {
         title: "Producto",
@@ -242,20 +248,40 @@ export function ProductsPage() {
         required: "true",
         value: product.description,
       },
-      {
-        title: "Supplies",
-        type: "select",
-        name: "supplies",
-        icon: "list",
-        col: "full",
-        required: "false",
-      },
     ];
 
     const handleEditProduct = async (data) => {
-      const { name, price, description } = data;
+      const { id ,name, price, description } = data;
+      console.log("entra a product" + id);
+      const product = await (await getProduct(productId)).data
+      const contentss = contents.filter(
+        (content) => content.product === product.name
+        )
 
       try {
+        console.log(contentss);
+
+        const updateData0 = new FormData();
+        updateData0.append("name", "burbuja");
+        updateData0.append("price", data.price);
+        updateData0.append("description", data.description);
+
+        const res0 = await createProduct(updateData0);
+        const updatedProduct0 = res0.data;
+
+
+        if (contentss.length > 0) {
+          for (let i = 0; i < contentss.length; i++) {
+            const content = contents[i];
+            const updateContent = new FormData()
+            updateContent.append("product", "burbuja");
+            updateContent.append("supplies", content.supplies);
+            updateContent.append("count", content.count);
+            console.log(updateContent);
+
+            await editContent(content.id , updateContent)
+          }
+        }
         const updateData = new FormData();
         updateData.append("name", data.name);
         updateData.append("price", data.price);
@@ -264,7 +290,25 @@ export function ProductsPage() {
         const res = await editProduct(productId, updateData);
         const updatedProduct = res.data;
 
+        if (contentss.length > 0) {
+          for (let i = 0; i < contentss.length; i++) {
+            const content = contents[i];
+            const updateContent = new FormData()
+            updateContent.append("product", name);
+            updateContent.append("supplies", content.supplies);
+            updateContent.append("count", content.count);
+            console.log(updateContent);
+
+            await editContent(content.id , updateContent)
+          }
+        }
+
+
+        await deleteProduct(res0.data.id)
+        
+
         closeModal();
+        reloadDataTable()
 
         // Actualizar la lista de productos sin recargar la página
         setProducts((prevProducts) => {
