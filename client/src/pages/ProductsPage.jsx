@@ -176,15 +176,18 @@ export function ProductsPage() {
       }
 
       const produc = await createProduct(formData);
-      const formData1 = new FormData();
-      formData1.append("product", produc.data.name);
-      formData1.append(
-        "supplies",
-        ingredientes.map((ingrediente) => ingrediente.value).join(",")
-      );
-      formData1.append("count", 1);
 
-      await createContent(formData1);
+      for (let index = 0; index < ingredientes.length; index++) {
+        const ingrediente = ingredientes[index];
+        const formData1 = new FormData();
+        formData1.append("product", produc.data.name);
+        formData1.append("supplies", ingrediente.name
+        );
+        formData1.append("count", 1);
+  
+        await createContent(formData1);
+        
+      }
 
       reloadDataTable();
       closeModal();
