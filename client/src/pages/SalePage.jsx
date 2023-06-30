@@ -14,8 +14,10 @@ import { getSales, createSale, deleteSale, editSale, getSale } from "../api/sale
 import { getDetail, createDetail, deleteDetail, editDetail, getDetails } from "../api/detail.api.js"
 import { getContent, getContents } from '../api/content.api.js'
 import { Modal } from "../components/Modal.jsx";
+import { ModalSale } from "../components/modal.sale.jsx";
 
 export function SalePage() {
+    const [isOpenSale, setIsOpenSale] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [modalConfig, setModalConfig] = useState();
     const [products, setProducts] = useState([]);
@@ -26,11 +28,18 @@ export function SalePage() {
 
     const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
         setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
-        setIsOpen(true);
+        setIsOpenSale(true);
+    };
+    const openModalSale = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
+        setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
+        setIsOpenSale(true);
     };
 
     const closeModal = () => {
         setIsOpen(false);
+    };
+    const closeModalSale = () => {
+        setIsOpenSale(false);
     };
     useEffect(() => {
         async function fetchData() {
@@ -43,7 +52,7 @@ export function SalePage() {
         if (storedDetail) {
             setDetail(JSON.parse(storedDetail));
         }
-        
+
         fetchData();
     }, []);
 
@@ -58,8 +67,8 @@ export function SalePage() {
     const handleSearchChange = (event) => {
         const value = event.target.value.toLowerCase();
         setSearchValue(value);
-      };
-      
+    };
+
 
 
     const handleCreateProduct = async (data) => {
@@ -96,7 +105,7 @@ export function SalePage() {
     const handleDeleteClick = (productId) => {
         setDetail((prevDetail) => {
             const updatedDetail = prevDetail.filter((product) => product.indexer !== productId);
-            Cookies.set("saleDetail", JSON.stringify(updatedDetail));
+            Cookies.set("saleDetail", JSONble.stringify(updatedDetail));
             return updatedDetail;
         });
         reloadDataTable()
@@ -104,18 +113,15 @@ export function SalePage() {
     const handleEditClick = async (selectedProduct, selectIndexer) => {
 
         const content = contents.filter(content => content.product === selectedProduct.name)
-        const headers = ["Nombre", "Precio"]
-        const key = ["name", "Price"]
+        const columns = ["Nombre", "Precio"]
+        const headers = ["name", "price"]
         const detai = detail.filter(detail => detail.indexer === selectIndexer)
-        console.log(detai);
-        console.log(content);
         const fieldsEdit = [
             {
                 type: "list",
-                headers,
-                key,
-                data: detai,
-                content,
+                columns,
+                headers ,
+                data: detai[0].contentOrder,
                 col: "full"
             },
             {
@@ -144,7 +150,7 @@ export function SalePage() {
             }
         };
 
-        openModal("Editar venta", fieldsEdit, content, 'supplies', true, handleEditUser);
+        openModalSale("Editar venta", fieldsEdit, content, 'supplies', true, handleEditUser);
     };
 
 
@@ -239,6 +245,16 @@ export function SalePage() {
                         nameSelect={modalConfig.nameSelect}
                         buttonSubmit={modalConfig.buttonSubmit}
                         onClose={closeModal}
+                    />
+                )}
+                {isOpenSale && (
+                    <ModalSale
+                        title={modalConfig.title}
+                        fields={modalConfig.fields}
+                        dataSelect={modalConfig.dataSelect}
+                        nameSelect={modalConfig.nameSelect}
+                        buttonSubmit={modalConfig.buttonSubmit}
+                        onClose={closeModalSale}
                     />
                 )}
             </div>

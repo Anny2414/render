@@ -7,8 +7,7 @@ import { Input } from "./Form/Input";
 export function ListProducts(props) {
   const { products, add } = props;
   const [count, setCount] = useState(0);
-  const [quantities, setQuantities] = useState([]); // Estado para almacenar las cantidades
- 
+  const [quantities, setQuantities] = useState(Array(products.length).fill(1)); 
 
   useEffect(() => {
     const counts = 0;
