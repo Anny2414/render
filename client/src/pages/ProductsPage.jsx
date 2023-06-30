@@ -374,20 +374,6 @@ export function ProductsPage() {
             <Button text="Generar PDF" color="primary" col="fullwidth" />
           </div>
         </div>
-        <Table 
-        headers = {["id" , "total"]}
-        columns = {["id", "total"]}
-        data = {[{
-          create_at: "2023-06-28",
-          id:16,
-          status:"Cancelado",
-          total:24,
-          update_at:"2023-06-29",
-          user:"Yei"
-        }]}
-        
-        
-        />
         <ViewP
           onStatusClick={handleStatusChange}
           onEditClick={handleEditClick}
