@@ -110,12 +110,20 @@ export function Modal(props) {
                             <span>no valido</span>
                           ) : field.data && field.data.length > 0 ? (
                             field.data.map((ingrediente, index) => (
-                              <span key={index}>
-                                {ingrediente?.supplies || ingrediente?.name}
-                              </span>
+                              <div className="is-flex">
+                                <div className="mx-auto">
+                                  <span key={index}>
+                                    {ingrediente?.supplies || ingrediente?.name}
+                                  </span>
+                                </div>
+                              </div>
                             ))
                           ) : (
-                            <span>No ingredients available.</span>
+                            <div className="is-flex">
+                              <div className="mx-auto">
+                                <span>No Hay {field.title} disponibles.</span>
+                              </div>
+                            </div>
                           )}
                         </div>
                       ) : field.type === "file" ? (
@@ -137,7 +145,7 @@ export function Modal(props) {
                         />
                       ) : field.type === "image" ? (
                         <div className="is-flex is-justify-content-center">
-                          <img src={field.image != null ? field.image : Logo} alt={field.name} width={200}  className="mx-auto" />
+                          <img src={field.image != null ? field.image : Logo} alt={field.name} width={200} className="mx-auto" />
 
                         </div>
                       ) : (

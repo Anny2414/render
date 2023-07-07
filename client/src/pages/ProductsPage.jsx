@@ -454,6 +454,8 @@ export function ProductsPage() {
   const handleViewDetailsClicks = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
+    const suppliesProduct = await contents.filter((content) => content.product == product.name )
+
 
     const fieldsview = [
       {
@@ -462,26 +464,44 @@ export function ProductsPage() {
         name: "name",
         icon: "burger",
         col: "half",
-        readonly: "true",
-        value: product.name,
+        required: "true",
+        value : product.name,
+        readonly: true
       },
       {
         title: "Precio",
-        type: "text",
+        type: "number",
         name: "price",
         icon: "dollar",
         col: "half",
-        readonly: "true",
-        value: product.price,
+        required: "true",
+        value : product.price,
+        readonly: true
+      },
+      {
+        title: "Imagen",
+        type: "image",
+        name: "image",
+        icon: "dollar",
+        col: "full",
+        image : product.image,
       },
       {
         title: "Descripción",
         type: "text",
         name: "description",
         icon: "comment",
-        readonly: "true",
-        col: "half",
-        value: product.description,
+        col: "full",
+        required: "true",
+        value : product.description,
+        readonly: true
+      },
+      {
+        title: "Ingredientes",
+        type: "list",
+        headers: ["Nombre", "Precio"],
+        key: ["name", "price"],
+        data: suppliesProduct,
       },
     ];
 
