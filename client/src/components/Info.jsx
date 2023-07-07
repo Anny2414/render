@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "./Form/Button";
+import Cookies from "js-cookie";
+
 
 export function Info(props) {
-    const { products } = props;
+    const { products, reload, submitButton } = props;
     const [total, setTotal] = useState(0);
   
     useEffect(() => {
@@ -86,12 +88,15 @@ export function Info(props) {
                 color="primary"
                 action={() => {
                   Cookies.remove("orderDetail");
-                  setProducts([]);
+                  reload()
                 }}
               />
-              <button className="ml-3 button is-success" name="buy" type="button">
-                Comprar
-              </button>
+              <Button
+              text= "Comprar"
+              color= "success ml-3"
+              action = {submitButton}
+              />
+             
             </div>
           </div>
         </div>

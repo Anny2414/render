@@ -6,11 +6,17 @@ const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = async () => {
+  const handleLogin = async (event) => {
+    event.preventDefault();
     try {
       const response = await Login(username, password);
-      location.replace('/home');
-      
+      console.log(response.status);
+      if (response.status == 400) {
+        location.replace('/home');
+        
+      }else{
+        alert("credenciales invalidas");
+      }
       // Realiza acciones adicionales después de iniciar sesión exitosamente
     } catch (error) {
       // Maneja el error de inicio de sesión
@@ -18,7 +24,7 @@ const LoginForm = () => {
   };
 
   return (
-<form className="form-login">
+<form className="form-login" onSubmit={handleLogin} >
   <div className="notifications" />
   <div className="hero-body has-text-centered">
     <div className="container">
@@ -62,7 +68,7 @@ const LoginForm = () => {
                     </div>
                   </div>
                 </div>
-                <button className="button is-primary" href="/" type="submit" onClick={handleLogin}>Iniciar sesión</button>
+                <button className="button is-primary"  type="submit">Iniciar sesión</button>
                 <br />
                 <br />
                 <a className="is-link contra" type="button" name="recuperar">¿Olvidaste tu

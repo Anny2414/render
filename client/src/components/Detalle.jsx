@@ -4,23 +4,26 @@ import { Link } from "react-router-dom";
 import { Button } from "./Form/Button";
 import Cookies from "js-cookie";
 import { Input } from "./Form/Input";
-
+import { ModalSale } from "./modal.sale";
 export function Detalle(props) {
-    const { products, deleteP, handleAmountChange } = props;
-
+    const { products, deleteP, EditP, handleAmountChange } = props;
     return (
         <div className="product-grid">
             {products.map((product) => (
                 <div className="card-pedido p-5" key={product.id}>
                     <div className="is-flex mb-2">
                         <Button
-                            color="danger is-justify-content-flex-start mr-auto"
-                            text="X"
-                            action={() => deleteP(product.id)}
+                            color="success is-justify-content-flex-start mr-auto"
+                            text={<span className="icon">
+                                <i className="fa-solid fa-pencil"></i>
+                            </span>}
+                            action={() => EditP(product)}
                         />
                         <Button
                             color="danger is-justify-content-flex-end ml-auto"
-                            text="X"
+                            text={ <span className="icon">
+                            <i className="fa-solid fa-trash"></i>
+                          </span>}
                             action={() => deleteP(product.id)}
                         />
                     </div>

@@ -69,14 +69,7 @@ export function ViewP(props) {
               <p>{product.name}</p>
             </b>
             <span>${product.price}</span>
-            <input
-              type="number"
-              name=""
-              id=""
-              className="input number m-0"
-              defaultValue="1"
-              min="0"
-            />
+            
             <div className="is-flex is-justify-content-center">
               <div className="is-justify-content-flex-start mt-3 mr-2">
                 <Button

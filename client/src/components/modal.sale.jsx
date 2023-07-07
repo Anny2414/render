@@ -48,25 +48,34 @@ export const ModalSale = (props) => {
                                                         <div className="control has-icons-left">
                                                             {field.type === 'list' ? (
                                                                 <div>
-                                                                    {console.log(field.key)}
                                                                     <Table
                                                                         columns={field.columns}
                                                                         headers={field.headers}
                                                                         data={field.data}
+                                                                        delete={field.delete}
+                                                                        onDeleteClick = {field.onDeleteClick}
                                                                     />
                                                                 </div>
                                                             ) : (
 
                                                                 <div>
                                                                     {/* {console.log(field)} */}
-                                                                    <Select
-                                                                        action={{ ...register(field.name) }}
-                                                                        fields={dataSelect}
-                                                                        name={nameSelect}
-                                                                        defaultValue={field.value}
-                                                                        customOptions={field.customOptions}
-                                                                        nameSelect={field.nameSelect}
-                                                                    />
+                                                                    <div>
+                                                                        <Select
+                                                                            action={{ ...register(field.name) }}
+                                                                            fields={dataSelect}
+                                                                            name={nameSelect}
+                                                                            defaultValue={field.value}
+                                                                            customOptions={field.customOptions}
+                                                                            nameSelect={field.nameSelect}
+                                                                            hasButton={field.hasButton}
+                                                                            keySelect={field.keySelect}
+                                                                            textButton={field.textButton}
+                                                                            icon={field.icon}
+                                                                            actionButton={field.actionButton}
+                                                                            handleOptionChange={field.handleOptionChange}
+                                                                        />
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                             <span className="icon is-small is-left">
