@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
-
+import "../assets/css/ResponsiveTable.css";
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
 

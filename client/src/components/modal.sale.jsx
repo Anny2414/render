@@ -48,13 +48,44 @@ export const ModalSale = (props) => {
                                                         <div className="control has-icons-left">
                                                             {field.type === 'list' ? (
                                                                 <div>
-                                                                    <Table
+                                                                    {/* <Table
                                                                         columns={field.columns}
                                                                         headers={field.headers}
                                                                         data={field.data}
                                                                         delete={field.delete}
                                                                         onDeleteClick = {field.onDeleteClick}
-                                                                    />
+                                                                    /> */}
+                                                                    <table className="table is-fullwidth">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                {field.columns.map((column, index) => (
+                                                                                    <th key={column}>{column}</th>
+                                                                                ))}
+                                                                                <th key={"delete"}></th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {field.data.map((ingrediente) => {
+                                                                                console.log(ingrediente);
+                                                                                return (
+                                                                                    <tr key={ingrediente.id}>
+                                                                                        <td>{ingrediente.name}</td>
+                                                                                        <td>{ingrediente.price}</td>
+                                                                                        <td>
+                                                                                            <Button
+                                                                                                text={ <span className="icon">
+                                                                                                <i className="fa-solid fa-trash"></i>
+                                                                                              </span>}
+                                                                                                color="primary"
+                                                                                                action={() => field.onDeleteClick(ingrediente.id)} // Llamar a la función onDeleteClick con el ID del ingrediente
+                                                                                            />
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                );
+                                                                            })}
+                                                                        </tbody>
+
+                                                                    </table>
                                                                 </div>
                                                             ) : (
 

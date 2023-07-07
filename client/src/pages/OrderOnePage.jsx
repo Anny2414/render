@@ -159,7 +159,6 @@ export function OrderPage() {
             Cookies.remove("orderDetail");
             setProducts([]);
             setIngredientes([]);
-            reloadDataTable()
           } catch (error) {
             console.error("Error al crear el pedido:", error);
           }
@@ -181,61 +180,60 @@ export function OrderPage() {
 
 
     const EditP = async (product) => {
-        const anadirIngrediente = () => {
-            setIngredientes([])
-            const ingredien = product.supplies.filter((supplie) => supplie.name == ingredientes.name )
-            console.log(product.supplies);
-            if (selectedOptionRef.current != undefined) {
-                ingredientes.push(selectedOptionRef.current);
-                 setIngredientes([...ingredientes]); // Actualiza el estado de ingredientes
+        const clickDelete = (ingredientId) => {
             const storedDetail = Cookies.get("orderDetail");
             if (storedDetail) {
               const orderDetail = JSON.parse(storedDetail);
-              const updatedOrderDetail = orderDetail.map((producto) => {
-                if (producto.id === producto.id) {
-                  // Verificar si el ingrediente ya existe en product.supplies
-                  const ingredien = producto.supplies.some(
-                    (supplie) => supplie.name === selectedOptionRef.current.name
+              const updatedProducts = orderDetail.map((prod) => {
+                if (prod.id === product.id) {
+                  // Filtrar los ingredientes y eliminar el que coincida con ingredientId
+                  prod.supplies = prod.supplies.filter(
+                    (supplie) => supplie.id !== ingredientId
                   );
-                  if (!ingredien) {
-                    producto.supplies.push(selectedOptionRef.current);
-                    // Actualizar el estado de products
-                    setProducts([...orderDetail]);
-                product.supplies.push(selectedOptionRef.current)
-
-                  }
                 }
-                return product;
+                return prod;
               });
-              Cookies.set("orderDetail", JSON.stringify(updatedOrderDetail));
+              setProducts(updatedProducts);
+              Cookies.set("orderDetail", JSON.stringify(updatedProducts));
+              reloadDataTable();
             }
-
-              
+          };
+          
+          
+          
+          const anadirIngrediente = () => {
+            setIngredientes([]);
+            const ingredien = product.supplies.filter((supplie) => supplie.name === ingredientes.name);
+            console.log(product.supplies);
+            if (selectedOptionRef.current != undefined) {
+              ingredientes.push(selectedOptionRef.current);
+              setIngredientes([...ingredientes]); // Actualiza el estado de ingredientes
+              const storedDetail = Cookies.get("orderDetail");
+              if (storedDetail) {
+                const orderDetail = JSON.parse(storedDetail);
+                const updatedOrderDetail = orderDetail.map((producto) => {
+                  if (producto.id === producto.id) {
+                    // Verificar si el ingrediente ya existe en product.supplies
+                    const ingredien = producto.supplies.some(
+                      (supplie) => supplie.name === selectedOptionRef.current.name
+                    );
+                    if (!ingredien) {
+                      producto.supplies.push(selectedOptionRef.current);
+                      // Actualizar el estado de products
+                      setProducts([...orderDetail]);
+                      product.supplies.push(selectedOptionRef.current);
+                    }
+                  }
+                  return product;
+                });
+                Cookies.set("orderDetail", JSON.stringify(updatedOrderDetail));
+                reloadDataTable();
+              }
             } else {
               console.log("error al añadir");
             }
           };
-          const clickDelete = (ingredientId) => {
-            const storedDetail = Cookies.get("orderDetail");
-            if (storedDetail) {
-              const orderDetail = JSON.parse(storedDetail);
-              const updatedOrderDetail = orderDetail.map((product) => {
-                if (product.id === product.id) {
-                  // Filtrar los ingredientes y eliminar el que coincida con ingredientId
-                  product.supplies = product.supplies.filter(
-                    (supplie) => supplie.id !== ingredientId
-                  );
-                  // Actualizar el estado de products
-                  setProducts([...orderDetail]);
-                  // Actualizar la cookie
-                  Cookies.set("orderDetail", JSON.stringify(updatedOrderDetail));
-                  // Volver a obtener los datos de la cookie y actualizar los estados
-                  reloadDataTable();
-                }
-                return product;
-              });
-            }
-          };
+          
           
 
         setIngredientes([])
@@ -248,11 +246,11 @@ export function OrderPage() {
         const FieldsEdit = [
             {
                 type : "list",
-                columns: ['name'],
-                headers: ['name'],
+                columns: ['Nombre','Precio'],
+                headers: ['name', 'price'],
                 data: ingredient,
                 delete: true,
-                onDeleteClick: {clickDelete}
+                onDeleteClick: clickDelete
             },
             {
                 title: "Ingredientes",
