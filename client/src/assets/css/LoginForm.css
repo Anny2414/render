@@ -1,0 +1,20 @@
+.card{
+    border: 1px solid black;
+}
+.contra{
+  color: black !important;
+}
+
+a:hover {
+  color: grey;
+}
+
+.contra {
+  border: none;
+  background-color: white;
+}
+
+.contra:hover {
+  color: grey;
+  cursor: pointer;
+}

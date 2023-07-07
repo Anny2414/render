@@ -1,11 +1,49 @@
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
+from .serializer import UserSerializer
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from django.db.models import Q
 from .serializer import UserSerializer, RoleSerializer , OrderSerializar, ProductSerializar, ClientSerializar, PermissionSerializer, DetailPermissionSerializer, SuppliesSerializar, SaleSerializar, DetailSerializer, ContetOrderSerializer, ContentSerializer
 from .models import User, Role, Order, Products, Permission,DetallePermiso, Supplies, Detail, ContentOrder, Content
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
 # Create your views here.
+class UserRegistrationView(APIView):
+    def post(self, request):
+        role_cliente = Role.objects.get(name="Cliente")
+        data = request.data.copy()
+        data['role'] = role_cliente.id  # Asignar el ID del rol "cliente" al campo "role" del objeto de datos
+
+        serializer = UserSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LoginView(APIView):
+    def post(self, request, format=None):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'message': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if user.password == password:
+            refresh = RefreshToken.for_user(user)
+            token = {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }
+            request.session['user_id'] = user.id
+            return Response({'message': 'Inicio de sesión exitoso', 'token': token, 'name': user.name}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
+        
 class UserView(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.exclude(role__name = "Cliente")
