@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { useForm } from "react-hook-form";
-
+import Logo from "../assets/img/burger.jpg"
 import { Input } from "./Form/Input";
 import { Button } from "./Form/Button";
 import { Select } from "./Form/Select";
@@ -117,6 +117,28 @@ export function Modal(props) {
                           ) : (
                             <span>No ingredients available.</span>
                           )}
+                        </div>
+                      ) : field.type === "file" ? (
+                        <Input
+                          type={field.type}
+                          name={field.name}
+                          value={field.value}
+                          icon={field.icon}
+                          action={{
+                            ...register(field.name, {
+                              required: field.required,
+                            }),
+                            onChange: (e) => {
+                              // Actualiza el valor del campo de imagen
+                              field.value = e.target.files[0];
+                            },
+                          }}
+                          error={errors[field.name]}
+                        />
+                      ) : field.type === "image" ? (
+                        <div className="is-flex is-justify-content-center">
+                          <img src={field.image != null ? field.image : Logo} alt={field.name} width={200}  className="mx-auto" />
+
                         </div>
                       ) : (
                         <div>

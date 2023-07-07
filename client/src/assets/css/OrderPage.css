@@ -2,7 +2,9 @@
     background-color: hsl(0deg, 0%, 100%);
     border-radius: 5px;
     margin: 15px;
-    padding: 5px;
+    padding-right: 5px;
+    padding-left: 5px;
+    padding-top: 0px !important;
     border: 2px solid;
 }
 
@@ -40,10 +42,9 @@
     display: flex;
     background-color: hsl(0deg, 0%, 100%);
     border-radius: 5px;
-    margin: 15px;
     padding: 5px;
     border: 2px solid;
-    height: 90%;
+    height: 100%;
 
 }
 
@@ -75,4 +76,10 @@
 
 .mas {
     color: black;
+}
+
+.top-right{
+    margin-left: 150px;
+    margin-bottom: 10px;
+    margin-top: 0px !important;
 }

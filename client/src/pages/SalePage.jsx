@@ -252,6 +252,7 @@ export function SalePage() {
     });
   };
 
+   
   const borrarDetalle = () => {
     setDetail([]);
     setIngredientes([]);

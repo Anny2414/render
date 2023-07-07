@@ -7,7 +7,7 @@ import { SwitchP } from "../components/Form/SwitchP";
 import { useState } from "react";
 
 export function ViewP(props) {
-  const { data, onEditClick, onDeleteClick, onViewDetails, onStatusClick } = props;
+  const { data, onEditClick, onDeleteClick, onViewDetails, onStatusClick, onAdd } = props;
 
   return (
     <div className="product-grid">
@@ -91,13 +91,11 @@ export function ViewP(props) {
                 />
               </div>
               <div className="is-justify-content-flex-end ml-auto mt-3">
-                <a
-                  href=""
-                  className="button is-success is-fullwidth"
-                  name="new"
-                >
-                  Agregar +
-                </a>
+                <Button
+                text = "Agregar"
+                color = "success"
+                action = {() => onAdd(product)}
+                />
               </div>
             </div>
           </div>

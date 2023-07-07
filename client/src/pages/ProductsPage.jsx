@@ -28,6 +28,7 @@ export function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [supplies, setSupplies] = useState([]);
   const [contents, setContents] = useState([]);
+  const [order, setOrder] = useState([]);
   const [ingredientes, setIngredientes] = useState([]);
   // const ingredientes = useRef([]);
   const selectedOptionRef = useRef();
@@ -37,8 +38,13 @@ export function ProductsPage() {
 
   useEffect(() => {
     const currentIngredients = ingredientes;
-    console.log(currentIngredients);
+    const storedDetail = Cookies.get("orderDetail");
+    if (storedDetail) {
+      setOrder(JSON.parse(storedDetail));
+    }
   }, [ingredientes]);
+
+
 
 
   
@@ -61,12 +67,13 @@ export function ProductsPage() {
     if (selectedOptionRef.current != undefined) {
       ingredientes.push(selectedOptionRef.current);
       setIngredientes([...ingredientes]); // Actualiza el estado de ingredientes
-      console.log(ingredientes);
       
     } else {
       console.log("error al añadir");
     }
   };
+
+
   
 
   const openModal = (
@@ -211,7 +218,6 @@ export function ProductsPage() {
   const handleEditClick = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
-    console.log("entra a click");
     const fieldsEdit = [
       {
         title: "Producto",
@@ -253,14 +259,12 @@ export function ProductsPage() {
 
     const handleEditProduct = async (data) => {
       const { id ,name, price, description } = data;
-      console.log("entra a product" + id);
       const product = await (await getProduct(productId)).data
       const contentss = contents.filter(
         (content) => content.product === product.name
         )
 
       try {
-        console.log(contentss);
 
         const updateData0 = new FormData();
         updateData0.append("name", "burbuja");
@@ -278,7 +282,6 @@ export function ProductsPage() {
             updateContent.append("product", "burbuja");
             updateContent.append("supplies", content.supplies);
             updateContent.append("count", content.count);
-            console.log(updateContent);
 
             await editContent(content.id , updateContent)
           }
@@ -298,7 +301,6 @@ export function ProductsPage() {
             updateContent.append("product", name);
             updateContent.append("supplies", content.supplies);
             updateContent.append("count", content.count);
-            console.log(updateContent);
 
             await editContent(content.id , updateContent)
           }
@@ -343,6 +345,112 @@ export function ProductsPage() {
       handleEditProduct
     );
   };
+
+  const handleAddclick = async (product) => {
+    const suppliesProduct = await contents.filter((content) => content.product == product.name )
+    const fieldsAdd =[
+      {
+        title: "Producto",
+        type: "text",
+        name: "name",
+        icon: "burger",
+        col: "half",
+        required: "true",
+        value : product.name,
+        readonly: true
+      },
+      {
+        title: "Precio",
+        type: "number",
+        name: "price",
+        icon: "dollar",
+        col: "half",
+        required: "true",
+        value : product.price,
+        readonly: true
+      },
+      {
+        title: "Imagen",
+        type: "image",
+        name: "image",
+        icon: "dollar",
+        col: "full",
+        image : product.image,
+      },
+      {
+        title: "Descripción",
+        type: "text",
+        name: "description",
+        icon: "comment",
+        col: "full",
+        required: "true",
+        value : product.description,
+        readonly: true
+      },
+      {
+        title: "Ingredientes",
+        hasButton: true,
+        textButton: "+",
+        type: "select",
+        name: "supplies",
+        icon: "list",
+        required: "false",
+        col : "full",
+        customOptions: [{id: 0, supplies: 'No seleccionado'}, ...suppliesProduct],
+        nameSelect: "supplies",
+        keySelect: "supplies",
+        handleOptionChange: handleOptionChange,
+        actionButton: anadirIngrediente,
+      },
+      {
+        type: "list",
+        headers: ["Nombre", "Precio"],
+        key: ["name", "price"],
+        data: ingredientes,
+      },
+    ]
+
+    const handleAdd = (data) => {
+
+      const {name,price,description,} = data
+      const idP  = products.filter((product)=>product.name == name)
+      console.log(idP[0].id);
+      try {
+
+        const data2 = {
+          id : idP[0].id,
+          name,
+          price,
+          description,
+          image : idP[0].image,
+          supplies: ingredientes, 
+          amount: 1
+        }
+
+        setOrder((prevOrder) => {
+          Cookies.remove("orderDetail");
+          const newOrder = [...prevOrder, data2];
+          Cookies.set("orderDetail", JSON.stringify(newOrder));
+          return newOrder;
+        });
+
+        closeModal()
+
+      } catch (error) {
+        console.log("Error al añadir a carito" + error)
+      }
+    }
+    openModal(
+      "Nuevo producto",
+      fieldsAdd,
+      [{id: 0, name: 'No seleccionado', price: 0, stock: 0, status: true}, ...supplies],
+      "name",
+      true,
+      handleAdd
+    )
+  }
+
+
   const handleViewDetailsClicks = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
@@ -432,6 +540,7 @@ export function ProductsPage() {
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
           onViewDetails={handleViewDetailsClicks}
+          onAdd={handleAddclick}
           data={products}
         />
       </div>
