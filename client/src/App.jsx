@@ -9,15 +9,16 @@ import { ClientPage } from "./pages/ClientPage";
 import { SuppliesPage } from "./pages/Supplies";
 import { OrderPage } from "./pages/OrderOnePage";
 import { OrdersPage } from "./pages/OrdersPage";  
-
-
-
+import { Loginpage } from "./pages/Loginpage"; 
+import { Registropage } from "./pages/registropage";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/registro" element={<Registropage/>} />
+        <Route path="/login" element={<Loginpage/>} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/roles" element={<RolePage />} />

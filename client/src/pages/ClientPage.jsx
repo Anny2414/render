@@ -196,8 +196,8 @@ export function ClientPage() {
           </div>
         </div>
         <Table
-          headers={["document", "name", "lastname", "address", "phone"]}
-          columns={["Documento", "Nombre", "Apellido", "Direccion", "Telefono"]}
+          headers={["document", "username","name", "lastname", "address", "phone"]}
+          columns={["Documento", "usuario","Nombre", "Apellido", "Direccion", "Telefono"]}
           data={users}
           status
           edit

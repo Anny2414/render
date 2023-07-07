@@ -1,8 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/img/only-text.png";
 
 export function Navbar() {
+  const [username, setUsername] = useState('');
+  
+  useEffect(() => {
+    const name = localStorage.getItem('name');
+    setUsername(name);
+  }, []);
+
+  function cerrarSesion() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('name')
+  }
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -65,10 +76,10 @@ export function Navbar() {
 
         <div className="navbar-end">
           <div className="navbar-item has-dropdown is-hoverable">
-            <a className="navbar-link">Yeiner Naranjo</a>
+            <a className="navbar-link">{username}</a>
 
             <div className="navbar-dropdown">
-              <Link to="/home" className="navbar-item">
+              <Link to="/" className="navbar-item" onClick={cerrarSesion}>
                 Cerrar sesión
               </Link>
             </div>
