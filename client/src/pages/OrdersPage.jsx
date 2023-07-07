@@ -138,8 +138,8 @@ export function OrdersPage() {
         ) : (
           // Mostrar datos para otros roles
           <Table
-            headers={["id", "create_at", "update_at", "total", "status"]}
-            columns={["ID", "Creado en", "Actualizado en", "Total", "Estado de venta"]}
+            headers={["#", "create_at", "update_at", "total", "status"]}
+            columns={["#", "Creado en", "Actualizado en", "Total", "Estado de venta"]}
             edit={false}
             delete={true}
             onDeleteClick={handleDeleteClick}

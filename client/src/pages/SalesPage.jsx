@@ -153,7 +153,7 @@ export function SalesPage() {
           </div>
         </div>
         <Table
-          headers={["id", "user", "create_at", "update_at", "total", "status"]}
+          headers={["#", "user", "create_at", "update_at", "total", "status"]}
           columns={[
             "ID",
             "Usuario",
@@ -166,14 +166,7 @@ export function SalesPage() {
           delete
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
-          data={[{
-            create_at: "2023-06-28",
-            id:16,
-            status:"Cancelado",
-            total:24,
-            update_at:"2023-06-29",
-            user:"Yei"
-          }]}
+          data={sales}
         />
         {isOpen && (
           <Modal

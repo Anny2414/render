@@ -134,42 +134,32 @@ export function OrderPage() {
               const product = products[i];
               
         
-              const formDataDetail = new FormData();
-              formDataDetail.append("order", respOrder.data.id);
-              formDataDetail.append("product", product.name);
-              formDataDetail.append("amount", product.amount);
-              formDataDetail.append("price", product.price);
-              formDataDetail.append("contentOrder", product.supplies);
                 const order = {
                     order: respOrder.data.id,
                     product: product.name,
-                    amount
+                    amount: product.amount,
+                    price : product.price,
+                    supplies: product.supplies
                 }
-              formDataDetails.push(formDataDetail);
-            }
-        
-            const createdDetails = [];
-            console.log(formDataDetails);
-        
-            for (const formDataDetail of formDataDetails) {
-              const respDetail = await createDetail(formDataDetail);
-              createdDetails.push(respDetail.data);
-        
-              const contentOrder = formDataDetail.get("contentOrder");
-                console.log(contentOrder);
-              for (const content of contentOrder) {
-                console.log(content);
-                const formData = new FormData();
-                formData.append("detail", respDetail.data.id);
-                formData.append("supplies", content.name);
-        
-                await createContentO(formData);
+                const resDetail = await createDetail(order)
+
+              for (let index = 0; index < order.supplies.length; index++) {
+                const supplies = order.supplies[index];
+
+                const suplie = {
+                    supplies: supplies.name,
+                    detail: resDetail.data.id
+                }
+
+                await createContentO(suplie)
+                
               }
             }
-        
-            setDetail([]);
-            setIngredientes([]);
+              
             Cookies.remove("orderDetail");
+            setProducts([]);
+            setIngredientes([]);
+            reloadDataTable()
           } catch (error) {
             console.error("Error al crear el pedido:", error);
           }
