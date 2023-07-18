@@ -53,30 +53,71 @@ export function ClientPage() {
   // Objeto para los campos de la ventana modal
   const fieldsNew = [
     {
-      title: "Nombre",
+      title: "Usuario",
       type: "text",
-      name: "Name",
+      name: "username",
       icon: "user",
       col: "half",
       required: "true",
     },
     {
-      title: "Apellido",
+      title: "Email",
       type: "text",
-      name: "Lastname",
-      icon: "user",
+      name: "email",
+      icon: "envelope",
       col: "half",
       required: "true",
     },
     {
-      title: "Dirección",
-      type: "text",
-      name: "Adress",
-      icon: "location-dot",
+      title: "Contraseña",
+      type: "password",
+      name: "password",
+      icon: "key",
       col: "half",
       value: "yourburger123",
       readonly: "true",
     },
+
+    {
+        title: "Nombre",
+        type: "text",
+        name: "name",
+        icon: "signature",
+        col: "half",
+        required: "true",
+      },
+      {
+        title: "Apellido",
+        type: "text",
+        name: "lastname",
+        icon: "signature",
+        col: "half",
+        required: "true",
+      },
+      {
+        title: "Documento",
+        type: "number",
+        name: "document",
+        icon: "id-card",
+        col: "half",
+        required: "true",
+      },
+      {
+        title: "Dirección",
+        type: "text",
+        name: "address",
+        icon: "location-dot",
+        col: "half",
+        required: "true",
+      },
+      {
+        title: "Telefono",
+        type: "number",
+        name: "phone",
+        icon: "phone",
+        required: "true",
+        col: "full"
+      },
    
   ];
 
@@ -93,8 +134,22 @@ export function ClientPage() {
   }, []);
 
   const handleCreateUser = async (data) => {
+    const {username, email, password,name,lastname,address,document,phone} = data
+    const res = await getRoles()
+    const rol = res.data.filter((rol) => rol.name == "Cliente")
     try {
-      await createUser(data);
+      const userOne = {
+        username,
+        email,
+        password,
+        role : rol[0].id,
+        name,
+        lastname,
+        address,
+        document,
+        phone,
+      }
+      await createUser(userOne);
       window.location.reload();
     } catch (error) {
       console.error("Error al crear el usuario:", error);
@@ -184,7 +239,7 @@ export function ClientPage() {
               color="success"
               col="fullwidth"
               action={() =>
-                openModal("Nuevo Cliente", fieldsNew, roles, handleCreateUser)
+                openModal("Nuevo Cliente", fieldsNew, roles,true,handleCreateUser)
               }
             />
           </div>
