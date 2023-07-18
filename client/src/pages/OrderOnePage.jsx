@@ -23,6 +23,12 @@ export function OrderPage() {
     const [contents , setContents] = useState([])
     const [detail, setDetail] = useState([])
     const [total, setTotal] = useState(0);
+    const [username, setUsername] = useState('');
+  
+    useEffect(() => {
+      const name = localStorage.getItem('name');
+      setUsername(name);
+    }, []);
   
     useEffect(() => {
       const calculateTotal = () => {
@@ -124,7 +130,7 @@ export function OrderPage() {
     const submitButton = async (data) => {
         try {
             const users = (await getUsers()).data;
-            const user = users[0];
+            const user = username;
             const orderData = { user: user.username, total: total, status: "Pago" };
             const respOrder = await createOrder(orderData);
         
@@ -320,7 +326,7 @@ export function OrderPage() {
 
 <div className="card card-info">
         <div className="card-header px-2">
-          <h1>Detalle</h1>
+          <h1 className="h1" >Detalle</h1>
           <div className="hr"></div>
         </div>
         <div className="card-content p-6">
@@ -336,7 +342,7 @@ export function OrderPage() {
               </div>
             </div>
           ))}
-          <div className="mb-3">
+          {/* <div className="mb-3">
             <div className="is-flex ">
               <div className="producto">
                 <p>IVA</p>
@@ -365,7 +371,7 @@ export function OrderPage() {
                 <p></p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="card-footer ">
           <div className="mb-3 p-6">

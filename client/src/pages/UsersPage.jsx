@@ -189,6 +189,8 @@ export function UsersPage() {
         name: "role",
         col: "full",
         icon: "lock-open",
+        nameSelect: "name",
+        keySelect: "id",
         value: user.role,
       },
     ];

@@ -13,7 +13,7 @@ export const Input = (props) => {
             className={`input ${error && "is-error"} ${styls}`}
             type={type}
             placeholder={holder}
-            value={value}
+            defaultValue={value}
             name={name}
             readOnly={!!read_only}
             {...action}

@@ -13,14 +13,14 @@ export function Detalle(props) {
                 <div className="card-pedido p-5" key={product.id}>
                     <div className="is-flex mb-2">
                         <Button
-                            color="success is-justify-content-flex-start mr-auto"
+                            color="warning is-justify-content-flex-start mr-auto"
                             text={<span className="icon">
                                 <i className="fa-solid fa-pencil"></i>
                             </span>}
                             action={() => EditP(product)}
                         />
                         <Button
-                            color="danger is-justify-content-flex-end ml-auto"
+                            color="primary is-justify-content-flex-end ml-auto"
                             text={ <span className="icon">
                             <i className="fa-solid fa-trash"></i>
                           </span>}
