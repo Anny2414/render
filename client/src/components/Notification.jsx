@@ -1,22 +1,17 @@
 import React, { useEffect } from 'react';
 
 export function Notification(props) {
-  const { msg, color, buttons, timeout } = props;
+  const { msg, color, buttons, timeout, onConfirm } = props;
 
   useEffect(() => {
     if (timeout) {
-      const timeoutId = setTimeout(() => {
-        // Aquí puedes definir cómo se debe manejar el tiempo de espera
-        // Por ejemplo, puedes usar una función de callback para eliminar el componente
-        props.onTimeout();
-      }, timeout * 1000);
+      const timer = setTimeout(() => {
+        props.onClose();
+      }, timeout);
 
-      // Limpia el temporizador si el componente se desmonta antes de que se cumpla el tiempo de espera
-      return () => {
-        clearTimeout(timeoutId);
-      };
+      return () => clearTimeout(timer);
     }
-  }, [timeout]);
+  }, [timeout, props]);
 
   return (
     <div className={`notification has-text-centered is-${color} mt-5`}>
@@ -27,7 +22,11 @@ export function Notification(props) {
           <button className="button is-small is-error mt-3" type="button">
             Cancelar
           </button>
-          <button className="button is-small is-success mt-3 ml-4" type="button">
+          <button
+            className="button is-small is-success mt-3 ml-4"
+            type="button"
+            onClick={onConfirm} // Agrega el evento onClick para llamar a la función onConfirm cuando se haga clic en "Confirmar"
+          >
             Confirmar
           </button>
         </div>

@@ -31,6 +31,8 @@ export function UsersPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
 
+  const [notification, setNotification] = useState(null)
+
   const reloadDataTable = async () => {
     setUsers([]);
     const res = await getUsers();
@@ -155,6 +157,14 @@ export function UsersPage() {
       await createUser(data);
       reloadDataTable();
       closeModal();
+
+      setNotification({
+        msg: "Usuario creado correctamente!",
+        color: "success",
+        buttons: false,
+        timeout: 3000,
+      })
+
     } catch (error) {
       console.error("Error al crear el usuario:", error);
     }
@@ -223,15 +233,46 @@ export function UsersPage() {
     }
   };
 
-  const handleDeleteClick = async (userId) => {
-    await deleteUser(userId);
-    reloadDataTable();
+  const handleDeleteClick = (userId) => {
+    setNotification({
+      msg: "¿Seguro deseas eliminar este usuario?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        try {
+          await deleteUser(userId);
+          setNotification({
+            msg: "Usuario eliminado correctamente!",
+            color: "success",
+            buttons: true,
+            timeout: 3000,
+          });
+          reloadDataTable();
+        } catch (error) {
+          console.error("Error al eliminar el usuario:", error);
+        }
+      },
+    });
   };
+  
+  
 
   return (
     <div>
       <Navbar />
       <div className="container is-fluid mt-5">
+        <div className="notifications float">
+          {notification && (
+            <Notification
+              msg={notification.msg}
+              color={notification.color}
+              buttons={notification.buttons}
+              timeout={notification.timeout}
+              onClose={() => setNotification(null)}
+            />
+          )}
+        </div>
         <div className="columns is-centered">
           <div className="column is-fullwidth">
             <Button
