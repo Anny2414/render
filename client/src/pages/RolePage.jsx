@@ -7,6 +7,8 @@ import { Input } from "../components/Form/Input.jsx";
 
 import { Modal } from "../components/Modal.jsx";
 
+import { Notification } from "../components/Notification.jsx";
+
 // CONEXION CON LA API DE ROLES
 import {
   savePermissions,
@@ -29,6 +31,8 @@ export function RolePage() {
   // CONFIGURACION MODAL
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
+
+  const [notification, setNotification] = useState(null);
 
   const openModal = (
     title,
@@ -105,6 +109,13 @@ export function RolePage() {
           );
         }
       }
+
+      setNotification({
+        msg: "Rol creado exitosamente!",
+        color: "success",
+        buttons: false,
+        timeout: 3000,
+      });
     } catch (error) {
       console.error("Error al crear el rol:", error);
     }
@@ -209,23 +220,68 @@ export function RolePage() {
   };
 
   const handleStatusChange = async (roleId, status) => {
-    try {
-      await updateRoleStatus(roleId, !status);
-    } catch (error) {
-      console.error(error);
-    }
+    setNotification({
+      msg: "¿Seguro deseas cambiar el estado?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        try {
+          await updateRoleStatus(roleId, !status);
+          setNotification({
+            msg: "Estado cambiado exitosamente!",
+            color: "info",
+            buttons: false,
+            timeout: 3000,
+          });
+          reloadDataTable();
+        } catch (error) {
+          console.error("Error al cambiar el estado:", error);
+        }
+      },
+    });
   };
 
   const handleDeleteClick = async (roleId) => {
-    await deleteRole(roleId);
-    await deletePermissionsByRole(roleId);
-    reloadDataTable();
+    setNotification({
+      msg: "¿Seguro deseas eliminar este rol?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        try {
+          await deleteRole(roleId);
+          await deletePermissionsByRole(roleId);
+          setNotification({
+            msg: "Rol eliminado exitosamente!",
+            color: "info",
+            buttons: false,
+            timeout: 3000,
+          });
+          reloadDataTable();
+        } catch (error) {
+          console.error("Error al eliminar el rol:", error);
+        }
+      },
+    });
   };
 
   return (
     <div>
       <Navbar />
       <div className="container is-fluid mt-5">
+        <div className="notifications float">
+          {notification && (
+            <Notification
+              msg={notification.msg}
+              color={notification.color}
+              buttons={notification.buttons}
+              timeout={notification.timeout}
+              onClose={() => setNotification(null)}
+              onConfirm={notification.onConfirm}
+            />
+          )}
+        </div>
         <div className="columns is-centered">
           <div className="column is-fullwidth">
             <Button

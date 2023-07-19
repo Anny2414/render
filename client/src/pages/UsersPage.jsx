@@ -31,7 +31,7 @@ export function UsersPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
 
-  const [notification, setNotification] = useState(null)
+  const [notification, setNotification] = useState(null);
 
   const reloadDataTable = async () => {
     setUsers([]);
@@ -96,7 +96,7 @@ export function UsersPage() {
       icon: "lock-open",
       col: "half",
       nameSelect: "name",
-      keySelect: "id"
+      keySelect: "id",
     },
     {
       title: "Documento",
@@ -159,12 +159,11 @@ export function UsersPage() {
       closeModal();
 
       setNotification({
-        msg: "Usuario creado correctamente!",
+        msg: "Usuario creado exitosamente!",
         color: "success",
         buttons: false,
         timeout: 3000,
-      })
-
+      });
     } catch (error) {
       console.error("Error al crear el usuario:", error);
     }
@@ -226,11 +225,26 @@ export function UsersPage() {
   };
 
   const handleStatusChange = async (userId, status) => {
-    try {
-      await updateUserStatus(userId, !status);
-    } catch (error) {
-      console.error(error);
-    }
+    setNotification({
+      msg: "¿Seguro deseas cambiar el estado?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        try {
+          await updateUserStatus(userId, !status);
+          setNotification({
+            msg: "Estado cambiado exitosamente!",
+            color: "info",
+            buttons: false,
+            timeout: 3000,
+          });
+          reloadDataTable();
+        } catch (error) {
+          console.error("Error al cambiar el estado:", error);
+        }
+      },
+    });
   };
 
   const handleDeleteClick = (userId) => {
@@ -243,9 +257,9 @@ export function UsersPage() {
         try {
           await deleteUser(userId);
           setNotification({
-            msg: "Usuario eliminado correctamente!",
-            color: "success",
-            buttons: true,
+            msg: "Usuario eliminado exitosamente!",
+            color: "info",
+            buttons: false,
             timeout: 3000,
           });
           reloadDataTable();
@@ -255,8 +269,6 @@ export function UsersPage() {
       },
     });
   };
-  
-  
 
   return (
     <div>
@@ -270,6 +282,7 @@ export function UsersPage() {
               buttons={notification.buttons}
               timeout={notification.timeout}
               onClose={() => setNotification(null)}
+              onConfirm={notification.onConfirm}
             />
           )}
         </div>

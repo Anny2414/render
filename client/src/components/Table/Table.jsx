@@ -30,7 +30,6 @@ function TableRow({
 
   const handleSwitchChange = async () => {
     onStatusClick(row.id, statusSlider);
-    setStatus(!statusSlider);
   };
 
   useEffect(() => {
@@ -66,8 +65,11 @@ function TableRow({
               </span>
             }
             action={() => {
-              row.indexer != undefined ? ( onEditClick(row,  row.indexer) ) : ( onEditClick(row.id) ) }}
-            />
+              row.indexer != undefined
+                ? onEditClick(row, row.indexer)
+                : onEditClick(row.id);
+            }}
+          />
         </td>
       )}
       {showDelete && (
@@ -80,7 +82,11 @@ function TableRow({
                 <i className="fa-solid fa-trash"></i>
               </span>
             }
-            action={() => {row.indexer != undefined ? ( onDeleteClick(row.indexer) ) : ( onDeleteClick(row.id) ) }}
+            action={() => {
+              row.indexer != undefined
+                ? onDeleteClick(row.indexer)
+                : onDeleteClick(row.id);
+            }}
           />
         </td>
       )}
@@ -99,7 +105,7 @@ export function Table(props) {
     onStatusClick,
     onEditClick,
     onDeleteClick,
-    itemsPorPage
+    itemsPorPage,
   } = props;
 
   const [count, setCount] = useState(1);
@@ -117,57 +123,63 @@ export function Table(props) {
 
   return (
     <div>
-    <div style={{ overflowX: "auto" }}>
-      <table className="table is-fullwidth">
-        <thead>
-          <tr>
-            {columns.map((column) => (
-              <th key={column}>{column}</th>
+      <div style={{ overflowX: "auto" }}>
+        <table className="table is-fullwidth">
+          <thead>
+            <tr>
+              {columns.map((column) => (
+                <th key={column}>{column}</th>
+              ))}
+              {status && <th>Estado</th>}
+              {edit && <th>Editar</th>}
+              {showDelete && <th>Eliminar</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {currentData.map((row, index) => (
+              <TableRow
+                key={row.id}
+                row={row}
+                headers={headers}
+                status={status}
+                edit={edit}
+                showDelete={showDelete}
+                onStatusClick={onStatusClick}
+                onEditClick={onEditClick}
+                onDeleteClick={onDeleteClick}
+                count={count + index + offset}
+              />
             ))}
-            {status && <th>Estado</th>}
-            {edit && <th>Editar</th>}
-            {showDelete && <th>Eliminar</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {currentData.map((row, index) => (
-            <TableRow
-              key={row.id}
-              row={row}
-              headers={headers}
-              status={status}
-              edit={edit}
-              showDelete={showDelete}
-              onStatusClick={onStatusClick}
-              onEditClick={onEditClick}
-              onDeleteClick={onDeleteClick}
-              count={count + index + offset}
-            />
-          ))}
-        </tbody>
-      </table>
-    </div>
-    {/* Paginador */}
-    <div className="mt-5">
-      <nav className="pagination is-centered" role="navigation" aria-label="pagination">
-        <ul className="pagination-list">
-          {Array.from({ length: pageCount }, (_, index) => {
-            const page = index + 1;
-            return (
-              <li key={page}>
-                <a
-                  className={`pagination-link${currentPage === page ? " is-current" : ""}`}
-                  aria-label={`Ir a la página ${page}`}
-                  onClick={() => handlePageChange(page)}
-                >
-                <b>{page}</b>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    </div>
+          </tbody>
+        </table>
+      </div>
+      {/* Paginador */}
+      <div className="mt-5">
+        <nav
+          className="pagination is-centered"
+          role="navigation"
+          aria-label="pagination"
+        >
+          <ul className="pagination-list">
+            {Array.from({ length: pageCount }, (_, index) => {
+              const page = index + 1;
+              return (
+                <li key={page}>
+                  <a
+                    className={`pagination-link${
+                      currentPage === page ? " is-current" : ""
+                    }`}
+                    aria-label={`Ir a la página ${page}`}
+                    onClick={() => handlePageChange(page)}
+                  >
+                    <b>{page}</b>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
     </div>
   );
 }
