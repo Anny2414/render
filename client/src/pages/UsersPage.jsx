@@ -1,3 +1,9 @@
+// GENERACION DE PDF
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
+import Logo from "../assets/img/Logo.png"; // Imagen que sera usada en el PDF
+
 import { useEffect, useState } from "react";
 
 import { Navbar } from "../components/Navbar.jsx";
@@ -26,6 +32,69 @@ export function UsersPage() {
   // ARREGLO DE USUARIOS Y ROLES
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    doc.addFont("helvetica", "normal");
+    const fontSize = 10;
+
+    const headers = [
+      "#",
+      "Rol",
+      "Usuario",
+      "Email",
+      "Teléfono",
+      "Dirección",
+      "Creado en",
+    ];
+    const tableData = users.map((user, index) => [
+      index + 1,
+      user.role,
+      user.username,
+      user.email,
+      user.phone,
+      user.address,
+      user.date,
+    ]);
+
+    doc.setFont("helvetica");
+    doc.setFontSize(fontSize);
+    doc.autoTable({
+      head: [headers],
+      body: tableData,
+      startY: 40,
+      styles: {
+        textColor: [100, 100, 100],
+        lineColor: [100, 100, 100],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [207, 41, 36],
+        textColor: [255, 255, 255],
+      },
+      bodyStyles: {
+        fillColor: [245, 245, 245],
+      },
+    });
+
+    const imgData = Logo;
+    doc.addImage(imgData, "PNG", 10, 10, 30, 30);
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(`REPORTE DE USUARIOS`, 50, 25);
+
+    const today = new Date();
+    const dateStr = today.toLocaleDateString();
+
+    doc.setFontSize(fontSize);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Fecha: ${dateStr}`, 50, 30);
+
+    doc.save("reporte_usuarios.pdf");
+  };
 
   // CONFIGURACION MODAL
   const [isOpen, setIsOpen] = useState(false);
@@ -308,7 +377,12 @@ export function UsersPage() {
             <Input holder="Buscar usuario" icon="magnifying-glass" />
           </div>
           <div className="column is-fullwidth">
-            <Button text="Generar PDF" color="primary" col="fullwidth" />
+            <Button
+              text="Generar PDF"
+              color="primary"
+              col="fullwidth"
+              action={generatePDF}
+            />
           </div>
         </div>
         <Table
