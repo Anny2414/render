@@ -1,13 +1,3 @@
-body {
-    margin-top: 84px;
-}
-
-.navbar {
-    position: fixed;
-    width: 100%;
-    top: 0;
-}
-
 .float {
     position: fixed;
     margin-left: auto;
@@ -112,6 +102,17 @@ input+.slider::before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+.slider,
+.slider::before {
+  opacity: 1; /* Valor de opacidad predeterminado */
+}
+
+/* Aplicamos una opacidad más baja cuando el input esté deshabilitado */
+.switch input:disabled + .slider,
+.switch input:disabled + .slider::before {
+  opacity: 0.5; /* Valor de opacidad más bajo cuando está deshabilitado */
 }
 
 @media screen and (max-width: 600px) {

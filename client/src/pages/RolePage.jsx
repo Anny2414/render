@@ -261,6 +261,14 @@ export function RolePage() {
           reloadDataTable();
         } catch (error) {
           console.error("Error al eliminar el rol:", error);
+          if (error.response.status == 500) {
+            setNotification({
+              msg: "Este rol tiene usuarios asociados!",
+              color: "primary",
+              buttons: false,
+              timeout: 3000,
+            });
+          }
         }
       },
     });
@@ -305,8 +313,8 @@ export function RolePage() {
           </div>
         </div>
         <Table
-          headers={["#", "name", "created_at", "permissions"]}
-          columns={["#", "Nombre", "Creado en", "Permisos"]}
+          headers={["#", "name", "permissions"]}
+          columns={["#", "Nombre", "Permisos"]}
           data={roles}
           edit
           status

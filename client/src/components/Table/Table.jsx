@@ -36,6 +36,10 @@ function TableRow({
     mostrarPermisos(row.id);
   }, [row.id]);
 
+  // Condicional para saber si es el rol de Administrador o Cliente
+  const isAdministradorOrCliente =
+    row.name === "Administrador" || row.name === "Cliente";
+
   return (
     <tr key={row.id}>
       {headers.map((header) => (
@@ -51,7 +55,11 @@ function TableRow({
       ))}
       {status && (
         <td>
-          <Switch change={handleSwitchChange} checked={statusSlider} />
+          <Switch
+            change={handleSwitchChange}
+            checked={statusSlider}
+            disabled={isAdministradorOrCliente}
+          />
         </td>
       )}
       {edit && (
@@ -69,6 +77,7 @@ function TableRow({
                 ? onEditClick(row, row.indexer)
                 : onEditClick(row.id);
             }}
+            disabled={isAdministradorOrCliente}
           />
         </td>
       )}
@@ -87,6 +96,7 @@ function TableRow({
                 ? onDeleteClick(row.indexer)
                 : onDeleteClick(row.id);
             }}
+            disabled={isAdministradorOrCliente}
           />
         </td>
       )}

@@ -4,7 +4,6 @@ from PIL import Image
 # Create your models here.
 class Role(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    created_at = models.DateField(auto_now_add=True)
     permissions = models.ManyToManyField('Permission', through='DetallePermiso')
 
     status = models.BooleanField(default=True)
@@ -24,7 +23,7 @@ class DetallePermiso(models.Model):
     permission = models.ForeignKey(Permission, on_delete=models.CASCADE, to_field='module_name')
 
 class User(models.Model):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, on_delete=models.PROTECT)
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=254)
     password = models.CharField(max_length=50)
