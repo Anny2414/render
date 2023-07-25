@@ -28,6 +28,13 @@ import {
 export function RolePage() {
   const [roles, setRoles] = useState([]);
 
+  // Variable para buscar roles
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredRoles = roles.filter((role) =>
+    role.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // CONFIGURACION MODAL
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
@@ -327,20 +334,31 @@ export function RolePage() {
             />
           </div>
           <div className="column is-10">
-            <Input holder="Buscar rol" icon="magnifying-glass" />
+            <Input
+              holder="Buscar rol"
+              icon="magnifying-glass"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
         </div>
-        <Table
-          headers={["#", "name", "permissions"]}
-          columns={["#", "Nombre", "Permisos"]}
-          data={roles}
-          edit
-          status
-          delete
-          onStatusClick={handleStatusChange}
-          onEditClick={handleEditClick}
-          onDeleteClick={handleDeleteClick}
-        />
+        {filteredRoles.length > 0 ? (
+          <Table
+            headers={["#", "name", "permissions"]}
+            columns={["#", "Nombre", "Permisos"]}
+            data={filteredRoles} // Use the filtered roles data in the table
+            edit
+            status
+            delete
+            onStatusClick={handleStatusChange}
+            onEditClick={handleEditClick}
+            onDeleteClick={handleDeleteClick}
+          />
+        ) : (
+          <div className="notification has-text-centered mt-4">
+            No se encontraron registros.
+          </div>
+        )}
       </div>
       {isOpen && (
         <Modal

@@ -33,6 +33,13 @@ export function UsersPage() {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
 
+  // Variable para buscar usuarios
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredUsers = users.filter((user) =>
+    user.username.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const generatePDF = () => {
     const doc = new jsPDF();
 
@@ -374,7 +381,12 @@ export function UsersPage() {
             />
           </div>
           <div className="column is-9">
-            <Input holder="Buscar usuario" icon="magnifying-glass" />
+            <Input
+              holder="Buscar usuario"
+              icon="magnifying-glass"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <div className="column is-fullwidth">
             <Button
@@ -385,33 +397,39 @@ export function UsersPage() {
             />
           </div>
         </div>
-        <Table
-          headers={[
-            "#",
-            "role",
-            "username",
-            "email",
-            "phone",
-            "address",
-            "date",
-          ]}
-          columns={[
-            "#",
-            "Rol",
-            "Usuario",
-            "Correo",
-            "Telefono",
-            "Direccion",
-            "Creado en",
-          ]}
-          data={users}
-          status
-          edit
-          delete
-          onStatusClick={handleStatusChange}
-          onEditClick={handleEditClick}
-          onDeleteClick={handleDeleteClick}
-        />
+        {filteredUsers.length > 0 ? (
+          <Table
+            headers={[
+              "#",
+              "role",
+              "username",
+              "email",
+              "phone",
+              "address",
+              "date",
+            ]}
+            columns={[
+              "#",
+              "Rol",
+              "Usuario",
+              "Correo",
+              "Telefono",
+              "Direccion",
+              "Creado en",
+            ]}
+            data={filteredUsers}
+            status
+            edit
+            delete
+            onStatusClick={handleStatusChange}
+            onEditClick={handleEditClick}
+            onDeleteClick={handleDeleteClick}
+          />
+        ) : (
+          <div className="notification has-text-centered mt-4">
+            No se encontraron registros.
+          </div>
+        )}
       </div>
       {isOpen && (
         <Modal

@@ -1,8 +1,18 @@
 import React from "react";
 
 export const Input = (props) => {
-  const { holder, icon, type, value, read_only, name, action, error, style } =
-    props;
+  const {
+    holder,
+    icon,
+    type,
+    value,
+    onChange,
+    read_only,
+    name,
+    action,
+    error,
+    style,
+  } = props;
   const styls = style || "";
 
   return (
@@ -14,6 +24,7 @@ export const Input = (props) => {
             type={type}
             placeholder={holder}
             defaultValue={value}
+            onChange={onChange}
             name={name}
             readOnly={!!read_only}
             {...action}
@@ -26,4 +37,3 @@ export const Input = (props) => {
     </div>
   );
 };
-
