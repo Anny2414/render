@@ -104,15 +104,10 @@ input+.slider::before {
     border-radius: 50%;
 }
 
-.slider,
-.slider::before {
-  opacity: 1; /* Valor de opacidad predeterminado */
-}
-
-/* Aplicamos una opacidad más baja cuando el input esté deshabilitado */
 .switch input:disabled + .slider,
 .switch input:disabled + .slider::before {
-  opacity: 0.5; /* Valor de opacidad más bajo cuando está deshabilitado */
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media screen and (max-width: 600px) {

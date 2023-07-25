@@ -91,13 +91,23 @@ export function RolePage() {
   }, []);
 
   const handleCreateRole = async (data) => {
+    const selectedModules = Object.entries(data)
+      .filter(([module, value]) => value && module !== "name")
+      .map(([module]) => module);
+
+    if (selectedModules.length === 0) {
+      setNotification({
+        msg: "Seleccione por lo menos un permiso antes de crear el rol!",
+        color: "error",
+        buttons: false,
+        timeout: 3000,
+      });
+      return;
+    }
+
     try {
       const res = await createRole({ name: data.name });
       const roleId = res.data.id; // Obtener el ID del rol creado
-
-      const selectedModules = Object.entries(data)
-        .filter(([module, value]) => value && module !== "name")
-        .map(([module]) => module);
 
       for (const module of selectedModules) {
         try {
@@ -109,7 +119,6 @@ export function RolePage() {
           );
         }
       }
-
       setNotification({
         msg: "Rol creado exitosamente!",
         color: "success",
@@ -136,7 +145,6 @@ export function RolePage() {
         icon: "user",
         col: "full",
         value: role.name,
-        disabled: "false",
       },
       {
         title: "Usuarios",
@@ -185,6 +193,20 @@ export function RolePage() {
     const handleEditRole = async (data) => {
       const { name } = data;
 
+      const selectedModules = Object.entries(data)
+        .filter(([module, value]) => value && module !== "name")
+        .map(([module]) => module);
+
+      if (selectedModules.length === 0) {
+        setNotification({
+          msg: "Seleccione por lo menos un permiso antes de editar el rol!",
+          color: "error",
+          buttons: false,
+          timeout: 3000,
+        });
+        return;
+      }
+
       try {
         await editRole(roleId, { name: name });
       } catch (error) {
@@ -196,10 +218,6 @@ export function RolePage() {
       } catch (error) {
         console.error("Error al eliminar los permisos del rol:", error);
       }
-
-      const selectedModules = Object.entries(data)
-        .filter(([module, value]) => value && module !== "name")
-        .map(([module]) => module);
 
       for (const module of selectedModules) {
         try {

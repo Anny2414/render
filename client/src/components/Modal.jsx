@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 
 import { useForm } from "react-hook-form";
-import Logo from "../assets/img/burger.jpg"
+import Logo from "../assets/img/burger.jpg";
 import { Input } from "./Form/Input";
 import { Button } from "./Form/Button";
 import { Select } from "./Form/Select";
-import { Switch } from "./Form/Switch";
-
-import { Table } from "./Table/Table";
+import { DefaultCheckedSwitch } from "./Form/DefaultCheckedSwitch";
 
 export function Modal(props) {
   const [ingredientes, setIngredientes] = useState([]);
@@ -15,7 +13,6 @@ export function Modal(props) {
   useEffect(() => {
     setIngredientes([]); // Reset ingredientes when the modal is opened
   }, [props.isOpen]);
-
 
   const {
     title,
@@ -25,7 +22,7 @@ export function Modal(props) {
     nameSelect,
     buttonSubmit,
     button,
-    submit
+    submit,
   } = props;
 
   const {
@@ -33,8 +30,6 @@ export function Modal(props) {
     handleSubmit,
     formState: { errors },
   } = useForm();
-
-
 
   return (
     <div className="modal is-active">
@@ -63,8 +58,8 @@ export function Modal(props) {
                         </label>
                       </div>
                       {field.type === "text" ||
-                        field.type === "number" ||
-                        field.type === "password" ? (
+                      field.type === "number" ||
+                      field.type === "password" ? (
                         <Input
                           type={field.type}
                           read_only={field.readonly}
@@ -81,7 +76,7 @@ export function Modal(props) {
                       ) : field.type === "checkbox" ? (
                         <div className="field is-grouped is-grouped-centered">
                           <div className="control">
-                            <Switch
+                            <DefaultCheckedSwitch
                               checked={field.checked}
                               action={{ ...register(field.title) }}
                             />
@@ -145,8 +140,12 @@ export function Modal(props) {
                         />
                       ) : field.type === "image" ? (
                         <div className="is-flex is-justify-content-center">
-                          <img src={field.image != null ? field.image : Logo} alt={field.name} width={200} className="mx-auto" />
-
+                          <img
+                            src={field.image != null ? field.image : Logo}
+                            alt={field.name}
+                            width={200}
+                            className="mx-auto"
+                          />
                         </div>
                       ) : (
                         <div>
@@ -180,9 +179,9 @@ export function Modal(props) {
               action={onClose}
               type="button"
             />
-            {buttonSubmit &&
-              (<Button text="Confirmar" color="success" type="submit" />)
-            }
+            {buttonSubmit && (
+              <Button text="Confirmar" color="success" type="submit" />
+            )}
           </footer>
           <div className="notifications">
             {Object.keys(errors).length > 0 && (
