@@ -26,7 +26,7 @@ import {
   updateUserStatus,
 } from "../api/users.api";
 
-import { getRoles } from "../api/roles.api";
+import { getRoles, getRoleName } from "../api/roles.api";
 
 export function UsersPage() {
   // ARREGLO DE USUARIOS Y ROLES
@@ -43,7 +43,7 @@ export function UsersPage() {
     user.address.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const generatePDF = () => {
+  const generatePDF = async() => {
     const doc = new jsPDF();
 
     doc.addFont("helvetica", "normal");
@@ -58,15 +58,17 @@ export function UsersPage() {
       "Dirección",
       "Creado en",
     ];
-    const tableData = users.map((user, index) => [
-      index + 1,
-      user.role,
-      user.username,
-      user.email,
-      user.phone,
-      user.address,
-      user.date,
-    ]);
+    const tableData = await Promise.all(
+      users.map(async (user, index) => [
+        index + 1,
+        await getRoleName(user.role),
+        user.username,
+        user.email,
+        user.phone,
+        user.address,
+        user.date,
+      ])
+    );
 
     doc.setFont("helvetica");
     doc.setFontSize(fontSize);
