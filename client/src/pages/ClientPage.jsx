@@ -1,10 +1,13 @@
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import Logo from "../assets/img/Logo.png";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
 
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
-
+import { Notification } from "../components/Notification.jsx";
 import { Modal } from "../components/Modal.jsx";
 
 // CONEXION CON LA API DE USERS Y ROLES
@@ -22,11 +25,75 @@ export function ClientPage() {
   // ARREGLO DE USUARIOS Y ROLES
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const filteredUsers = users.filter((user) =>
+    user.username.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const generatePDF = () => {
+    const doc = new jsPDF();
 
-  //
+    doc.addFont("helvetica", "normal");
+    const fontSize = 10;
+
+    const headers = [
+      "#",
+      "Nombre",
+      "Usuario",
+      "Email",
+      "Teléfono",
+      "Dirección",
+    ];
+    const tableData = users.map((user, index) => [
+      index + 1,
+      user.name,
+      user.username,
+      user.email,
+      user.phone,
+      user.address,
+    ]);
+
+    doc.setFont("helvetica");
+    doc.setFontSize(fontSize);
+    doc.autoTable({
+      head: [headers],
+      body: tableData,
+      startY: 40,
+      styles: {
+        textColor: [100, 100, 100],
+        lineColor: [100, 100, 100],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [207, 41, 36],
+        textColor: [255, 255, 255],
+      },
+      bodyStyles: {
+        fillColor: [245, 245, 245],
+      },
+    });
+
+    const imgData = Logo;
+    doc.addImage(imgData, "PNG", 10, 10, 30, 30);
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(`Reporte de Clientes`, 50, 25);
+
+    const today = new Date();
+    const dateStr = today.toLocaleDateString();
+
+    doc.setFontSize(fontSize);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Fecha: ${dateStr}`, 50, 30);
+
+    doc.save("reporte_Clientes.pdf");
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
-
+  const [notification, setNotification] = useState(null);
   const reloadDataTable = async () => {
     setUsers([])
     const res = await getUsers();
@@ -38,12 +105,26 @@ export function ClientPage() {
     setIsOpen(true);
   };
   const handleStatusChange = async (userId, status) => {
+    setNotification({
+      msg: "¿Seguro deseas cambiar el estado?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
     try {
       await updateUserStatus(userId, !status);
+      setNotification({
+        msg: "Estado cambiado Exitosamente  ",
+        color: "info",
+        buttons: false,
+        timeout: 3000,
+      });
+      reloadDataTable()
     } catch (error) {
       console.error(error);
     }
-  };
+  }})
+  }
 
 
   const closeModal = () => {
@@ -116,7 +197,7 @@ export function ClientPage() {
         name: "phone",
         icon: "phone",
         required: "true",
-        col: "full"
+        col: "half"
       },
    
   ];
@@ -150,7 +231,15 @@ export function ClientPage() {
         phone,
       }
       await createUser(userOne);
-      window.location.reload();
+      reloadDataTable();
+      closeModal();
+      setNotification({
+        msg: "Cliente creado exitosamente!",
+        color: "success",
+        buttons: false,
+        timeout: 3000,
+      });
+
     } catch (error) {
       console.error("Error al crear el usuario:", error);
     }
@@ -204,7 +293,7 @@ export function ClientPage() {
         icon: "phone",
         required: "true",
         value: user.phone,
-        col: "full"
+        col: "col"
       },
     ];
 
@@ -214,6 +303,13 @@ export function ClientPage() {
         await editUser(userId, data);
         reloadDataTable()
         closeModal()
+        setNotification({
+          msg: "Cliente Editado exitosamente!",
+          color: "success",
+          buttons: false,
+          timeout: 3000,
+        });
+  
       } catch (error) {
         console.error("Error al editar el usuario:", error);
       }
@@ -223,14 +319,41 @@ export function ClientPage() {
     openModal("Editar cliente", fieldsEdit, null, true, handleEditUser);
   };
 
-  const handleDeleteClick = async(userId) => {
-    await deleteUser(userId);
-    reloadDataTable()
-  };
+ const handleDeleteClick = async (userId) => {
+  setNotification({
+    msg: "¿Seguro deseas eliminar el cliente?",
+    color: "warning",
+    buttons: true,
+    timeout: 0,
+    onConfirm: async () => {
+      await deleteUser(userId);
+      reloadDataTable();
+      setNotification({
+        msg: "¡Usuario eliminado exitosamente!",
+        color: "info",
+        buttons: false,
+        timeout: 3000,
+      });
+    },
+  });
+};
 
   return (
     <div>
       <Navbar />
+      <div className="container is-fluid mt-5">
+        <div className="notifications float">
+          {notification && (
+            <Notification
+              msg={notification.msg}
+              color={notification.color}
+              buttons={notification.buttons}
+              timeout={notification.timeout}
+              onClose={() => setNotification(null)}
+              onConfirm={notification.onConfirm}
+            />
+          )}
+        </div>
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
           <div className="column is-fullwidth">
@@ -247,12 +370,12 @@ export function ClientPage() {
             <Input holder="Buscar usuario" icon="magnifying-glass" />
           </div>
           <div className="column is-fullwidth">
-            <Button text="Generar PDF" color="primary" col="fullwidth" />
+            <Button text="Generar PDF" color="primary"action={generatePDF}col="fullwidth" />
           </div>
         </div>
         <Table
-          headers={["document", "username","name", "lastname", "address", "phone"]}
-          columns={["Documento", "usuario","Nombre", "Apellido", "Direccion", "Telefono"]}
+          headers={["#","document", "username","name", "lastname", "address", "phone"]}
+          columns={["#","Documento", "usuario","Nombre", "Apellido", "Direccion", "Telefono"]}
           data={users}
           status
           edit
@@ -261,6 +384,7 @@ export function ClientPage() {
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
         />
+      </div>
       </div>
       {isOpen && (
         <Modal
@@ -272,7 +396,6 @@ export function ClientPage() {
           submit={modalConfig.submit}
         />
       )}
-
     </div>
   );
 }
