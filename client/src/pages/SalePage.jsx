@@ -28,6 +28,7 @@ import { getContent, getContents, deleteContent } from "../api/content.api.js";
 import { createContentO } from "../api/contentdetail.api.js";
 import { Modal } from "../components/Modal.jsx";
 import { useRef } from "react";
+import { Notification } from "../components/Notification.jsx";
 
 export function SalePage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +39,23 @@ export function SalePage() {
   const [ingredientes, setIngredientes] = useState([]);
   // const ingredientes = useRef([]);
   const selectedOptionRef = useRef();
+  const [notification, setNotification] = useState(null);
+  const [username, setUsername] = useState('');
+  const [rol, setRol] = useState()
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const resUser = await getUsers();
+      setUsers(resUser.data);
+    }
+    
+    fetchData();
+    const name = localStorage.getItem('name');
+    const user = users.filter((user) => user.name == name)
+    setUsername(user.username);
+    setRol(user.rol)
+  }, []);
 
 
   useEffect(() => {
@@ -110,9 +128,8 @@ export function SalePage() {
 
   const handleCreateProduct = async (data) => {
     try {
-      const users = (await getUsers()).data;
-      const user = users[0];
-      const orderData = { user: user.username, total: total, status: "Pago" };
+      const user = username;
+      const orderData = { user: user, total: total, status: "Pago" };
       const respOrder = await createSale(orderData);
   
       const formDataDetails = [];
@@ -149,7 +166,12 @@ export function SalePage() {
           await createContentO(formData);
         }
       }
-  
+      setNotification({
+        msg: "Venta creada exitosamente!",
+        color: "success",
+        buttons: false,
+        timeout: 3000,
+      });
       setDetail([]);
       setIngredientes([]);
       Cookies.remove("saleDetail");
@@ -263,6 +285,18 @@ export function SalePage() {
     <div>
       <Navbar />
       <div className="container mt-5">
+      <div className="notifications float">
+          {notification && (
+            <Notification
+              msg={notification.msg}
+              color={notification.color}
+              buttons={notification.buttons}
+              timeout={notification.timeout}
+              onClose={() => setNotification(null)}
+              onConfirm={notification.onConfirm}
+            />
+          )}
+        </div>
         <div className="columns is-centered ">
           <div className="column is-three-quarters card-venta list-detail">
             <div className="has-text-centered">

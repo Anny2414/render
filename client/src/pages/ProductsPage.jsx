@@ -50,8 +50,12 @@ export function ProductsPage() {
   
   const reloadDataTable = async () => {
     setProducts([]);
+    setContents([])
+    setIngredientes([])
     const res = await getProducts();
+    const resContent = await getContents();
     setProducts(res.data);
+    setContents(resContent.data);
   };
 
 

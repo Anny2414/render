@@ -1,11 +1,16 @@
-import React, { useEffect } from "react";
-
+import React, { useEffect, useState } from "react";
+import "../assets/css/barra-carga.css"
 export function Notification(props) {
   const { msg, color, buttons, timeout, onConfirm } = props;
 
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     if (timeout) {
+      setIsLoading(true);
+
       const timer = setTimeout(() => {
+        setIsLoading(false);
         props.onClose();
       }, timeout);
 
@@ -20,6 +25,14 @@ export function Notification(props) {
   return (
     <div className={`notification has-text-centered is-${color} mt-5`}>
       <b>{msg}</b>
+      {isLoading && (
+        <div className="carga">
+          <div
+            className="barra-carga"
+            style={{ animation: `cargaAnimacion ${timeout}ms linear` }}
+          />
+        </div>
+      )}
       {buttons && (
         <div>
           <br />
@@ -33,7 +46,7 @@ export function Notification(props) {
           <button
             className="button is-small is-success mt-3 ml-4"
             type="button"
-            onClick={onConfirm} // Agrega el evento onClick para llamar a la función onConfirm cuando se haga clic en "Confirmar"
+            onClick={onConfirm}
           >
             Confirmar
           </button>

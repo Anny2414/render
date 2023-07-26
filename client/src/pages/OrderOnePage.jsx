@@ -10,9 +10,11 @@ import { ModalSale } from "../components/modal.sale";
 import { getContent, getContents } from "../api/content.api";
 import { getSupplies } from "../api/supplies.api";
 import { getUsers } from "../api/users.api";
+import {getclients} from "../api/clients.api"
 import {createOrder,deleteOrder,editOrder,getOrder,getOrders} from "../api/order.api"
 import { createDetail } from "../api/detail.api";
 import { createContentO } from "../api/contentdetail.api";
+import { Notification } from "../components/Notification";
 
 export function OrderPage() {
     const [products, setProducts] = useState([])
@@ -24,11 +26,59 @@ export function OrderPage() {
     const [detail, setDetail] = useState([])
     const [total, setTotal] = useState(0);
     const [username, setUsername] = useState('');
+    const [rol, setRol] = useState()
+    const [users, setUsers] = useState([]);
+    const [clientes, setClientes] = useState([]);
+    const [notification, setNotification] = useState(null);
+
+  
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+      async function fetchData() {
+        try {
+          const resUser = await getUsers();
+          const resclient = await getclients();
+          console.log(resclient.data);
+          console.log(resUser.data);
+          setUsers(resUser.data);
+          setClientes(resclient.data);
+          setIsLoading(false); // Los datos han cargado, establece isLoading a false
+        } catch (error) {
+          console.error("Error al obtener los datos:", error);
+          setIsLoading(false); // Si ocurre un error, también establece isLoading a false
+        }
+      }
+  
+      fetchData();
+    }, []);
   
     useEffect(() => {
-      const name = localStorage.getItem('name');
-      setUsername(name);
-    }, []);
+      // Verifica si los datos han cargado antes de utilizar la variable username
+      if (!isLoading) {
+        const name = localStorage.getItem("name");
+        console.log("name:", name);
+  
+        const user = users.find((user) => user.name === name);
+        console.log("users:", users);
+        console.log("client:", users);
+        console.log("user:", user);
+  
+        if (user) {
+          setUsername(user.username);
+          setRol(user.rol);
+          console.log("user");
+          console.log(user);
+        } else {
+          const client = clientes.find((client) => client.name === name);
+          console.log("client");
+          console.log(clientes);
+          setUsername(client.username);
+          setRol(client.rol);
+        }
+      }
+    }, [users, clientes, isLoading]);
+  
   
     useEffect(() => {
       const calculateTotal = () => {
@@ -129,9 +179,8 @@ export function OrderPage() {
     };
     const submitButton = async (data) => {
         try {
-            const users = (await getUsers()).data;
             const user = username;
-            const orderData = { user: user.username, total: total, status: "Pago" };
+            const orderData = { user: user, total: total, status: "Por Pagar" };
             const respOrder = await createOrder(orderData);
         
             const formDataDetails = [];
@@ -161,7 +210,12 @@ export function OrderPage() {
                 
               }
             }
-              
+            setNotification({
+              msg: "Pedido creado exitosamente!",
+              color: "success",
+              buttons: false,
+              timeout: 3000,
+            });
             Cookies.remove("orderDetail");
             setProducts([]);
             setIngredientes([]);
@@ -291,6 +345,18 @@ export function OrderPage() {
     return <div>
         <Navbar />
         <div className="container is-fluid mt-5 has-text-centered">
+        <div className="notifications float">
+          {notification && (
+            <Notification
+              msg={notification.msg}
+              color={notification.color}
+              buttons={notification.buttons}
+              timeout={notification.timeout}
+              onClose={() => setNotification(null)}
+              onConfirm={notification.onConfirm}
+            />
+          )}
+        </div>
             <div className="columns ">
 
                 <div className="column is-two-thirds">

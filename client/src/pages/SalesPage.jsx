@@ -10,13 +10,94 @@ import { getUsers } from "../api/users.api";
 import { createSale, deleteSale, editSale, getSale, getSales } from "../api/sales.api.js";
 import { Modal } from "../components/Modal.jsx";
 import { Link } from "react-router-dom";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import Logo from "../assets/img/Logo.png"; // Imagen que sera usada en el PDF
+import { Notification } from "../components/Notification.jsx";
+
 
 export function SalesPage() {
   const [users, setUsers] = useState([]);
   const [sales, setSales] = useState([]);
   //
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredUsers = sales.filter((sale) => {
+    const searchString = searchQuery.toLowerCase();
+    const userMatches = sale.user.toLowerCase().includes(searchString);
+    const statusMatches = sale.status.toLowerCase().includes(searchString);
+    const createAtMatches = sale.create_at.toLowerCase().includes(searchString);
+    const updateAtMatches = sale.update_at.toLowerCase().includes(searchString);
+  
+    return userMatches || statusMatches || createAtMatches || updateAtMatches;
+  });
+  
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    doc.addFont("helvetica", "normal");
+    const fontSize = 10;
+
+    const headers = [
+      "#",
+      "Usuario",
+      "creado en",
+      "Actualizdo en",
+      "Total",
+      "Estado",
+    ];
+    const tableData = sales.map((sale, index) => [
+      index + 1,
+      sale.user,
+      sale.create_at,
+      sale.update_at,
+      sale.total,
+      sale.status,
+    ]);
+
+    doc.setFont("helvetica");
+    doc.setFontSize(fontSize);
+    doc.autoTable({
+      head: [headers],
+      body: tableData,
+      startY: 40,
+      styles: {
+        textColor: [100, 100, 100],
+        lineColor: [100, 100, 100],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [207, 41, 36],
+        textColor: [255, 255, 255],
+      },
+      bodyStyles: {
+        fillColor: [245, 245, 245],
+      },
+    });
+
+    const imgData = Logo;
+    doc.addImage(imgData, "PNG", 10, 10, 30, 30);
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(`REPORTE DE VENTAS`, 50, 25);
+
+    const today = new Date();
+    const dateStr = today.toLocaleDateString();
+
+    doc.setFontSize(fontSize);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Fecha: ${dateStr}`, 50, 30);
+
+    doc.save("reporte_ventas.pdf");
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
+  const [notification, setNotification] = useState(null);
 
 
 
@@ -125,14 +206,28 @@ export function SalesPage() {
 
 
   const handleDeleteClick = async (userId) => {
-    try {
-      const data = await getSale(userId)
-      data.status = "Cancelado"
-      await editSale(userId, data);
-      reloadDataTable()
-    } catch (error) {
-      console.error("Error al editar el pedido: ", error);
-    }
+    setNotification({
+      msg: "¿Seguro deseas cancelar esta venta?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        try {
+          const data = await getSale(userId)
+          data.status = "Cancelado"
+          await editSale(userId, data);
+          reloadDataTable()
+          setNotification({
+            msg: "venta cancelada exitosamente!",
+            color: "info",
+            buttons: false,
+            timeout: 3000,
+          });
+        } catch (error) {
+          console.error("Error al editar el pedido: ", error);
+        }
+      },
+    });
   };
 
 
@@ -141,17 +236,40 @@ export function SalesPage() {
     <div>
       <Navbar />
       <div className="container is-fluid mt-5">
+      <div className="notifications float">
+          {notification && (
+            <Notification
+              msg={notification.msg}
+              color={notification.color}
+              buttons={notification.buttons}
+              timeout={notification.timeout}
+              onClose={() => setNotification(null)}
+              onConfirm={notification.onConfirm}
+            />
+          )}
+        </div>
         <div className="columns is-centered">
           <div className="column is-fullwidth">
             <Link to="/sale" className="button is-success is-fullwidth">Crear Venta +</Link>
           </div>
           <div className="column is-9">
-            <Input holder="Buscar usuario" icon="magnifying-glass" />
+          <Input
+              holder="Buscar usuario"
+              icon="magnifying-glass"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <div className="column is-fullwidth">
-            <Button text="Generar PDF" color="primary" col="fullwidth" />
+            <Button
+              text="Generar PDF"
+              color="primary"
+              col="fullwidth"
+              action={generatePDF}
+            />
           </div>
         </div>
+        {filteredUsers.length > 0 ? (
         <Table
           headers={["#", "user", "create_at", "update_at", "total", "status"]}
           columns={[
@@ -166,8 +284,12 @@ export function SalesPage() {
           delete
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
-          data={sales}
-        />
+          data={filteredUsers}
+          />):(
+          <div className="notification has-text-centered mt-4">
+            No se encontraron registros.
+          </div>
+        )}
         {isOpen && (
           <Modal
             title={modalConfig.title}
