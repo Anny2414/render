@@ -37,7 +37,10 @@ export function UsersPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(searchQuery.toLowerCase())
+    user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.address.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const generatePDF = () => {
