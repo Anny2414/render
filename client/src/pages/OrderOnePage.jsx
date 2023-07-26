@@ -53,28 +53,24 @@ export function OrderPage() {
       fetchData();
     }, []);
   
+
     useEffect(() => {
       // Verifica si los datos han cargado antes de utilizar la variable username
       if (!isLoading) {
         const name = localStorage.getItem("name");
-        console.log("name:", name);
-  
         const user = users.find((user) => user.name === name);
-        console.log("users:", users);
-        console.log("client:", users);
-        console.log("user:", user);
-  
-        if (user) {
-          setUsername(user.username);
-          setRol(user.rol);
-          console.log("user");
-          console.log(user);
+        const cliente = clientes.find((client) => client.name === name);
+        if (name) {
+          if (user) {
+            setUsername(user.username);
+            setRol(user.rol);
+          } else if(cliente){
+            setUsername(cliente.username);
+            setRol(cliente.rol);
+          }
+          
         } else {
-          const client = clientes.find((client) => client.name === name);
-          console.log("client");
-          console.log(clientes);
-          setUsername(client.username);
-          setRol(client.rol);
+          window.location.replace("/")
         }
       }
     }, [users, clientes, isLoading]);

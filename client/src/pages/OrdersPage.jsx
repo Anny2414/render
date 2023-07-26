@@ -4,7 +4,7 @@ import { Table } from "../components/Table/Table.jsx";
 
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 // CONEXION CON LA API DE USERS Y ROLES
 import { getUser, getUsers } from "../api/users.api";
@@ -67,16 +67,19 @@ export function OrdersPage() {
     // Verifica si los datos han cargado antes de utilizar la variable username
     if (!isLoading) {
       const name = localStorage.getItem("name");
-
       const user = users.find((user) => user.name === name);
-
-      if (user) {
-        setUsername(user.username);
-        setRol(user.rol);
+      const cliente = clientes.find((client) => client.name === name);
+      if (name) {
+        if (user) {
+          setUsername(user.username);
+          setRol(user.rol);
+        } else if(cliente){
+          setUsername(cliente.username);
+          setRol(cliente.rol);
+        }
+        
       } else {
-        const client = clientes.find((client) => client.name === name);
-        setUsername(client.username);
-        setRol(client.rol);
+        window.location.replace("/")
       }
     }
   }, [users, clientes, isLoading]);

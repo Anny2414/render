@@ -27,7 +27,10 @@ export function SuppliesPage() {
 
   // CONFIGURACION MODAL
   const [isOpen, setIsOpen] = useState(false);
+
   const [modalConfig, setModalConfig] = useState();
+  const [notification, setNotification] = useState(null);
+
 
   const reloadDataTable = async () => {
     setSupplies([])
@@ -38,6 +41,7 @@ export function SuppliesPage() {
   const openModal = (title, fields, dataSelect, nameSelect, buttonSubmit, submit) => {
     setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
     setIsOpen(true);
+
   };
 
   const closeModal = () => {
@@ -90,6 +94,12 @@ export function SuppliesPage() {
       await createSupplie(data);
       reloadDataTable()
       closeModal()
+      setNotification({
+        msg: "Ingrediente creado exitosamente!",
+        color: "success",
+        buttons: false,
+        timeout: 3000,
+      });
     } catch (error) {
       console.error("Error al crear el Ingrediente:", error);
     }
@@ -146,22 +156,70 @@ export function SuppliesPage() {
   };
 
   const handleStatusChange = async (supplieId, status) => {
+    setNotification({
+      msg: "¿Seguro deseas cambiar el estado?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
     try {
       await updateSupplieStatus(supplieId, !status);
+      setNotification({
+        msg: "Estado cambiado exitosamente!",
+        color: "info",
+        buttons: false,
+        timeout: 3000,
+      });
+      reloadDataTable();
+
     } catch (error) {
       console.error(error);
     }
+
+      },
+    });
+
   };
 
   const handleDeleteClick = async(supplieId) => {
-    await deleteSupplie(supplieId);
-    reloadDataTable()
+    setNotification({
+      msg: "¿Seguro deseas eliminar el ingrediente?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        try {
+          await deleteSupplie(supplieId);
+          setNotification({
+            msg: "ingrediente eliminado exitosamente!",
+            color: "info",
+            buttons: false,
+            timeout: 3000,
+          });
+          reloadDataTable();
+        } catch (error) {
+          console.error("Error al eliminar:", error);
+        }
+      },
+    });
   };
 
   return (
     <div>
       <Navbar />
       <div className="container is-fluid mt-5">
+      <div className="notifications float">
+          {notification && (
+            <Notification
+              msg={notification.msg}
+              color={notification.color}
+              buttons={notification.buttons}
+              timeout={notification.timeout}
+              onClose={() => setNotification(null)}
+              onConfirm={notification.onConfirm}
+            />
+          )}
+        </div>
         <div className="columns is-centered">
           <div className="column is-fullwidth">
             <Button
