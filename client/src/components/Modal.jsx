@@ -53,7 +53,7 @@ export function Modal(props) {
                   <div className={`column is-${field.col}`} key={index}>
                     <div className="field is-vertical">
                       <div className="field-label" style={{ marginRight: 0 }}>
-                        <label className="label has-text-centered">
+                        <label className="label has-text-centered" htmlFor={field.name}>
                           {field.title}
                         </label>
                       </div>
@@ -61,11 +61,13 @@ export function Modal(props) {
                       field.type === "number" ||
                       field.type === "password" ? (
                         <Input
+                          id={field.name}
                           type={field.type}
                           read_only={field.readonly}
                           name={field.name}
                           value={field.value}
                           icon={field.icon}
+                          disabled={field.disabled}
                           action={{
                             ...register(field.name, {
                               required: field.required,

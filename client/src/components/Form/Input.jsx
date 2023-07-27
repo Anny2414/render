@@ -12,6 +12,7 @@ export const Input = (props) => {
     action,
     error,
     style,
+    disabled,
   } = props;
   const styls = style || "";
 
@@ -20,10 +21,12 @@ export const Input = (props) => {
       <div className="field">
         <div className="control has-icons-left">
           <input
-            className={`input ${error && "is-error"} ${styls}`}
+            id={name}
+            className={`input ${error ? "is-error" : ""} ${styls}`}
             type={type}
             placeholder={holder}
             defaultValue={value}
+            disabled={!!disabled}
             onChange={onChange}
             name={name}
             readOnly={!!read_only}

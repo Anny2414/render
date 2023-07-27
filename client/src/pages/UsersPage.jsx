@@ -169,6 +169,7 @@ export function UsersPage() {
       col: "half",
       value: "yourburger123",
       readonly: "true",
+      disabled: "true"
     },
     {
       title: "Rol",
