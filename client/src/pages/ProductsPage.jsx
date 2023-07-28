@@ -1,3 +1,9 @@
+// GENERACION DE PDF
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
+import Logo from "../assets/img/Logo.png"; // Imagen que sera usada en el PDF
+
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar.jsx";
 import { ViewP } from "../components/ViewP.jsx";
@@ -30,11 +36,76 @@ export function ProductsPage() {
   const [contents, setContents] = useState([]);
   const [order, setOrder] = useState([]);
   const [ingredientes, setIngredientes] = useState([]);
+  
   // const ingredientes = useRef([]);
   const selectedOptionRef = useRef();
 
+  //Generar PDF
+  const generatePDF = async() => {
+    const doc = new jsPDF();
+
+    doc.addFont("helvetica", "normal");
+    const fontSize = 10;
+
+    const headers = [
+      "#",
+      "Nombre",
+      "Precio",
+      "Descripcion",
+    ];
+    const tableData = await Promise.all(
+      products.map(async (product, index) => [
+        index + 1,
+        product.name,
+        product.price,
+        product.description,
+
+      ])
+    );
+
+    doc.setFont("helvetica");
+    doc.setFontSize(fontSize);
+    doc.autoTable({
+      head: [headers],
+      body: tableData,
+      startY: 40,
+      styles: {
+        textColor: [100, 100, 100],
+        lineColor: [100, 100, 100],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [207, 41, 36],
+        textColor: [255, 255, 255],
+      },
+      bodyStyles: {
+        fillColor: [245, 245, 245],
+      },
+    });
+
+    const imgData = Logo;
+    doc.addImage(imgData, "PNG", 10, 10, 30, 30);
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(`REPORTE DE PRODUCTOS`, 50, 25);
+
+    const today = new Date();
+    const dateStr = today.toLocaleDateString();
+
+    doc.setFontSize(fontSize);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Fecha: ${dateStr}`, 50, 30);
+
+    doc.save("reporte_productos.pdf");
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
+
+    // Variable para buscar productos
+
 
   useEffect(() => {
     const currentIngredients = ingredientes;
@@ -553,7 +624,13 @@ export function ProductsPage() {
             <Input holder="Buscar Producto" icon="magnifying-glass" />
           </div>
           <div className="column is-fullwidth">
-            <Button text="Generar PDF" color="primary" col="fullwidth" />
+          <Button
+              text="Generar PDF"
+              color="primary"
+              col="fullwidth"
+              action={generatePDF}
+            />
+
           </div>
         </div>
         <ViewP

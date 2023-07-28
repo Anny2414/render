@@ -1,13 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/img/only-text.png";
+import {getclients} from "../api/clients.api"
+import {getUsers} from "../api/users.api"
+import {getPermissions} from "../api/permissions.api"
 
 export function Navbar() {
   const [username, setUsername] = useState('');
+  const [rol, setRol] = useState('');
+  const [permiso, setPermiso] = useState('');
   
   useEffect(() => {
     const name = localStorage.getItem('name');
-    setUsername(name);
+    const api = async () =>{
+      const resUser = await getUsers()
+
+      const user = resUser.data.filter((user) => user.name == name)
+      
+      if (user) {
+        setUsername(user.username);
+        setRol(user.role)
+        const resPermiso  = await getPermissions(user.role)
+        setPermiso(resPermiso.data)
+      }else{
+        const resClient = await getclients()
+        const client = resClient.data.filter((client) => client.name ==  name)
+
+        if (client) {
+          setUsername(client.username);
+          setRol(client.role)
+          const resPermiso  = await getPermissions(client.role)
+        } else {
+          window.location.replace("/login")
+        }
+      }
+
+    }
   }, []);
 
   function cerrarSesion() {
