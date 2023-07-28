@@ -124,7 +124,19 @@ export function UsersPage() {
   const reloadDataTable = async () => {
     setUsers([]);
     const res = await getUsers();
-    setUsers(res.data);
+    // Obtiene una matriz de promesas que resuelven los nombres de los roles
+    const rolePromises = res.data.map((user) => getRoleName(user.role));
+  
+    // Espera a que todas las promesas se resuelvan
+    const roleNames = await Promise.all(rolePromises);
+
+    // Combina los datos de usuario con los nombres de roles resueltos
+    const usersWithRoles = res.data.map((user, index) => ({
+      ...user,
+      roleName: roleNames[index],
+    }));
+
+    setUsers(usersWithRoles);
   };
 
   const handleOptionChange = (event) => {
@@ -241,14 +253,33 @@ export function UsersPage() {
   // Conexion a API y obtiene datos de Users y Roles
   useEffect(() => {
     async function fetchData() {
-      const res = await getUsers();
-      const resRoles = await getRoles();
-      setUsers(res.data);
-      setRoles(resRoles.data);
+      try {
+        const res = await getUsers();
+        const resRoles = await getRoles();
+  
+        // Obtiene una matriz de promesas que resuelven los nombres de los roles
+        const rolePromises = res.data.map((user) => getRoleName(user.role));
+  
+        // Espera a que todas las promesas se resuelvan
+        const roleNames = await Promise.all(rolePromises);
+  
+        // Combina los datos de usuario con los nombres de roles resueltos
+        const usersWithRoles = res.data.map((user, index) => ({
+          ...user,
+          roleName: roleNames[index],
+        }));
+  
+        setUsers(usersWithRoles);
+        setRoles(resRoles.data);
+      } catch (error) {
+        // Manejar errores de manera apropiada
+        console.error("Error al obtener datos:", error);
+      }
     }
-
+  
     fetchData();
   }, []);
+  
 
   const handleCreateUser = async (data) => {
     try {
@@ -447,7 +478,7 @@ export function UsersPage() {
           <Table
             headers={[
               "#",
-              "role",
+              "roleName",
               "username",
               "email",
               "phone",
