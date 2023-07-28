@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useRef } from "react";
 
 import { useForm } from "react-hook-form";
 import Logo from "../assets/img/burger.jpg";
@@ -10,8 +11,26 @@ import { DefaultCheckedSwitch } from "./Form/DefaultCheckedSwitch";
 export function Modal(props) {
   const [ingredientes, setIngredientes] = useState([]);
 
+  //
+  const [inputDisabledState, setInputDisabledState] = useState({});
+  const [isAdmin, setIsAdmin] = useState(true);
+
+  const selectedOptionRef = useRef("Administrador");
+  const isAdminSelected = useRef();
+
   useEffect(() => {
     setIngredientes([]); // Reset ingredientes when the modal is opened
+
+    if(props.title == "Nuevo usuario") {
+      setInputDisabledState(() => ({
+        document: true, 
+        name: true,
+        lastname: true,
+        phone: true,
+        address: true
+      }));
+    }
+    
   }, [props.isOpen]);
 
   const {
@@ -24,6 +43,25 @@ export function Modal(props) {
     button,
     submit,
   } = props;
+
+  const handleOptionChange = (event) => {
+    const selectedIndex = event.target.selectedIndex;
+    const selectedOptionText = event.target.options[selectedIndex].text;
+    selectedOptionRef.current = selectedOptionText;
+
+    isAdminSelected.current = selectedOptionRef.current === "Administrador";
+    setIsAdmin(isAdminSelected.current); // Actualiza el estado "isAdmin"
+
+    // También puedes actualizar el estado de deshabilitación aquí, si deseas que se refleje de inmediato
+    setInputDisabledState((prevState) => ({
+      ...prevState,
+      document: isAdminSelected.current, 
+      name: isAdminSelected.current,
+      lastname: isAdminSelected.current,
+      phone: isAdminSelected.current,
+      address: isAdminSelected.current
+    }));
+  };
 
   const {
     register,
@@ -53,7 +91,10 @@ export function Modal(props) {
                   <div className={`column is-${field.col}`} key={index}>
                     <div className="field is-vertical">
                       <div className="field-label" style={{ marginRight: 0 }}>
-                        <label className="label has-text-centered">
+                        <label
+                          className="label has-text-centered"
+                          htmlFor={field.name}
+                        >
                           {field.title}
                         </label>
                       </div>
@@ -61,14 +102,16 @@ export function Modal(props) {
                       field.type === "number" ||
                       field.type === "password" ? (
                         <Input
+                          id={field.name}
                           type={field.type}
                           read_only={field.readonly}
                           name={field.name}
                           value={field.value}
                           icon={field.icon}
+                          disabled={inputDisabledState[field.name]}
                           action={{
                             ...register(field.name, {
-                              required: field.required,
+                              required: !inputDisabledState[field.name],
                             }),
                           }}
                           error={errors[field.name]}
@@ -116,7 +159,7 @@ export function Modal(props) {
                           ) : (
                             <div className="is-flex">
                               <div className="mx-auto">
-                                <span>No Hay {field.title} disponibles.</span>
+                                <span>No hay {field.title} disponibles.</span>
                               </div>
                             </div>
                           )}
@@ -161,7 +204,7 @@ export function Modal(props) {
                             textButton={field.textButton}
                             icon={field.icon}
                             actionButton={field.actionButton}
-                            handleOptionChange={field.handleOptionChange}
+                            handleOptionChange={handleOptionChange}
                           />
                         </div>
                       )}

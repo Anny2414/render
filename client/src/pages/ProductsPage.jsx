@@ -115,21 +115,15 @@ export function ProductsPage() {
     }
   }, [ingredientes]);
 
-
-
-
-  
   const reloadDataTable = async () => {
     setProducts([]);
-    setContents([])
-    setIngredientes([])
+    setContents([]);
+    setIngredientes([]);
     const res = await getProducts();
     const resContent = await getContents();
     setProducts(res.data);
     setContents(resContent.data);
   };
-
-
 
   const handleOptionChange = (event) => {
     const option = supplies.find(
@@ -142,14 +136,10 @@ export function ProductsPage() {
     if (selectedOptionRef.current != undefined) {
       ingredientes.push(selectedOptionRef.current);
       setIngredientes([...ingredientes]); // Actualiza el estado de ingredientes
-      
     } else {
       console.log("error al añadir");
     }
   };
-
-
-  
 
   const openModal = (
     title,
@@ -180,7 +170,6 @@ export function ProductsPage() {
   const closeModal = () => {
     setIsOpen(false);
   };
-
 
   const fieldsNew = [
     {
@@ -224,7 +213,7 @@ export function ProductsPage() {
       name: "supplies",
       icon: "list",
       required: "false",
-      col : "full",
+      col: "full",
       handleOptionChange: handleOptionChange,
       actionButton: anadirIngrediente,
     },
@@ -241,7 +230,7 @@ export function ProductsPage() {
     async function fetchData() {
       const res = await getProducts();
       const resContent = await getContents();
-      setContents(resContent.data)
+      setContents(resContent.data);
       setProducts(res.data);
     }
 
@@ -274,16 +263,14 @@ export function ProductsPage() {
         const ingrediente = ingredientes[index];
         const formData1 = new FormData();
         formData1.append("product", produc.data.name);
-        formData1.append("supplies", ingrediente.name
-        );
+        formData1.append("supplies", ingrediente.name);
         formData1.append("count", 1);
-  
+
         await createContent(formData1);
-        
       }
 
       reloadDataTable();
-      setIngredientes([])
+      setIngredientes([]);
       closeModal();
     } catch (error) {
       console.error("Error al crear el Producto:", error);
@@ -333,14 +320,13 @@ export function ProductsPage() {
     ];
 
     const handleEditProduct = async (data) => {
-      const { id ,name, price, description } = data;
-      const product = await (await getProduct(productId)).data
+      const { id, name, price, description } = data;
+      const product = await (await getProduct(productId)).data;
       const contentss = contents.filter(
         (content) => content.product === product.name
-        )
+      );
 
       try {
-
         const updateData0 = new FormData();
         updateData0.append("name", "burbuja");
         updateData0.append("price", data.price);
@@ -349,16 +335,15 @@ export function ProductsPage() {
         const res0 = await createProduct(updateData0);
         const updatedProduct0 = res0.data;
 
-
         if (contentss.length > 0) {
           for (let i = 0; i < contentss.length; i++) {
             const content = contents[i];
-            const updateContent = new FormData()
+            const updateContent = new FormData();
             updateContent.append("product", "burbuja");
             updateContent.append("supplies", content.supplies);
             updateContent.append("count", content.count);
 
-            await editContent(content.id , updateContent)
+            await editContent(content.id, updateContent);
           }
         }
         const updateData = new FormData();
@@ -372,21 +357,19 @@ export function ProductsPage() {
         if (contentss.length > 0) {
           for (let i = 0; i < contentss.length; i++) {
             const content = contents[i];
-            const updateContent = new FormData()
+            const updateContent = new FormData();
             updateContent.append("product", name);
             updateContent.append("supplies", content.supplies);
             updateContent.append("count", content.count);
 
-            await editContent(content.id , updateContent)
+            await editContent(content.id, updateContent);
           }
         }
 
-
-        await deleteProduct(res0.data.id)
-        
+        await deleteProduct(res0.data.id);
 
         closeModal();
-        reloadDataTable()
+        reloadDataTable();
 
         // Actualizar la lista de productos sin recargar la página
         setProducts((prevProducts) => {
@@ -422,8 +405,10 @@ export function ProductsPage() {
   };
 
   const handleAddclick = async (product) => {
-    const suppliesProduct = await contents.filter((content) => content.product == product.name )
-    const fieldsAdd =[
+    const suppliesProduct = await contents.filter(
+      (content) => content.product == product.name
+    );
+    const fieldsAdd = [
       {
         title: "Producto",
         type: "text",
@@ -431,8 +416,8 @@ export function ProductsPage() {
         icon: "burger",
         col: "half",
         required: "true",
-        value : product.name,
-        readonly: true
+        value: product.name,
+        readonly: true,
       },
       {
         title: "Precio",
@@ -441,8 +426,8 @@ export function ProductsPage() {
         icon: "dollar",
         col: "half",
         required: "true",
-        value : product.price,
-        readonly: true
+        value: product.price,
+        readonly: true,
       },
       {
         title: "Imagen",
@@ -450,7 +435,7 @@ export function ProductsPage() {
         name: "image",
         icon: "dollar",
         col: "full",
-        image : product.image,
+        image: product.image,
       },
       {
         title: "Descripción",
@@ -459,8 +444,8 @@ export function ProductsPage() {
         icon: "comment",
         col: "full",
         required: "true",
-        value : product.description,
-        readonly: true
+        value: product.description,
+        readonly: true,
       },
       {
         title: "Ingredientes",
@@ -470,8 +455,11 @@ export function ProductsPage() {
         name: "supplies",
         icon: "list",
         required: "false",
-        col : "full",
-        customOptions: [{id: 0, supplies: 'No seleccionado'}, ...suppliesProduct],
+        col: "full",
+        customOptions: [
+          { id: 0, supplies: "No seleccionado" },
+          ...suppliesProduct,
+        ],
         nameSelect: "supplies",
         keySelect: "supplies",
         handleOptionChange: handleOptionChange,
@@ -483,24 +471,22 @@ export function ProductsPage() {
         key: ["name", "price"],
         data: ingredientes,
       },
-    ]
+    ];
 
     const handleAdd = (data) => {
-
-      const {name,price,description,} = data
-      const idP  = products.filter((product)=>product.name == name)
+      const { name, price, description } = data;
+      const idP = products.filter((product) => product.name == name);
       console.log(idP[0].id);
       try {
-
         const data2 = {
-          id : idP[0].id,
+          id: idP[0].id,
           name,
           price,
           description,
-          image : idP[0].image,
-          supplies: ingredientes, 
-          amount: 1
-        }
+          image: idP[0].image,
+          supplies: ingredientes,
+          amount: 1,
+        };
 
         setOrder((prevOrder) => {
           Cookies.remove("orderDetail");
@@ -509,28 +495,30 @@ export function ProductsPage() {
           return newOrder;
         });
 
-        closeModal()
-
+        closeModal();
       } catch (error) {
-        console.log("Error al añadir a carito" + error)
+        console.log("Error al añadir a carito" + error);
       }
-    }
+    };
     openModal(
       "Nuevo producto",
       fieldsAdd,
-      [{id: 0, name: 'No seleccionado', price: 0, stock: 0, status: true}, ...supplies],
+      [
+        { id: 0, name: "No seleccionado", price: 0, stock: 0, status: true },
+        ...supplies,
+      ],
       "name",
       true,
       handleAdd
-    )
-  }
-
+    );
+  };
 
   const handleViewDetailsClicks = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
-    const suppliesProduct = await contents.filter((content) => content.product == product.name )
-
+    const suppliesProduct = await contents.filter(
+      (content) => content.product == product.name
+    );
 
     const fieldsview = [
       {
@@ -540,8 +528,8 @@ export function ProductsPage() {
         icon: "burger",
         col: "half",
         required: "true",
-        value : product.name,
-        readonly: true
+        value: product.name,
+        readonly: true,
       },
       {
         title: "Precio",
@@ -550,8 +538,8 @@ export function ProductsPage() {
         icon: "dollar",
         col: "half",
         required: "true",
-        value : product.price,
-        readonly: true
+        value: product.price,
+        readonly: true,
       },
       {
         title: "Imagen",
@@ -559,7 +547,7 @@ export function ProductsPage() {
         name: "image",
         icon: "dollar",
         col: "full",
-        image : product.image,
+        image: product.image,
       },
       {
         title: "Descripción",
@@ -568,8 +556,8 @@ export function ProductsPage() {
         icon: "comment",
         col: "full",
         required: "true",
-        value : product.description,
-        readonly: true
+        value: product.description,
+        readonly: true,
       },
       {
         title: "Ingredientes",
@@ -615,7 +603,16 @@ export function ProductsPage() {
                 openModal(
                   "Nuevo producto",
                   fieldsNew,
-                  [{id: 0, name: 'No seleccionado', price: 0, stock: 0, status: true}, ...supplies],
+                  [
+                    {
+                      id: 0,
+                      name: "No seleccionado",
+                      price: 0,
+                      stock: 0,
+                      status: true,
+                    },
+                    ...supplies,
+                  ],
                   "name",
                   true,
                   handleCreateProduct

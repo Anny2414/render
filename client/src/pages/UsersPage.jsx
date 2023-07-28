@@ -5,6 +5,7 @@ import "jspdf-autotable";
 import Logo from "../assets/img/Logo.png"; // Imagen que sera usada en el PDF
 
 import { useEffect, useState } from "react";
+import { useRef } from "react";
 
 import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
@@ -36,14 +37,15 @@ export function UsersPage() {
   // Variable para buscar usuarios
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.address.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.address.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const generatePDF = async() => {
+  const generatePDF = async () => {
     const doc = new jsPDF();
 
     doc.addFont("helvetica", "normal");
@@ -117,7 +119,19 @@ export function UsersPage() {
   const reloadDataTable = async () => {
     setUsers([]);
     const res = await getUsers();
-    setUsers(res.data);
+    // Obtiene una matriz de promesas que resuelven los nombres de los roles
+    const rolePromises = res.data.map((user) => getRoleName(user.role));
+  
+    // Espera a que todas las promesas se resuelvan
+    const roleNames = await Promise.all(rolePromises);
+
+    // Combina los datos de usuario con los nombres de roles resueltos
+    const usersWithRoles = res.data.map((user, index) => ({
+      ...user,
+      roleName: roleNames[index],
+    }));
+
+    setUsers(usersWithRoles);
   };
 
   const openModal = (
@@ -151,7 +165,6 @@ export function UsersPage() {
       name: "username",
       icon: "user",
       col: "half",
-      required: "true",
     },
     {
       title: "Email",
@@ -159,7 +172,6 @@ export function UsersPage() {
       name: "email",
       icon: "envelope",
       col: "half",
-      required: "true",
     },
     {
       title: "Contraseña",
@@ -185,7 +197,6 @@ export function UsersPage() {
       name: "document",
       icon: "id-card",
       col: "half",
-      required: "true",
     },
     {
       title: "Nombre",
@@ -193,7 +204,6 @@ export function UsersPage() {
       name: "name",
       icon: "signature",
       col: "half",
-      required: "true",
     },
     {
       title: "Apellido",
@@ -201,7 +211,6 @@ export function UsersPage() {
       name: "lastname",
       icon: "signature",
       col: "half",
-      required: "true",
     },
     {
       title: "Telefono",
@@ -209,7 +218,6 @@ export function UsersPage() {
       name: "phone",
       icon: "phone",
       col: "half",
-      required: "true",
     },
     {
       title: "Direccion",
@@ -217,27 +225,43 @@ export function UsersPage() {
       name: "address",
       icon: "location-dot",
       col: "full",
-      required: "true",
     },
   ];
 
   // Conexion a API y obtiene datos de Users y Roles
   useEffect(() => {
     async function fetchData() {
-      const res = await getUsers();
-      const resRoles = await getRoles();
-      setUsers(res.data);
-      setRoles(resRoles.data);
+      try {
+        const res = await getUsers();
+        const resRoles = await getRoles();
+  
+        // Obtiene una matriz de promesas que resuelven los nombres de los roles
+        const rolePromises = res.data.map((user) => getRoleName(user.role));
+  
+        // Espera a que todas las promesas se resuelvan
+        const roleNames = await Promise.all(rolePromises);
+  
+        // Combina los datos de usuario con los nombres de roles resueltos
+        const usersWithRoles = res.data.map((user, index) => ({
+          ...user,
+          roleName: roleNames[index],
+        }));
+  
+        setUsers(usersWithRoles);
+        setRoles(resRoles.data);
+      } catch (error) {
+        // Manejar errores de manera apropiada
+        console.error("Error al obtener datos:", error);
+      }
     }
-
+  
     fetchData();
   }, []);
+  
 
   const handleCreateUser = async (data) => {
     try {
       await createUser(data);
-      reloadDataTable();
-      closeModal();
 
       setNotification({
         msg: "Usuario creado exitosamente!",
@@ -246,8 +270,19 @@ export function UsersPage() {
         timeout: 3000,
       });
     } catch (error) {
-      console.error("Error al crear el usuario:", error);
+      console.log(error);
+      if (error.response.status == 400) {
+        return setNotification({
+          msg: "Ya existe este usuario!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      }
     }
+
+    reloadDataTable();
+    closeModal();
   };
 
   const handleEditClick = async (userId) => {
@@ -288,10 +323,25 @@ export function UsersPage() {
     const handleEditUser = async (data) => {
       try {
         await editUser(userId, data);
+
+        setNotification({
+          msg: "Usuario editado exitosamente!",
+          color: "success",
+          buttons: false,
+          timeout: 3000,
+        });
+
         reloadDataTable();
         closeModal();
       } catch (error) {
-        console.error("Error al editar el usuario:", error);
+        if (error.response.status == 400) {
+          setNotification({
+            msg: "Este usuario ya existe!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        }
       }
     };
 
@@ -406,7 +456,7 @@ export function UsersPage() {
           <Table
             headers={[
               "#",
-              "role",
+              "roleName",
               "username",
               "email",
               "phone",
