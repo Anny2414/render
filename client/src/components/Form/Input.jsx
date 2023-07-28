@@ -17,14 +17,6 @@ export const Input = (props) => {
 
   const styls = style || "";
 
-  // // Estado para controlar si el input está habilitado o deshabilitado
-  // const [isInputDisabled, setIsInputDisabled] = useState(!!disabled);
-
-  // // Actualizar el estado si la prop 'disabled' cambia
-  // useEffect(() => {
-  //   setIsInputDisabled(!!disabled);
-  // }, [disabled]);
-
   return (
     <div className="field-body">
       <div className="field">
