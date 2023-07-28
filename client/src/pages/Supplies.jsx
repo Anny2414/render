@@ -1,3 +1,10 @@
+// GENERACION DE PDF
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
+import Logo from "../assets/img/Logo.png"; // Imagen que sera usada en el PDF
+
+
 import { useEffect, useState } from "react";
 
 import { Navbar } from "../components/Navbar.jsx";
@@ -24,12 +31,77 @@ import {
 export function SuppliesPage() {
   // ARREGLO DE USUARIOS Y ROLES
   const [Supplies, setSupplies] = useState([]);
+//Generar PDF
+const generatePDF = async() => {
+  const doc = new jsPDF();
 
+  doc.addFont("helvetica", "normal");
+  const fontSize = 10;
+
+  const headers = [
+    "#",
+    "Nombre",
+    "Costo Adicional",
+    "Stock",
+  ];
+  const tableData = await Promise.all(
+    Supplies.map(async (suppli, index) => [
+      index + 1,
+      suppli.name,
+      suppli.price,
+      suppli.stock,
+
+    ])
+  );
+
+  doc.setFont("helvetica");
+  doc.setFontSize(fontSize);
+  doc.autoTable({
+    head: [headers],
+    body: tableData,
+    startY: 40,
+    styles: {
+      textColor: [100, 100, 100],
+      lineColor: [100, 100, 100],
+      lineWidth: 0.1,
+    },
+    headStyles: {
+      fillColor: [207, 41, 36],
+      textColor: [255, 255, 255],
+    },
+    bodyStyles: {
+      fillColor: [245, 245, 245],
+    },
+  });
+
+  const imgData = Logo;
+  doc.addImage(imgData, "PNG", 10, 10, 30, 30);
+
+  doc.setTextColor(100, 100, 100);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.text(`REPORTE DE INGREDIENTES`, 50, 25);
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString();
+
+  doc.setFontSize(fontSize);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Fecha: ${dateStr}`, 50, 30);
+
+  doc.save("reporte_ingredientes.pdf");
+};
+
+  
+
+  
   // CONFIGURACION MODAL
   const [isOpen, setIsOpen] = useState(false);
+  
 
   const [modalConfig, setModalConfig] = useState();
   const [notification, setNotification] = useState(null);
+  
 
 
   const reloadDataTable = async () => {
@@ -147,6 +219,12 @@ export function SuppliesPage() {
         await editSupplie(supplieId, data);
         reloadDataTable()
         closeModal()
+        setNotification({
+          msg: "Ingrediente editado exitosamente!",
+          color: "warning",
+          buttons: false,
+          timeout: 3000,
+        });
       } catch (error) {
         console.error("Error al editar el Ingrediente:", error);
       }
@@ -242,12 +320,17 @@ export function SuppliesPage() {
             <Input holder="Buscar Ingrediente" icon="magnifying-glass" />
           </div>
           <div className="column is-fullwidth">
-            <Button text="Generar PDF" color="primary" col="fullwidth" />
+          <Button
+              text="Generar PDF"
+              color="primary"
+              col="fullwidth"
+              action={generatePDF}
+            />
           </div>
         </div>
         <Table
-          headers={["id", "name", "price","stock"]}
-          columns={["ID", "Nombre", "Costo Adicional","Stock"]}
+          headers={["#", "name", "price","stock"]}
+          columns={["#", "Nombre", "Costo Adicional","Stock"]}
           data={Supplies}
           status
           edit
