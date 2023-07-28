@@ -126,6 +126,7 @@ export function RolePage() {
           );
         }
       }
+
       setNotification({
         msg: "Rol creado exitosamente!",
         color: "success",
@@ -133,7 +134,14 @@ export function RolePage() {
         timeout: 3000,
       });
     } catch (error) {
-      console.error("Error al crear el rol:", error);
+      if (error.response.status == 400) {
+        return setNotification({
+          msg: "Ya existe un rol con este nombre!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      }
     }
 
     reloadDataTable();
@@ -151,6 +159,7 @@ export function RolePage() {
         name: "name",
         icon: "user",
         col: "full",
+        required: "true",
         value: role.name,
       },
       {
@@ -216,6 +225,13 @@ export function RolePage() {
 
       try {
         await editRole(roleId, { name: name });
+
+        setNotification({
+          msg: "Rol editado exitosamente!",
+          color: "success",
+          buttons: false,
+          timeout: 3000,
+        });
       } catch (error) {
         console.error("Error al editar el rol:", error);
       }

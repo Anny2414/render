@@ -36,14 +36,15 @@ export function UsersPage() {
   // Variable para buscar usuarios
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.address.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.address.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const generatePDF = async() => {
+  const generatePDF = async () => {
     const doc = new jsPDF();
 
     doc.addFont("helvetica", "normal");
@@ -169,7 +170,6 @@ export function UsersPage() {
       col: "half",
       value: "yourburger123",
       readonly: "true",
-      disabled: "true"
     },
     {
       title: "Rol",
@@ -237,8 +237,6 @@ export function UsersPage() {
   const handleCreateUser = async (data) => {
     try {
       await createUser(data);
-      reloadDataTable();
-      closeModal();
 
       setNotification({
         msg: "Usuario creado exitosamente!",
@@ -247,8 +245,18 @@ export function UsersPage() {
         timeout: 3000,
       });
     } catch (error) {
-      console.error("Error al crear el usuario:", error);
+      if (error.response.status == 400) {
+        return setNotification({
+          msg: "Ya existe este usuario!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      }
     }
+
+    reloadDataTable();
+    closeModal();
   };
 
   const handleEditClick = async (userId) => {
@@ -289,10 +297,25 @@ export function UsersPage() {
     const handleEditUser = async (data) => {
       try {
         await editUser(userId, data);
+
+        setNotification({
+          msg: "Usuario editado exitosamente!",
+          color: "success",
+          buttons: false,
+          timeout: 3000,
+        });
+
         reloadDataTable();
         closeModal();
       } catch (error) {
-        console.error("Error al editar el usuario:", error);
+        if (error.response.status == 400) {
+          setNotification({
+            msg: "Este usuario ya existe!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        }
       }
     };
 
