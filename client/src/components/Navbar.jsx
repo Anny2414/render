@@ -1,41 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/img/only-text.png";
-import {getclients} from "../api/clients.api"
-import {getUsers} from "../api/users.api"
-import {getPermissions} from "../api/permissions.api"
+import { getclients } from "../api/clients.api"
+import { getUsers } from "../api/users.api"
+import { getPermissions } from "../api/permissions.api"
 
 export function Navbar() {
   const [username, setUsername] = useState('');
-  const [rol, setRol] = useState('');
-  const [permiso, setPermiso] = useState('');
-  
+  const [rol, setRol] = useState();
+  const [permisos, setPermisos] = useState();
+
   useEffect(() => {
     const name = localStorage.getItem('name');
-    const api = async () =>{
-      const resUser = await getUsers()
-
-      const user = resUser.data.filter((user) => user.name == name)
-      
-      if (user) {
-        setUsername(user.username);
-        setRol(user.role)
-        const resPermiso  = await getPermissions(user.role)
-        setPermiso(resPermiso.data)
-      }else{
-        const resClient = await getclients()
-        const client = resClient.data.filter((client) => client.name ==  name)
-
-        if (client) {
-          setUsername(client.username);
-          setRol(client.role)
-          const resPermiso  = await getPermissions(client.role)
+    const api = async () => {
+      try {
+        const resUser = await getUsers();
+        const user = resUser.data.filter((user) => user.name === name);
+    
+        if (user.length > 0) { // Check if the 'user' array has any elements
+          console.log(user);
+          setUsername(name);
+          setRol(user[0].role);
+          const resPermiso = await getPermissions(user[0].role);
+          setPermisos(resPermiso);
         } else {
-          window.location.replace("/login")
+          const resClient = await getclients();
+          const client = resClient.data.filter((client) => client.name === name);
+    
+          if (client.length > 0) { // Check if the 'client' array has any elements
+            setUsername(name);
+            setRol(client[0].role);
+            const resPermiso = await getPermissions(client[0].role);
+            setPermisos(resPermiso);
+          } else {
+            window.location.replace("/login");
+          }
         }
+      } catch (error) {
+        // Handle any errors that occur during the API calls
+        console.error("Error:", error);
+        // Optionally, you might want to redirect to an error page or display an error message.
       }
-
-    }
+    };
+    api()
   }, []);
 
   function cerrarSesion() {
@@ -73,33 +80,58 @@ export function Navbar() {
 
       <div className={`navbar-menu ${isMenuOpen ? "is-active" : ""}`}>
         <div className="navbar-start">
-          <Link to="/users" className="navbar-item">
-            Usuarios
-          </Link>
+          {console.log(permisos)}
+          {permisos ? (
+            permisos.map((obj) => {
+              if (obj === "Usuarios") {
+                return (
+                  <Link to="/users" className="navbar-item" key="Usuarios">
+                    Usuarios
+                  </Link>
+                );
+              } else if (obj === "Clientes") {
+                return (
+                  <Link to="/clients" className="navbar-item" key="Clientes">
+                    Clientes
+                  </Link>
+                );
+              } else if (obj === "Productos") {
+                return (
+                  <Link to="/products" className="navbar-item" key="Productos">
+                    Productos
+                  </Link>
+                );
+              } else if (obj === "Ingredientes") {
+                return (
+                  <Link to="/supplies" className="navbar-item" key="Ingredientes">
+                    Ingredientes
+                  </Link>
+                );
+              } else if (obj === "Pedidos") {
+                return (
+                  <Link to="/order" className="navbar-item" key="Pedido">
+                    Pedidos
+                  </Link>
+                );
+              } else if (obj === "Roles") {
+                return (
+                  <Link to="/roles" className="navbar-item" key="Roles">
+                    Roles
+                  </Link>
+                );
+              } else if (obj === "Ventas") {
+                return (
+                  <Link to="/sales" className="navbar-item" key="Ventas">
+                    Ventas
+                  </Link>
+                );
+              }
+              return null; // Return null for cases where obj does not match any condition
+            })
+          ) : (
+            console.log("no")
+          )}
 
-          <Link to="/clients" className="navbar-item">
-            Clientes
-          </Link>
-
-          <Link to="/products" className="navbar-item">
-            Productos
-          </Link>
-
-          <Link to="/supplies" className="navbar-item">
-            Ingredientes
-          </Link>
-
-          <Link to="/order" className="navbar-item">
-            Pedidos
-          </Link>
-
-          <Link to="/roles" className="navbar-item">
-            Roles
-          </Link>
-
-          <Link to="/sales" className="navbar-item">
-            Ventas
-          </Link>
         </div>
 
         <div className="navbar-end">
