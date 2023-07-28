@@ -261,6 +261,7 @@ export function UsersPage() {
         timeout: 3000,
       });
     } catch (error) {
+      console.log(error.config.data);
       if (error.response.status == 400) {
         return setNotification({
           msg: "Ya existe este usuario!",

@@ -8,7 +8,6 @@ import { Select } from "./Form/Select";
 import { DefaultCheckedSwitch } from "./Form/DefaultCheckedSwitch";
 
 export function Modal(props) {
-  const [selectedRole, setSelectedRole] = useState("");
   const [ingredientes, setIngredientes] = useState([]);
 
   useEffect(() => {

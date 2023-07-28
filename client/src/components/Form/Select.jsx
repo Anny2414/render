@@ -1,5 +1,4 @@
 import React from "react";
-
 import { Button } from "./Button";
 
 export const Select = (props) => {
@@ -11,17 +10,13 @@ export const Select = (props) => {
     defaultValue,
     customOptions,
     keySelect,
-    nameSelect,
     hasButton,
     textButton,
     actionButton,
     handleOptionChange,
   } = props;
 
-  const options = customOptions || fields;
-  const nameOption = nameSelect || name;
-
-  if (hasButton == true) {
+  if (hasButton) {
     return (
       <div className="field has-addons">
         <div className="control has-icons-left is-expanded">
@@ -30,9 +25,9 @@ export const Select = (props) => {
           </span>
           <div className="select is-fullwidth">
             <select onChange={handleOptionChange}>
-              {options.map((option, index) => (
-                <option value={option.keySelect} key={index}>
-                  {option[nameOption]}
+              {(customOptions || fields).map((option, index) => (
+                <option value={option[keySelect]} key={index}>
+                  {option[name]}
                 </option>
               ))}
             </select>
@@ -59,13 +54,14 @@ export const Select = (props) => {
           </span>
           <div className="select" style={{ minWidth: "100%" }}>
             <select
+              {...action}
               onChange={handleOptionChange}
               style={{ minWidth: "100%" }}
               defaultValue={defaultValue}
             >
-              {options.map((option, index) => (
+              {(customOptions || fields).map((option, index) => (
                 <option value={option[keySelect]} key={index}>
-                  {option[nameOption]}
+                  {option[name]}
                 </option>
               ))}
             </select>
