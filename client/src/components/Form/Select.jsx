@@ -59,9 +59,9 @@ export const Select = (props) => {
           </span>
           <div className="select" style={{ minWidth: "100%" }}>
             <select
+              onChange={handleOptionChange}
               style={{ minWidth: "100%" }}
               defaultValue={defaultValue}
-              {...action}
             >
               {options.map((option, index) => (
                 <option value={option[keySelect]} key={index}>

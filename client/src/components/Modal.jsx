@@ -8,6 +8,7 @@ import { Select } from "./Form/Select";
 import { DefaultCheckedSwitch } from "./Form/DefaultCheckedSwitch";
 
 export function Modal(props) {
+  const [selectedRole, setSelectedRole] = useState("");
   const [ingredientes, setIngredientes] = useState([]);
 
   useEffect(() => {
@@ -53,7 +54,10 @@ export function Modal(props) {
                   <div className={`column is-${field.col}`} key={index}>
                     <div className="field is-vertical">
                       <div className="field-label" style={{ marginRight: 0 }}>
-                        <label className="label has-text-centered" htmlFor={field.name}>
+                        <label
+                          className="label has-text-centered"
+                          htmlFor={field.name}
+                        >
                           {field.title}
                         </label>
                       </div>
@@ -118,7 +122,7 @@ export function Modal(props) {
                           ) : (
                             <div className="is-flex">
                               <div className="mx-auto">
-                                <span>No Hay {field.title} disponibles.</span>
+                                <span>No hay {field.title} disponibles.</span>
                               </div>
                             </div>
                           )}

@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
 
+import { useRef } from "react";
+
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
 
@@ -35,6 +37,10 @@ export function UsersPage() {
 
   // Variable para buscar usuarios
   const [searchQuery, setSearchQuery] = useState("");
+
+  //
+  const selectedOptionRef = useRef("Administrador");
+  const isAdminSelected = useRef();
 
   const filteredUsers = users.filter(
     (user) =>
@@ -121,6 +127,14 @@ export function UsersPage() {
     setUsers(res.data);
   };
 
+  const handleOptionChange = (event) => {
+    const selectedIndex = event.target.selectedIndex;
+    const selectedOptionText = event.target.options[selectedIndex].text;
+    selectedOptionRef.current = selectedOptionText;
+
+    isAdminSelected.current = selectedOptionRef.current === "Administrador";
+  };
+
   const openModal = (
     title,
     fields,
@@ -179,6 +193,7 @@ export function UsersPage() {
       col: "half",
       nameSelect: "name",
       keySelect: "id",
+      handleOptionChange: handleOptionChange,
     },
     {
       title: "Documento",
@@ -187,6 +202,7 @@ export function UsersPage() {
       icon: "id-card",
       col: "half",
       required: "true",
+      disabled: isAdminSelected.current,
     },
     {
       title: "Nombre",

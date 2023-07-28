@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 export const Input = (props) => {
   const {
@@ -14,7 +14,16 @@ export const Input = (props) => {
     style,
     disabled,
   } = props;
+
   const styls = style || "";
+
+  // Estado para controlar si el input está habilitado o deshabilitado
+  const [isInputDisabled, setIsInputDisabled] = useState(!!disabled);
+
+  // Actualizar el estado si la prop 'disabled' cambia
+  useEffect(() => {
+    setIsInputDisabled(!!disabled);
+  }, [disabled]);
 
   return (
     <div className="field-body">
@@ -26,7 +35,7 @@ export const Input = (props) => {
             type={type}
             placeholder={holder}
             defaultValue={value}
-            disabled={!!disabled}
+            disabled={isInputDisabled}
             onChange={onChange}
             name={name}
             readOnly={!!read_only}
