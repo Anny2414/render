@@ -1,24 +1,25 @@
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
-
+import Logo from "../assets/img/Logo.png"; // Imagen que sera usada en el PDF
 import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
 import { Link, Navigate } from "react-router-dom";
-
+import { getRoleName } from "../api/roles.api.js"
 // CONEXION CON LA API DE USERS Y ROLES
 import { getUser, getUsers } from "../api/users.api";
 import { editOrder, getOrder, getOrders } from "../api/order.api";
 import { Modal } from "../components/Modal.jsx";
 import { getclients } from "../api/clients.api.js";
 import { Notification } from "../components/Notification.jsx";
+import jsPDF from "jspdf";
 
 export function OrdersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [order, setOrder] = useState([]);
   const [username, setUsername] = useState('');
-  const [clientes , setClientes] = useState([])
+  const [clientes, setClientes] = useState([])
   const [rol, setRol] = useState()
   const [notification, setNotification] = useState(null);
 
@@ -27,7 +28,7 @@ export function OrdersPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
   // const rol = "Cliente"; 
-  
+
   const reloadDataTable = async () => {
     setOrder([])
     const res = await getOrders();
@@ -37,7 +38,7 @@ export function OrdersPage() {
     setModalConfig({ title, fields, dataSelect, nameSelect, buttonSubmit, submit });
     setIsOpen(true);
   };
-  
+
   const closeModal = () => {
     setIsOpen(false);
   };
@@ -64,6 +65,10 @@ export function OrdersPage() {
   }, []);
 
   useEffect(() => {
+    async function roles(id) {
+      const role = await getRoleName(id)
+      setRol(role)
+    }
     // Verifica si los datos han cargado antes de utilizar la variable username
     if (!isLoading) {
       const name = localStorage.getItem("name");
@@ -72,20 +77,87 @@ export function OrdersPage() {
       if (name) {
         if (user) {
           setUsername(user.username);
-          setRol(user.rol);
-        } else if(cliente){
+          roles(user.role)
+        } else if (cliente) {
           setUsername(cliente.username);
-          setRol(cliente.rol);
+          roles(cliente.role)
+
         }
-        
+
       } else {
         window.location.replace("/")
       }
     }
   }, [users, clientes, isLoading]);
-  
+
+  const generatePDF = async () => {
+    const doc = new jsPDF();
+
+    doc.addFont("helvetica", "normal");
+    const fontSize = 10;
+
+    const headers = [
+      "#",
+      "Usuario",
+      "Creado en",
+      "Actualizado en",
+      "Total",
+      "Estado de venta",
+      "Detalle",
+    ];
+    const tableData = await Promise.all(
+      order.map(async (user, index) => [
+        index + 1,
+        user.user,
+        user.create_at,
+        user.update_at,
+        user.total,
+        user.status,
+      ])
+    );
+
+    doc.setFont("helvetica");
+    doc.setFontSize(fontSize);
+    doc.autoTable({
+      head: [headers],
+      body: tableData,
+      startY: 40,
+      styles: {
+        textColor: [100, 100, 100],
+        lineColor: [100, 100, 100],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [207, 41, 36],
+        textColor: [255, 255, 255],
+      },
+      bodyStyles: {
+        fillColor: [245, 245, 245],
+      },
+    });
+
+    const imgData = Logo;
+    doc.addImage(imgData, "PNG", 10, 10, 30, 30);
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(`REPORTE DE USUARIOS`, 50, 25);
+
+    const today = new Date();
+    const dateStr = today.toLocaleDateString();
+
+    doc.setFontSize(fontSize);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Fecha: ${dateStr}`, 50, 30);
+
+    doc.save("reporte_pedidos.pdf");
+  };
 
 
+  const onContentClick = async(SalesId) =>{
+    
+  }
   const handleEditClick = async (SalesId) => {
     const res = await getOrder(SalesId);
     const sales = res.data;
@@ -130,7 +202,7 @@ export function OrdersPage() {
       timeout: 0,
       onConfirm: async () => {
         try {
-    
+
           const data = await getOrder(userId)
           data.status = "Cancelado"
           await editOrder(userId, data);
@@ -154,7 +226,7 @@ export function OrdersPage() {
     <div>
       <Navbar />
       <div className="container is-fluid mt-5">
-      <div className="notifications float">
+        <div className="notifications float">
           {notification && (
             <Notification
               msg={notification.msg}
@@ -175,8 +247,12 @@ export function OrdersPage() {
           </div>
           {rol === "Administrador" && (
             <div className="column is-fullwidth">
-              <Button text="Generar PDF" color="primary" col="fullwidth" />
-            </div>
+              <Button
+                text="Generar PDF"
+                color="primary" 
+                col="fullwidth"
+                action={generatePDF}
+              />            </div>
           )}
         </div>
 
@@ -196,6 +272,7 @@ export function OrdersPage() {
             delete={true}
             onEditClick={handleEditClick}
             onDeleteClick={handleDeleteClick}
+            onContentClick = {onContentClick}
             data={order}
           />
         ) : (
