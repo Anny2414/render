@@ -11,6 +11,7 @@ import { OrderPage } from "./pages/OrderOnePage";
 import { OrdersPage } from "./pages/OrdersPage";  
 import { Loginpage } from "./pages/Loginpage"; 
 import { Registropage } from "./pages/registropage";
+import {PasswordResetForm} from "./pages/PasswordResetForm";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/registro" element={<Registropage/>} />
+        <Route path="/recuperar" element={<PasswordResetForm/>}/>
         <Route path="/login" element={<Loginpage/>} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/users" element={<UsersPage />} />
@@ -29,6 +31,8 @@ function App() {
         <Route path="/supplies" element={<SuppliesPage />} />
         <Route path="/order" element={<OrderPage />} />
         <Route path="/orders" element={<OrdersPage />} />
+
+        
 
       </Routes>
     </BrowserRouter>

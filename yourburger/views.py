@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from .serializer import UserSerializer
@@ -5,12 +6,27 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.db.models import Q
 from .serializer import UserSerializer, RoleSerializer , OrderSerializar, ProductSerializar, ClientSerializar, PermissionSerializer, DetailPermissionSerializer, SuppliesSerializar, SaleSerializar, DetailSerializer, ContetOrderSerializer, ContentSerializer
 from .models import User, Role, Order, Products, Permission,DetallePermiso, Supplies, Detail, ContentOrder, Content
 from rest_framework_simplejwt.authentication import JWTAuthentication
-# Create your views here.
+
+
+
+class PasswordResetView(APIView):
+    def post(self, request):
+        email = request.data.get('email', None)
+
+        try:
+            user = get_object_or_404(User, email=email)
+            return JsonResponse({'message': 'OK', 'info': email},status=200)
+        
+        except:
+            return JsonResponse({'message': 'El correo electrónico no existe en la base de datos'}, status=404)
+
+
 class UserRegistrationView(APIView):
     def post(self, request):
         role_cliente = Role.objects.get(name="Cliente")

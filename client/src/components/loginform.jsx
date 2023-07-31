@@ -71,7 +71,7 @@ const LoginForm = () => {
                 <button className="button is-primary"  type="submit">Iniciar sesión</button>
                 <br />
                 <br />
-                <a className="is-link contra" type="button" name="recuperar">¿Olvidaste tu
+                <a className="is-link contra" type="button" name="recuperar" href='/recuperar'>¿Olvidaste tu
                   contraseña?</a>
                 <br />
                 <br />
