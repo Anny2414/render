@@ -29,8 +29,7 @@ const LoginForm = () => {
   <div className="hero-body has-text-centered">
     <div className="container">
       <div className="columns is-centered">
-        <div className="column is-half has-background-white">
-          <div className="card">
+        <div className="column is-half has-background-white columna">
             <header className="card-header">
               <div className="media">
               <img src={Logo} alt="Logo" width="230px" />
@@ -79,7 +78,7 @@ const LoginForm = () => {
                 <br /><br />
               </div>
             </div>
-          </div>
+          
         </div>
       </div>
     </div>
