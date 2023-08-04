@@ -204,7 +204,7 @@ export function Modal(props) {
                             textButton={field.textButton}
                             icon={field.icon}
                             actionButton={field.actionButton}
-                            handleOptionChange={handleOptionChange}
+                            handleOptionChange={field.hasButton ? field.handleOptionChange : handleOptionChange}
                           />
                         </div>
                       )}

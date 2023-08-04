@@ -18,7 +18,6 @@ export function Navbar() {
         const user = resUser.data.filter((user) => user.name === name);
     
         if (user.length > 0) { // Check if the 'user' array has any elements
-          console.log(user);
           setUsername(name);
           setRol(user[0].role);
           const resPermiso = await getPermissions(user[0].role);
@@ -80,8 +79,7 @@ export function Navbar() {
 
       <div className={`navbar-menu ${isMenuOpen ? "is-active" : ""}`}>
         <div className="navbar-start">
-          {console.log(permisos)}
-          {permisos ? (
+          {permisos && (
             permisos.map((obj) => {
               if (obj === "Usuarios") {
                 return (
@@ -128,9 +126,7 @@ export function Navbar() {
               }
               return null; // Return null for cases where obj does not match any condition
             })
-          ) : (
-            console.log("no")
-          )}
+          ) }
 
         </div>
 

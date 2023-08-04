@@ -127,7 +127,7 @@ export function ProductsPage() {
 
   const handleOptionChange = (event) => {
     const option = supplies.find(
-      (supplie) => supplie.name === event.target.value
+      (supplie) => supplie.name === event.target.value,
     );
     selectedOptionRef.current = option;
   };
@@ -461,8 +461,7 @@ export function ProductsPage() {
           ...suppliesProduct,
         ],
         nameSelect: "supplies",
-        keySelect: "supplies",
-        handleOptionChange: handleOptionChange,
+        // handleOptionChange: handleOptionChange,
         actionButton: anadirIngrediente,
       },
       {
