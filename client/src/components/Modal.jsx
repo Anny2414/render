@@ -11,27 +11,49 @@ import { DefaultCheckedSwitch } from "./Form/DefaultCheckedSwitch";
 export function Modal(props) {
   const [ingredientes, setIngredientes] = useState([]);
 
-  //
   const [inputDisabledState, setInputDisabledState] = useState({});
-  const [isAdmin, setIsAdmin] = useState(true);
 
-  const selectedOptionRef = useRef("Administrador");
+  const selectedOptionRef = useRef(props.editingUserRole);
   const isAdminSelected = useRef();
+
+  const updateInputDisabledState = (selectedOption) => {
+    isAdminSelected.current = selectedOption === "Administrador";
+
+    setInputDisabledState(() => ({
+      document: isAdminSelected.current,
+      name: isAdminSelected.current,
+      lastname: isAdminSelected.current,
+      phone: isAdminSelected.current,
+      address: isAdminSelected.current,
+    }));
+  };
 
   useEffect(() => {
     setIngredientes([]); // Reset ingredientes when the modal is opened
+    const isAdmin = selectedOptionRef.current === "Administrador";
 
-    if(props.title == "Nuevo usuario") {
-      setInputDisabledState(() => ({
-        document: true, 
-        name: true,
-        lastname: true,
-        phone: true,
-        address: true
-      }));
+    if (props.title === "Nuevo usuario") {
+      selectedOptionRef.current = "Administrador";
     }
-    
+
+    setInputDisabledState({
+      document: isAdmin,
+      name: isAdmin,
+      lastname: isAdmin,
+      phone: isAdmin,
+      address: isAdmin,
+    });
+
+    updateInputDisabledState(selectedOptionRef.current);
   }, [props.isOpen]);
+
+  const handleOptionChange = (event) => {
+    const selectedIndex = event.target.selectedIndex;
+    const selectedOptionText = event.target.options[selectedIndex].text;
+    selectedOptionRef.current = selectedOptionText;
+
+    updateInputDisabledState(selectedOptionText);
+  };
 
   const {
     title,
@@ -43,25 +65,6 @@ export function Modal(props) {
     button,
     submit,
   } = props;
-
-  const handleOptionChange = (event) => {
-    const selectedIndex = event.target.selectedIndex;
-    const selectedOptionText = event.target.options[selectedIndex].text;
-    selectedOptionRef.current = selectedOptionText;
-
-    isAdminSelected.current = selectedOptionRef.current === "Administrador";
-    setIsAdmin(isAdminSelected.current); // Actualiza el estado "isAdmin"
-
-    // También puedes actualizar el estado de deshabilitación aquí, si deseas que se refleje de inmediato
-    setInputDisabledState((prevState) => ({
-      ...prevState,
-      document: isAdminSelected.current, 
-      name: isAdminSelected.current,
-      lastname: isAdminSelected.current,
-      phone: isAdminSelected.current,
-      address: isAdminSelected.current
-    }));
-  };
 
   const {
     register,
@@ -204,7 +207,11 @@ export function Modal(props) {
                             textButton={field.textButton}
                             icon={field.icon}
                             actionButton={field.actionButton}
-                            handleOptionChange={field.hasButton ? field.handleOptionChange : handleOptionChange}
+                            handleOptionChange={
+                              field.hasButton
+                                ? field.handleOptionChange
+                                : handleOptionChange
+                            }
                           />
                         </div>
                       )}

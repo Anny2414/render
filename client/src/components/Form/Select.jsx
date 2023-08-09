@@ -24,9 +24,7 @@ export const Select = (props) => {
             <i className={`fa-solid fa-${icon}`}></i>
           </span>
           <div className="select is-fullwidth">
-          <select
-              onChange={handleOptionChange}
-            >
+            <select onChange={handleOptionChange}>
               {(customOptions || fields).map((option, index) => (
                 <option value={option[keySelect]} key={index}>
                   {option[name]}

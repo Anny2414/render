@@ -37,6 +37,8 @@ export function UsersPage() {
   // Variable para buscar usuarios
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [editingUserRole, setEditingUserRole] = useState("Administrador");
+
   const filteredUsers = users.filter(
     (user) =>
       user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -121,7 +123,7 @@ export function UsersPage() {
     const res = await getUsers();
     // Obtiene una matriz de promesas que resuelven los nombres de los roles
     const rolePromises = res.data.map((user) => getRoleName(user.role));
-  
+
     // Espera a que todas las promesas se resuelvan
     const roleNames = await Promise.all(rolePromises);
 
@@ -234,19 +236,19 @@ export function UsersPage() {
       try {
         const res = await getUsers();
         const resRoles = await getRoles();
-  
+
         // Obtiene una matriz de promesas que resuelven los nombres de los roles
         const rolePromises = res.data.map((user) => getRoleName(user.role));
-  
+
         // Espera a que todas las promesas se resuelvan
         const roleNames = await Promise.all(rolePromises);
-  
+
         // Combina los datos de usuario con los nombres de roles resueltos
         const usersWithRoles = res.data.map((user, index) => ({
           ...user,
           roleName: roleNames[index],
         }));
-  
+
         setUsers(usersWithRoles);
         setRoles(resRoles.data);
       } catch (error) {
@@ -254,10 +256,9 @@ export function UsersPage() {
         console.error("Error al obtener datos:", error);
       }
     }
-  
+
     fetchData();
   }, []);
-  
 
   const handleCreateUser = async (data) => {
     try {
@@ -289,6 +290,10 @@ export function UsersPage() {
     const res = await getUser(userId);
     const user = res.data;
 
+    const role = await getRoleName(user.role);
+
+    setEditingUserRole(role);
+
     const fieldsEdit = [
       {
         title: "Usuario",
@@ -312,11 +317,51 @@ export function UsersPage() {
         title: "Rol",
         type: "select",
         name: "role",
-        col: "full",
+        col: "half",
         icon: "lock-open",
         nameSelect: "name",
         keySelect: "id",
         value: user.role,
+      },
+      {
+        title: "Documento",
+        type: "number",
+        name: "document",
+        icon: "id-card",
+        col: "half",
+        value: user.document,
+      },
+      {
+        title: "Nombre",
+        type: "text",
+        name: "name",
+        icon: "signature",
+        col: "half",
+        value: user.name,
+      },
+      {
+        title: "Apellido",
+        type: "text",
+        name: "lastname",
+        icon: "signature",
+        col: "half",
+        value: user.lastname,
+      },
+      {
+        title: "Telefono",
+        type: "text",
+        name: "phone",
+        icon: "phone",
+        col: "half",
+        value: user.phone,
+      },
+      {
+        title: "Direccion",
+        type: "text",
+        name: "address",
+        icon: "location-dot",
+        col: "half",
+        value: user.address,
       },
     ];
 
@@ -495,6 +540,7 @@ export function UsersPage() {
           buttonSubmit={modalConfig.buttonSubmit}
           onClose={closeModal}
           submit={modalConfig.submit}
+          editingUserRole={editingUserRole}
         />
       )}
     </div>
