@@ -4,6 +4,7 @@ import Logo from "../assets/img/only-text.png";
 import { getclients } from "../api/clients.api"
 import { getUsers } from "../api/users.api"
 import { getPermissions } from "../api/permissions.api"
+import Cookies from "js-cookie";
 
 export function Navbar() {
   const [username, setUsername] = useState('');
@@ -16,24 +17,29 @@ export function Navbar() {
       try {
         const resUser = await getUsers();
         const user = resUser.data.filter((user) => user.name === name);
-    
+        
         if (user.length > 0) { // Check if the 'user' array has any elements
-          setUsername(name);
+          setUsername(user[0].username);
           setRol(user[0].role);
           const resPermiso = await getPermissions(user[0].role);
           setPermisos(resPermiso);
+          localStorage.setItem('username', user[0].username); 
+          
         } else {
           const resClient = await getclients();
           const client = resClient.data.filter((client) => client.name === name);
     
           if (client.length > 0) { // Check if the 'client' array has any elements
-            setUsername(name);
+            setUsername(client[0].username);
             setRol(client[0].role);
             const resPermiso = await getPermissions(client[0].role);
             setPermisos(resPermiso);
+          localStorage.setItem('username', client[0].username); 
+
           } else {
             window.location.replace("/login");
           }
+          console.log(username);
         }
       } catch (error) {
         // Handle any errors that occur during the API calls
