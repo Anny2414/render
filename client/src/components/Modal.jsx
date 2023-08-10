@@ -102,8 +102,8 @@ export function Modal(props) {
                         </label>
                       </div>
                       {field.type === "text" ||
-                      field.type === "number" ||
-                      field.type === "password" ? (
+                        field.type === "number" ||
+                        field.type === "password" ? (
                         <Input
                           id={field.name}
                           type={field.type}
@@ -145,27 +145,47 @@ export function Modal(props) {
                           }}
                           error={errors[field.name]}
                         />
-                      ) : field.type === "list" ? (
+                      ) : field.type === 'list' ? (
                         <div>
-                          {field.data === undefined ? (
-                            <span>no valido</span>
-                          ) : field.data && field.data.length > 0 ? (
-                            field.data.map((ingrediente, index) => (
-                              <div className="is-flex">
-                                <div className="mx-auto">
-                                  <span key={index}>
-                                    {ingrediente?.supplies || ingrediente?.name}
-                                  </span>
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="is-flex">
-                              <div className="mx-auto">
-                                <span>No hay {field.title} disponibles.</span>
-                              </div>
-                            </div>
-                          )}
+                          {/* <Table
+                                columns={field.columns}
+                                headers={field.headers}
+                                data={field.data}
+                                delete={field.delete}
+                                onDeleteClick = {field.onDeleteClick}
+                            /> */}
+                          <table className="table is-fullwidth">
+                            <thead>
+                              <tr>
+                                {field.columns.map((column, index) => (
+                                  <th key={column}>{column}</th>
+                                ))}
+                                <th key={"delete"}></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {field.data.map((ingrediente) => {
+                                console.log(ingrediente);
+                                return (
+                                  <tr key={ingrediente.id}>
+                                    {field.headers.map((header, index) => (
+                                      <td>{ingrediente[header]}</td>
+                                    ))}
+                                    <td>
+                                      <Button
+                                        text={<span className="icon">
+                                          <i className="fa-solid fa-trash"></i>
+                                        </span>}
+                                        color="primary"
+                                        action={() => field.onDeleteClick(ingrediente.id)}
+                                      />
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+
+                          </table>
                         </div>
                       ) : field.type === "file" ? (
                         <Input

@@ -11,6 +11,8 @@ import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
 import { Modal } from "../components/Modal.jsx";
 import { Table } from "../components/Table/Table.jsx";
+import { Notification } from "../components/Notification.jsx";
+
 
 import { useRef } from "react";
 
@@ -103,6 +105,8 @@ export function ProductsPage() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState();
+  const [notification, setNotification] = useState(null);
+
 
     // Variable para buscar productos
 
@@ -218,11 +222,13 @@ export function ProductsPage() {
       actionButton: anadirIngrediente,
     },
     {
-      type: "list",
-      headers: ["Nombre", "Precio"],
-      key: ["name", "price"],
+      type : "list",
+      columns: ['Nombre','Precio'],
+      headers: ['name', 'price'],
       data: ingredientes,
-    },
+      delete: true,
+      //onDeleteClick: clickDelete
+  },
   ];
 
   // Conexion a API y obtiene datos de Users y Roles
@@ -272,6 +278,12 @@ export function ProductsPage() {
       reloadDataTable();
       setIngredientes([]);
       closeModal();
+      setNotification({
+        msg: "Producto creado exitosamente!",
+        color: "success",
+        buttons: false,
+        timeout: 3000,
+      });
     } catch (error) {
       console.error("Error al crear el Producto:", error);
     }
@@ -280,6 +292,7 @@ export function ProductsPage() {
   const handleEditClick = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
+    const content = contents.filter((content) => content.product == product.name)
     const fieldsEdit = [
       {
         title: "Producto",
@@ -317,10 +330,33 @@ export function ProductsPage() {
         required: "true",
         value: product.description,
       },
+      {
+        type : "list",
+        columns: ['Nombre'],
+        headers: ['supplies'],
+        data: content,
+        delete: true,
+        //onDeleteClick: clickDelete
+    },
+    {
+        title: "Ingredientes",
+        hasButton: true,
+        textButton: "+",
+        type: "select",
+        name: "supplies",
+        icon: "list",
+        required: "false",
+        col : "full",
+        customOptions: [{"name" : "no seleccionado"}, ...supplies],
+        nameSelect:"name",
+        keySelect: "name",
+        handleOptionChange: handleOptionChange,
+        actionButton: anadirIngrediente,
+    },
     ];
 
     const handleEditProduct = async (data) => {
-      const { id, name, price, description } = data;
+      const { name, price, description } = data;
       const product = await (await getProduct(productId)).data;
       const contentss = contents.filter(
         (content) => content.product === product.name
@@ -370,6 +406,12 @@ export function ProductsPage() {
 
         closeModal();
         reloadDataTable();
+        setNotification({
+          msg: "Producto editado exitosamente!",
+          color: "warning",
+          buttons: false,
+          timeout: 3000,
+        });
 
         // Actualizar la lista de productos sin recargar la página
         setProducts((prevProducts) => {
@@ -398,7 +440,7 @@ export function ProductsPage() {
       "Editar producto",
       fieldsEdit,
       products,
-      "status",
+      "name",
       true,
       handleEditProduct
     );
@@ -408,6 +450,8 @@ export function ProductsPage() {
     const suppliesProduct = await contents.filter(
       (content) => content.product == product.name
     );
+    const content = contents.filter((content) => content.product == product.name)
+
     const fieldsAdd = [
       {
         title: "Producto",
@@ -465,11 +509,13 @@ export function ProductsPage() {
         actionButton: anadirIngrediente,
       },
       {
-        type: "list",
-        headers: ["Nombre", "Precio"],
-        key: ["name", "price"],
+        type : "list",
+        columns: ['Nombre','Precio'],
+        headers: ['name', 'price'],
         data: ingredientes,
-      },
+        delete: true,
+        //onDeleteClick: clickDelete
+    },
     ];
 
     const handleAdd = (data) => {
@@ -483,7 +529,7 @@ export function ProductsPage() {
           price,
           description,
           image: idP[0].image,
-          supplies: ingredientes,
+          supplies: content,
           amount: 1,
         };
 
@@ -495,18 +541,24 @@ export function ProductsPage() {
         });
 
         closeModal();
+        setNotification({
+          msg: " El Producto fue añadido al Carrito!",
+          color: "warning",
+          buttons: false,
+          timeout: 3000,
+        });
       } catch (error) {
         console.log("Error al añadir a carito" + error);
       }
     };
     openModal(
-      "Nuevo producto",
+      "Añadir al Carrito",
       fieldsAdd,
       [
         { id: 0, name: "No seleccionado", price: 0, stock: 0, status: true },
         ...supplies,
       ],
-      "name",
+      "supplies",
       true,
       handleAdd
     );
@@ -518,6 +570,8 @@ export function ProductsPage() {
     const suppliesProduct = await contents.filter(
       (content) => content.product == product.name
     );
+    const content = contents.filter((content) => content.product == product.name)
+
 
     const fieldsview = [
       {
@@ -559,34 +613,73 @@ export function ProductsPage() {
         readonly: true,
       },
       {
-        title: "Ingredientes",
-        type: "list",
-        headers: ["Nombre", "Precio"],
-        key: ["name", "price"],
-        data: suppliesProduct,
-      },
+        type : "list",
+        columns: ['Nombre'],
+        headers: ['supplies'],
+        data: content,
+        delete: false,
+        //onDeleteClick: clickDelete
+    },
     ];
 
     openModal("Ver producto", fieldsview, products, "status", false);
   };
 
   const handleStatusChange = async (productId, status) => {
-    try {
-      await updateProductStatus(productId, !status);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+        try {
+          await updateProductStatus(productId, !status);
+          setNotification({
+            msg: "Estado cambiado exitosamente!",
+            color: "info",
+            buttons: false,
+            timeout: 3000,
+          });
+
+        } catch (error) {
+          console.error(error);
+        }
+      };
 
   const handleDeleteClick = async (productId) => {
-    await deleteProduct(productId);
-    reloadDataTable();
+    setNotification({
+      msg: "¿Seguro deseas eliminar el Producto?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        try{
+          await deleteProduct(productId);
+          setNotification({
+            msg: "Producto eliminado exitosamente!",
+            color: "info",
+            buttons: false,
+            timeout: 3000,
+          });
+          reloadDataTable();
+
+        }catch{
+          console.error("Error al eliminar:");
+        }
+     },
+    });
   };
 
   return (
     <div>
       <Navbar />
       <div className="container is-fluid mt-5">
+      <div className="notifications float">
+          {notification && (
+            <Notification
+              msg={notification.msg}
+              color={notification.color}
+              buttons={notification.buttons}
+              timeout={notification.timeout}
+              onClose={() => setNotification(null)}
+              onConfirm={notification.onConfirm}
+            />
+          )}
+        </div>
         <div className="columns is-centered">
           <div className="column is-fullwidth">
             {/* <Table
