@@ -165,7 +165,6 @@ export function Modal(props) {
                             </thead>
                             <tbody>
                               {field.data.map((ingrediente) => {
-                                console.log(ingrediente);
                                 return (
                                   <tr key={ingrediente.id}>
                                     {field.headers.map((header, index) => (
