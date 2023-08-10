@@ -216,7 +216,7 @@ export function UsersPage() {
     },
     {
       title: "Telefono",
-      type: "text",
+      type: "number",
       name: "phone",
       icon: "phone",
       col: "half",
@@ -349,7 +349,7 @@ export function UsersPage() {
       },
       {
         title: "Telefono",
-        type: "text",
+        type: "number",
         name: "phone",
         icon: "phone",
         col: "half",
