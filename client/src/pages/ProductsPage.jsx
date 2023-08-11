@@ -38,8 +38,9 @@ export function ProductsPage() {
   const [contents, setContents] = useState([]);
   const [order, setOrder] = useState([]);
   const [ingredientes, setIngredientes] = useState([]);
+  const [ingredientes1, setIngredientes1] = useState([]);
   
-  // const ingredientes = useRef([]);
+  const ingredientesPrueba = useRef([]);
   const selectedOptionRef = useRef();
 
   //Generar PDF
@@ -123,6 +124,7 @@ export function ProductsPage() {
     setProducts([]);
     setContents([]);
     setIngredientes([]);
+    setIngredientes1([]);
     const res = await getProducts();
     const resContent = await getContents();
     setProducts(res.data);
@@ -144,6 +146,7 @@ export function ProductsPage() {
       console.log("error al añadir");
     }
   };
+  
 
   const openModal = (
     title,
@@ -173,6 +176,7 @@ export function ProductsPage() {
 
   const closeModal = () => {
     setIsOpen(false);
+    reloadDataTable()
   };
 
   const fieldsNew = [
@@ -249,6 +253,8 @@ export function ProductsPage() {
     fetchData();
   }, []);
 
+
+
   const handleCreateProduct = async (data) => {
     try {
       // anadirIngrediente(data);
@@ -288,11 +294,29 @@ export function ProductsPage() {
       console.error("Error al crear el Producto:", error);
     }
   };
-
+  const datos = async (data) => {
+    ingredientes1.append(data)
+    await setIngredientes1([...ingredientes1])
+  }
+  const handleAddSupplies = () => {
+    if (selectedOptionRef.current != undefined) {
+      const res = selectedOptionRef.current
+      const ingediente = {
+        count: 1,
+        products : "",
+        supplies : res.name
+      }
+      ingredientes1.push(ingediente);
+      setIngredientes1([...ingredientes1])
+    } else {
+      console.log("error al añadir");
+    }
+  };
   const handleEditClick = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
     const content = contents.filter((content) => content.product == product.name)
+    datos(product)
     const fieldsEdit = [
       {
         title: "Producto",
@@ -334,7 +358,7 @@ export function ProductsPage() {
         type : "list",
         columns: ['Nombre'],
         headers: ['supplies'],
-        data: content,
+        data: ingredientes1,
         delete: true,
         //onDeleteClick: clickDelete
     },
@@ -351,11 +375,12 @@ export function ProductsPage() {
         nameSelect:"name",
         keySelect: "name",
         handleOptionChange: handleOptionChange,
-        actionButton: anadirIngrediente,
+        actionButton: handleAddSupplies,
     },
     ];
 
     const handleEditProduct = async (data) => {
+      console.log(data);
       const { name, price, description } = data;
       const product = await (await getProduct(productId)).data;
       const contentss = contents.filter(
@@ -371,15 +396,28 @@ export function ProductsPage() {
         const res0 = await createProduct(updateData0);
         const updatedProduct0 = res0.data;
 
-        if (contentss.length > 0) {
-          for (let i = 0; i < contentss.length; i++) {
-            const content = contents[i];
-            const updateContent = new FormData();
-            updateContent.append("product", "burbuja");
-            updateContent.append("supplies", content.supplies);
-            updateContent.append("count", content.count);
+        // if (contentss.length > 0) {
+        //   for (let i = 0; i < contentss.length; i++) {
+        //     const content = contents[i];
+        //     const updateContent = new FormData();
+        //     updateContent.append("product", "burbuja");
+        //     updateContent.append("supplies", content.supplies);
+        //     updateContent.append("count", content.count);
 
-            await editContent(content.id, updateContent);
+        //     await editContent(content.id, updateContent);
+        //   }
+        // }
+        if (ingredientes1.length > 0) {
+          for (let i = 0; i < ingredientes1.length; i++) {
+            const element = ingredientes1[i];
+            const suppli = {
+              product : product.name,
+              supplies : element.supplies,
+              count : element.count
+            } 
+            console.log(suppli);
+            await createContent(suppli)
+            
           }
         }
         const updateData = new FormData();
