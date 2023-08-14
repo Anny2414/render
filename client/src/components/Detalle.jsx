@@ -45,13 +45,11 @@ export function Detalle(props) {
                     />
                 </div>
             ))}
-            <div className="column is-full-tablet-only">
-                <div className="card añadir">
+                <div className="card añadir card-pedido p-5">
                     <Link to={"/products"} className="mas m-auto">
                         <i className="fa-light fa-plus plus mas"></i>
                     </Link>
                 </div>
-            </div>
         </div>
     );
 }
