@@ -271,7 +271,7 @@ export function UsersPage() {
         timeout: 3000,
       });
     } catch (error) {
-      console.log(error.response.data);
+      console.log(error);
       if (error.response.data.username) {
         return setNotification({
           msg: "Ya existe este usuario!",
@@ -386,9 +386,16 @@ export function UsersPage() {
         reloadDataTable();
         closeModal();
       } catch (error) {
-        if (error.response.status == 400) {
-          setNotification({
-            msg: "Este usuario ya existe!",
+        if (error.response.data.username) {
+          return setNotification({
+            msg: "Ya existe este usuario!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        } else if (error.response.data.email) {
+          return setNotification({
+            msg: "El correo ingresado es invalido!",
             color: "primary",
             buttons: false,
             timeout: 3000,
