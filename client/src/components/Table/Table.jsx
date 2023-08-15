@@ -19,9 +19,11 @@ function TableRow({
   onEditClick,
   onDeleteClick,
   count,
+  currentUser
 }) {
   const [statusSlider, setStatus] = useState(row.status);
   const [permisos, setPermisos] = useState([]);
+
 
   const mostrarPermisos = async (id) => {
     const permisos = await getPermissions(id);
@@ -58,7 +60,7 @@ function TableRow({
           <Switch
             change={handleSwitchChange}
             checked={statusSlider}
-            disabled={isAdministradorOrCliente}
+            disabled={isAdministradorOrCliente || currentUser === row.username}
           />
         </td>
       )}
@@ -77,7 +79,7 @@ function TableRow({
                 ? onEditClick(row, row.indexer)
                 : onEditClick(row.id);
             }}
-            disabled={isAdministradorOrCliente}
+            disabled={isAdministradorOrCliente || currentUser === row.username}
           />
         </td>
       )}
@@ -96,7 +98,7 @@ function TableRow({
                 ? onDeleteClick(row.indexer)
                 : onDeleteClick(row.id);
             }}
-            disabled={isAdministradorOrCliente}
+            disabled={isAdministradorOrCliente || currentUser === row.username}
           />
         </td>
       )}
@@ -120,6 +122,9 @@ export function Table(props) {
 
   const [count, setCount] = useState(1);
 
+  const [username, setUsername] = useState('');
+
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = itemsPorPage || 5;
   const offset = (currentPage - 1) * itemsPerPage;
@@ -130,6 +135,11 @@ export function Table(props) {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
+
+  useEffect(() => {
+    setUsername(localStorage.getItem('username'));
+  })
+  
 
   return (
     <div>
@@ -158,6 +168,7 @@ export function Table(props) {
                 onEditClick={onEditClick}
                 onDeleteClick={onDeleteClick}
                 count={count + index + offset}
+                currentUser={username}
               />
             ))}
           </tbody>
