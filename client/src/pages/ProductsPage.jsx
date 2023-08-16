@@ -27,7 +27,7 @@ import {
   editProduct,
   updateProductStatus,
 } from "../api/products.api.js";
-import { getSupplies } from "../api/supplies.api.js";
+import { getSupplies, getSupplie } from "../api/supplies.api.js";
 import { createContent, editContent, getContents } from "../api/content.api.js";
 
 // import {createContent} from "../api/"
@@ -274,8 +274,8 @@ export function ProductsPage() {
       for (let index = 0; index < ingredientes.length; index++) {
         const ingrediente = ingredientes[index];
         const formData1 = new FormData();
-        formData1.append("product", produc.data.name);
-        formData1.append("supplies", ingrediente.name);
+        formData1.append("product", produc.data.id);
+        formData1.append("supplies", ingrediente.id);
         formData1.append("count", 1);
 
         await createContent(formData1);
@@ -304,7 +304,7 @@ export function ProductsPage() {
       const ingediente = {
         count: 1,
         products : "",
-        supplies : res.name
+        supplies : res.id
       }
       ingredientes1.push(ingediente);
       setIngredientes1([...ingredientes1])
@@ -316,7 +316,13 @@ export function ProductsPage() {
     const res = await getProduct(productId);
     const product = res.data;
     const content = contents.filter((content) => content.product == product.name)
-    datos(product)
+    const Juntar = () => {
+      const ingre = ingredientes1
+      setIngredientes1([content, ...ingre])
+    }
+
+    Juntar()
+    datos(content)
     const fieldsEdit = [
       {
         title: "Producto",
@@ -371,9 +377,9 @@ export function ProductsPage() {
         icon: "list",
         required: "false",
         col : "full",
-        customOptions: [{"name" : "no seleccionado"}, ...supplies],
+        customOptions: [{"name" : "no seleccionado", id : 0}, ...supplies],
         nameSelect:"name",
-        keySelect: "name",
+        keySelect: "id",
         handleOptionChange: handleOptionChange,
         actionButton: handleAddSupplies,
     },
@@ -381,20 +387,14 @@ export function ProductsPage() {
 
     const handleEditProduct = async (data) => {
       console.log(data);
-      const { name, price, description } = data;
+      const {id, name, price, image ,description } = data;
       const product = await (await getProduct(productId)).data;
       const contentss = contents.filter(
         (content) => content.product === product.name
       );
 
       try {
-        const updateData0 = new FormData();
-        updateData0.append("name", "burbuja");
-        updateData0.append("price", data.price);
-        updateData0.append("description", data.description);
 
-        const res0 = await createProduct(updateData0);
-        const updatedProduct0 = res0.data;
 
         // if (contentss.length > 0) {
         //   for (let i = 0; i < contentss.length; i++) {
@@ -407,11 +407,12 @@ export function ProductsPage() {
         //     await editContent(content.id, updateContent);
         //   }
         // }
+
         if (ingredientes1.length > 0) {
           for (let i = 0; i < ingredientes1.length; i++) {
             const element = ingredientes1[i];
             const suppli = {
-              product : product.name,
+              product : product.id,
               supplies : element.supplies,
               count : element.count
             } 
@@ -423,6 +424,11 @@ export function ProductsPage() {
         const updateData = new FormData();
         updateData.append("name", data.name);
         updateData.append("price", data.price);
+       // Agrega cada archivo individualmente
+      for (let i = 0; i < data.image.length; i++) {
+        updateData.append("image", data.image[i]);
+      }
+
         updateData.append("description", data.description);
 
         const res = await editProduct(productId, updateData);
@@ -432,15 +438,13 @@ export function ProductsPage() {
           for (let i = 0; i < contentss.length; i++) {
             const content = contents[i];
             const updateContent = new FormData();
-            updateContent.append("product", name);
+            updateContent.append("product", id);
             updateContent.append("supplies", content.supplies);
             updateContent.append("count", content.count);
 
             await editContent(content.id, updateContent);
           }
         }
-
-        await deleteProduct(res0.data.id);
 
         closeModal();
         reloadDataTable();
@@ -490,6 +494,7 @@ export function ProductsPage() {
     );
     const content = contents.filter((content) => content.product == product.name)
 
+    
     const fieldsAdd = [
       {
         title: "Producto",
@@ -606,10 +611,16 @@ export function ProductsPage() {
     const res = await getProduct(productId);
     const product = res.data;
     const suppliesProduct = await contents.filter(
-      (content) => content.product == product.name
+      (content) => content.product == product.id
     );
-    const content = contents.filter((content) => content.product == product.name)
-
+    const content = contents.filter((content) => content.product == product.id)
+    const B = []
+    content.forEach(async conten => {
+      const A = await getSupplie(conten.supplies)
+      const {name} = A.data
+      const C = {name , id : conten.supplies, count :conten.count}
+      B.push(C)
+    });
 
     const fieldsview = [
       {
@@ -653,8 +664,8 @@ export function ProductsPage() {
       {
         type : "list",
         columns: ['Nombre'],
-        headers: ['supplies'],
-        data: content,
+        headers: ['name'],
+        data: B,
         delete: false,
         //onDeleteClick: clickDelete
     },
