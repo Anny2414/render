@@ -124,9 +124,8 @@ export function Table(props) {
 
   const [username, setUsername] = useState('');
 
-
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = itemsPorPage || 5;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const offset = (currentPage - 1) * itemsPerPage;
   const currentData = data.slice(offset, offset + itemsPerPage);
 
@@ -136,10 +135,14 @@ export function Table(props) {
     setCurrentPage(page);
   };
 
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setCurrentPage(1); // Restablecer la página actual al cambiar los elementos por página
+    setItemsPerPage(parseInt(newItemsPerPage, 10));
+  };
+
   useEffect(() => {
     setUsername(localStorage.getItem('username'));
   })
-  
 
   return (
     <div>
@@ -175,31 +178,53 @@ export function Table(props) {
         </table>
       </div>
       {/* Paginador */}
-      <div className="mt-5">
-        <nav
-          className="pagination is-centered"
-          role="navigation"
-          aria-label="pagination"
-        >
-          <ul className="pagination-list">
-            {Array.from({ length: pageCount }, (_, index) => {
-              const page = index + 1;
-              return (
-                <li key={page}>
-                  <a
-                    className={`pagination-link${
-                      currentPage === page ? " is-current" : ""
-                    }`}
-                    aria-label={`Ir a la página ${page}`}
-                    onClick={() => handlePageChange(page)}
-                  >
-                    <b>{page}</b>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+      <div className="container mt-5">
+        <div className="columns is-vcentered">
+          <div className="column is-full">
+            <ul className="pagination-list" style={{justifyContent: "center"}}>
+              {Array.from({ length: pageCount }, (_, index) => {
+                const page = index + 1;
+
+                const shouldShowPage =
+                  pageCount <= 7 ||
+                  (page <= 3 || page >= pageCount - 2) ||
+                  (page >= currentPage - 1 && page <= currentPage + 1);
+
+                if (!shouldShowPage) {
+                  return null;
+                }
+
+                return (
+                  <li key={page}>
+                    <a
+                      className={`pagination-link${currentPage === page ? " is-current" : ""
+                        }`}
+                      aria-label={`Ir a la página ${page}`}
+                      onClick={() => handlePageChange(page)}
+                    >
+                      <b>{page}</b>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          <div className="column is-justify-content-flex-end is-flex is-align-items-center">
+            <label htmlFor="itemsPerPage" className="">Mostrar:</label>
+            <div className="select is-small ml-3">
+              <select
+                id="itemsPerPage"
+                onChange={(e) => handleItemsPerPageChange(e.target.value)}
+                value={itemsPerPage}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                {/* Agrega más opciones según tus necesidades */}
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
