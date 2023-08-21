@@ -6,6 +6,8 @@ import Logo from "../assets/img/Logo.png"; // Imagen que sera usada en el PDF
 
 
 import { useEffect, useState } from "react";
+import { useRef } from "react";
+
 
 import { Navbar } from "../components/Navbar.jsx";
 import { Table } from "../components/Table/Table.jsx";
@@ -31,6 +33,16 @@ import {
 export function SuppliesPage() {
   // ARREGLO DE USUARIOS Y ROLES
   const [Supplies, setSupplies] = useState([]);
+
+  // Variable para buscar Supplies
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredSupplie = Supplies.filter(
+    (supplie) =>
+    supplie.name.toLowerCase().includes(searchQuery.toLowerCase()) 
+  );
+
+
 //Generar PDF
 const generatePDF = async() => {
   const doc = new jsPDF();
@@ -317,7 +329,12 @@ const generatePDF = async() => {
             />
           </div>
           <div className="column is-9">
-            <Input holder="Buscar Ingrediente" icon="magnifying-glass" />
+          <Input
+              holder="Buscar usuario"
+              icon="magnifying-glass"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <div className="column is-fullwidth">
           <Button
@@ -328,10 +345,12 @@ const generatePDF = async() => {
             />
           </div>
         </div>
+        {filteredSupplie.length > 0 ? (
+
         <Table
           headers={["#", "name", "price","stock"]}
           columns={["#", "Nombre", "Costo Adicional","Stock"]}
-          data={Supplies}
+          data={filteredSupplie}
           status
           edit
           delete
@@ -339,6 +358,11 @@ const generatePDF = async() => {
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
         />
+        ) : (
+          <div className="notification has-text-centered mt-4">
+            No se encontraron registros.
+          </div>
+        )}
       </div>
       {isOpen && (
         <Modal
