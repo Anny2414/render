@@ -18,3 +18,4 @@ export const editContent = (userId, updatedContent) =>
 export const updateContentStatus = (userId, status) => {
   return contentApi.patch(`/${userId}/`, { status });
 };
+

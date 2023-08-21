@@ -18,3 +18,14 @@ SuppliesApi.patch(`/${supplieId}/`, updatedSupplie);
 export const updateSupplieStatus = (supplieId, status) => {
   return SuppliesApi.patch(`/${supplieId}/`, { status });
 };
+
+export const getSupplieName = async(roleId) => {
+  try {
+      const response = await getSupplie(roleId);
+      const role = response.data;
+      return role.name;
+  } catch (error) {
+      console.error("Error fetching role:", error);
+      return null;
+  }
+};

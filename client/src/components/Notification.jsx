@@ -28,8 +28,8 @@ export function Notification(props) {
       {isLoading && (
         <div className="carga">
           <div
-            className="barra-carga"
-            style={{ animation: `cargaAnimacion ${timeout}ms linear` }}
+            className={`barra-carga has-background-${color}`}
+            style={{ animation: `cargaAnimacion ${timeout}ms linear ` }}
           />
         </div>
       )}

@@ -27,7 +27,7 @@ import {
   editProduct,
   updateProductStatus,
 } from "../api/products.api.js";
-import { getSupplies, getSupplie } from "../api/supplies.api.js";
+import { getSupplies, getSupplie, getSupplieName } from "../api/supplies.api.js";
 import { createContent, editContent, getContents } from "../api/content.api.js";
 
 // import {createContent} from "../api/"
@@ -122,13 +122,25 @@ export function ProductsPage() {
 
   const reloadDataTable = async () => {
     setProducts([]);
+  
     setContents([]);
     setIngredientes([]);
     setIngredientes1([]);
-    const res = await getProducts();
-    const resContent = await getContents();
-    setProducts(res.data);
-    setContents(resContent.data);
+    const res = await getContents();
+    // Obtiene una matriz de promesas que resuelven los nombres de los roles
+    const rolePromises = res.data.map((user) => getSupplieName(user.supplies));
+    
+    // Espera a que todas las promesas se resuelvan
+    const roleNames = await Promise.all(rolePromises);
+    
+    // Combina los datos de usuario con los nombres de roles resueltos
+    const usersWithRoles = res.data.map((user, index) => ({
+      ...user,
+      name: roleNames[index],
+    }));
+    setContents(usersWithRoles);
+    const resProduct = await getProducts();
+    setProducts(resProduct.data)
   };
 
   const handleOptionChange = (event) => {
@@ -137,7 +149,7 @@ export function ProductsPage() {
     );
     selectedOptionRef.current = option;
   };
-
+//tal vez editar
   const anadirIngrediente = () => {
     if (selectedOptionRef.current != undefined) {
       ingredientes.push(selectedOptionRef.current);
@@ -235,13 +247,24 @@ export function ProductsPage() {
   },
   ];
 
-  // Conexion a API y obtiene datos de Users y Roles
+  // Conexion a API y obtiene datos de Productos y contenido
   useEffect(() => {
     async function fetchData() {
-      const res = await getProducts();
-      const resContent = await getContents();
-      setContents(resContent.data);
-      setProducts(res.data);
+      const resP = await getProducts();
+      const res = await getContents();
+      // Obtiene una matriz de promesas que resuelven los nombres de los roles
+      const rolePromises = res.data.map((user) => getSupplieName(user.supplies));
+      
+      // Espera a que todas las promesas se resuelvan
+      const roleNames = await Promise.all(rolePromises);
+      
+      // Combina los datos de usuario con los nombres de roles resueltos
+      const usersWithRoles = res.data.map((user, index) => ({
+        ...user,
+        name: roleNames[index],
+      }));
+      setContents(usersWithRoles);
+      setProducts(resP.data);
     }
 
     async function fetchSupplies() {
@@ -294,10 +317,7 @@ export function ProductsPage() {
       console.error("Error al crear el Producto:", error);
     }
   };
-  const datos = async (data) => {
-    ingredientes1.append(data)
-    await setIngredientes1([...ingredientes1])
-  }
+
   const handleAddSupplies = () => {
     if (selectedOptionRef.current != undefined) {
       const res = selectedOptionRef.current
@@ -315,14 +335,10 @@ export function ProductsPage() {
   const handleEditClick = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
-    const content = contents.filter((content) => content.product == product.name)
-    const Juntar = () => {
-      const ingre = ingredientes1
-      setIngredientes1([content, ...ingre])
-    }
+    const content = contents.filter((content) => content.product == productId)
+    console.log(content);
+    const combinedIngredientes = [...content, ...ingredientes1];
 
-    Juntar()
-    datos(content)
     const fieldsEdit = [
       {
         title: "Producto",
@@ -361,13 +377,12 @@ export function ProductsPage() {
         value: product.description,
       },
       {
-        type : "list",
+        type: "list",
         columns: ['Nombre'],
-        headers: ['supplies'],
-        data: ingredientes1,
+        headers: ['name'],
+        data: combinedIngredientes, // Use the combined array here
         delete: true,
-        //onDeleteClick: clickDelete
-    },
+      },
     {
         title: "Ingredientes",
         hasButton: true,
@@ -391,23 +406,10 @@ export function ProductsPage() {
       const product = await (await getProduct(productId)).data;
       const contentss = contents.filter(
         (content) => content.product === product.name
+        //revisar
       );
 
       try {
-
-
-        // if (contentss.length > 0) {
-        //   for (let i = 0; i < contentss.length; i++) {
-        //     const content = contents[i];
-        //     const updateContent = new FormData();
-        //     updateContent.append("product", "burbuja");
-        //     updateContent.append("supplies", content.supplies);
-        //     updateContent.append("count", content.count);
-
-        //     await editContent(content.id, updateContent);
-        //   }
-        // }
-
         if (ingredientes1.length > 0) {
           for (let i = 0; i < ingredientes1.length; i++) {
             const element = ingredientes1[i];
@@ -491,9 +493,10 @@ export function ProductsPage() {
   const handleAddclick = async (product) => {
     const suppliesProduct = await contents.filter(
       (content) => content.product == product.name
+      //revisar
     );
     const content = contents.filter((content) => content.product == product.name)
-
+//revisar
     
     const fieldsAdd = [
       {
@@ -564,6 +567,7 @@ export function ProductsPage() {
     const handleAdd = (data) => {
       const { name, price, description } = data;
       const idP = products.filter((product) => product.name == name);
+      //revisar
       console.log(idP[0].id);
       try {
         const data2 = {
@@ -610,17 +614,9 @@ export function ProductsPage() {
   const handleViewDetailsClicks = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
-    const suppliesProduct = await contents.filter(
-      (content) => content.product == product.id
-    );
     const content = contents.filter((content) => content.product == product.id)
-    const B = []
-    content.forEach(async conten => {
-      const A = await getSupplie(conten.supplies)
-      const {name} = A.data
-      const C = {name , id : conten.supplies, count :conten.count}
-      B.push(C)
-    });
+    console.log(content);
+
 
     const fieldsview = [
       {
@@ -665,7 +661,7 @@ export function ProductsPage() {
         type : "list",
         columns: ['Nombre'],
         headers: ['name'],
-        data: B,
+        data: content,
         delete: false,
         //onDeleteClick: clickDelete
     },
@@ -755,6 +751,7 @@ export function ProductsPage() {
                     ...supplies,
                   ],
                   "name",
+                  //revisar
                   true,
                   handleCreateProduct
                 )
