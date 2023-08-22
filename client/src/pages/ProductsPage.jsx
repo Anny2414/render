@@ -458,7 +458,7 @@ export function ProductsPage() {
               count: element.count
             }
             console.log(suppli);
-            const contentIndex = content.filter((content) => content.supplies === idSupplie);
+            const contentIndex = content.filter((content) => content.supplies === suppli.supplies);
             if (contentIndex.length === 0) {
               await createContent(suppli)
               // await deleteContent(contentIndex[0].id)
