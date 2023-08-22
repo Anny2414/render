@@ -28,7 +28,7 @@ import {
   updateProductStatus,
 } from "../api/products.api.js";
 import { getSupplies, getSupplie, getSupplieName } from "../api/supplies.api.js";
-import { createContent, editContent, getContents } from "../api/content.api.js";
+import { createContent, deleteContent, editContent, getContents } from "../api/content.api.js";
 
 // import {createContent} from "../api/"
 
@@ -336,8 +336,25 @@ export function ProductsPage() {
     const res = await getProduct(productId);
     const product = res.data;
     const content = contents.filter((content) => content.product == productId)
-    console.log(content);
     const combinedIngredientes = [...content, ...ingredientes1];
+
+    const DeleteSuppplies = async (idSupplie) => {
+      const contentIndex = contents.findIndex((content) => content.supplies === idSupplie);
+      if (contentIndex !== -1) {
+        console.log(contentIndex);
+        // await deleteContent(content[contentIndex].id)
+      } else {
+        const ingredienteIndex = ingredientes1.findIndex((ingrediente) => ingrediente.supplies === idSupplie);
+        if (ingredienteIndex !== -1) {
+        console.log(contentIndex);
+
+          // El ID fue encontrado en el array ingredientes1
+          ingredientes1.splice(ingredienteIndex, 1); // Eliminar el elemento del array ingredientes1
+          setIngredientes1([...ingredientes1]); // Actualizar el estado para reflejar el cambio
+        }
+      }
+    };
+    
 
     const fieldsEdit = [
       {
@@ -382,6 +399,7 @@ export function ProductsPage() {
         headers: ['name'],
         data: combinedIngredientes, // Use the combined array here
         delete: true,
+        onDeleteClick : DeleteSuppplies
       },
     {
         title: "Ingredientes",
@@ -492,10 +510,10 @@ export function ProductsPage() {
 
   const handleAddclick = async (product) => {
     const suppliesProduct = await contents.filter(
-      (content) => content.product == product.name
+      (content) => content.product == product.id
       //revisar
     );
-    const content = contents.filter((content) => content.product == product.name)
+    const content = contents.filter((content) => content.product == product.id)
 //revisar
     
     const fieldsAdd = [
@@ -547,10 +565,11 @@ export function ProductsPage() {
         required: "false",
         col: "full",
         customOptions: [
-          { id: 0, supplies: "No seleccionado" },
+          { id: 0, name: "No seleccionado" },
           ...suppliesProduct,
         ],
-        nameSelect: "supplies",
+        nameSelect: "name",
+        
         // handleOptionChange: handleOptionChange,
         actionButton: anadirIngrediente,
       },
@@ -602,10 +621,10 @@ export function ProductsPage() {
       "Añadir al Carrito",
       fieldsAdd,
       [
-        { id: 0, name: "No seleccionado", price: 0, stock: 0, status: true },
+        { id: 0, name: "No seleccionado", price: 0, stock: 0, status: false },
         ...supplies,
       ],
-      "supplies",
+      "name",
       true,
       handleAdd
     );
@@ -662,8 +681,6 @@ export function ProductsPage() {
         columns: ['Nombre'],
         headers: ['name'],
         data: content,
-        delete: false,
-        //onDeleteClick: clickDelete
     },
     ];
 
@@ -778,6 +795,8 @@ export function ProductsPage() {
           onViewDetails={handleViewDetailsClicks}
           onAdd={handleAddclick}
           data={products}
+          Administrador = {true}
+          generatePDF = {generatePDF}
         />
       </div>
 

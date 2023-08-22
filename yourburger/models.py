@@ -60,7 +60,7 @@ class Products(models.Model):
 
 class Content(models.Model):
     supplies = models.ForeignKey(Supplies, on_delete=models.PROTECT)
-    product = models.ForeignKey(Products, on_delete=models.PROTECT)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
     count = models.IntegerField(default = 0)
     status = models.BooleanField(default=True)
     def __str__(self):

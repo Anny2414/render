@@ -12,11 +12,11 @@ export function Navbar() {
   const [permisos, setPermisos] = useState();
 
   useEffect(() => {
-    const name = localStorage.getItem('name');
+    const name = localStorage.getItem('username');
     const api = async () => {
       try {
         const resUser = await getUsers();
-        const user = resUser.data.filter((user) => user.name === name);
+        const user = resUser.data.filter((user) => user.username === name);
         
         if (user.length > 0) { // Check if the 'user' array has any elements
           setUsername(user[0].username);
@@ -27,7 +27,7 @@ export function Navbar() {
           
         } else {
           const resClient = await getclients();
-          const client = resClient.data.filter((client) => client.name === name);
+          const client = resClient.data.filter((client) => client.username === name);
     
           if (client.length > 0) { // Check if the 'client' array has any elements
             setUsername(client[0].username);

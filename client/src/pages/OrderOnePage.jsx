@@ -57,9 +57,9 @@ export function OrderPage() {
     useEffect(() => {
       // Verifica si los datos han cargado antes de utilizar la variable username
       if (!isLoading) {
-        const name = localStorage.getItem("name");
-        const user = users.find((user) => user.name === name);
-        const cliente = clientes.find((client) => client.name === name);
+        const name = localStorage.getItem("username");
+        const user = users.find((user) => user.username === name);
+        const cliente = clientes.find((client) => client.username === name);
         if (name) {
           if (user) {
             setUsername(user.username);
