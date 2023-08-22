@@ -171,13 +171,13 @@ export function Modal(props) {
                                       <td>{ingrediente[header]}</td>
                                     ))}
                                     <td>
-                                      <Button
+                                      {field.onDeleteClick && <Button
                                         text={<span className="icon">
                                           <i className="fa-solid fa-trash"></i>
                                         </span>}
                                         color="primary"
-                                        action={() => field.onDeleteClick(ingrediente.id)}
-                                      />
+                                        action={() => field.onDeleteClick(ingrediente.supplies||ingrediente.id)}
+                                      />}
                                     </td>
                                   </tr>
                                 );

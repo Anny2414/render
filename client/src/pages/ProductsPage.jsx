@@ -39,12 +39,12 @@ export function ProductsPage() {
   const [order, setOrder] = useState([]);
   const [ingredientes, setIngredientes] = useState([]);
   const [ingredientes1, setIngredientes1] = useState([]);
-  
+
   const ingredientesPrueba = useRef([]);
   const selectedOptionRef = useRef();
 
   //Generar PDF
-  const generatePDF = async() => {
+  const generatePDF = async () => {
     const doc = new jsPDF();
 
     doc.addFont("helvetica", "normal");
@@ -109,7 +109,7 @@ export function ProductsPage() {
   const [notification, setNotification] = useState(null);
 
 
-    // Variable para buscar productos
+  // Variable para buscar productos
 
 
   useEffect(() => {
@@ -122,17 +122,17 @@ export function ProductsPage() {
 
   const reloadDataTable = async () => {
     setProducts([]);
-  
+
     setContents([]);
     setIngredientes([]);
     setIngredientes1([]);
     const res = await getContents();
     // Obtiene una matriz de promesas que resuelven los nombres de los roles
     const rolePromises = res.data.map((user) => getSupplieName(user.supplies));
-    
+
     // Espera a que todas las promesas se resuelvan
     const roleNames = await Promise.all(rolePromises);
-    
+
     // Combina los datos de usuario con los nombres de roles resueltos
     const usersWithRoles = res.data.map((user, index) => ({
       ...user,
@@ -149,7 +149,13 @@ export function ProductsPage() {
     );
     selectedOptionRef.current = option;
   };
-//tal vez editar
+  const handleOptionChange1 = (event) => {
+    const option = supplies.filter(
+      (supplie) => supplie.id === parseInt(event.target.value),
+    );
+    selectedOptionRef.current = option[0];
+  };
+  //tal vez editar
   const anadirIngrediente = () => {
     if (selectedOptionRef.current != undefined) {
       ingredientes.push(selectedOptionRef.current);
@@ -158,7 +164,7 @@ export function ProductsPage() {
       console.log("error al añadir");
     }
   };
-  
+
 
   const openModal = (
     title,
@@ -238,13 +244,13 @@ export function ProductsPage() {
       actionButton: anadirIngrediente,
     },
     {
-      type : "list",
-      columns: ['Nombre','Precio'],
+      type: "list",
+      columns: ['Nombre', 'Precio'],
       headers: ['name', 'price'],
       data: ingredientes,
       delete: true,
       //onDeleteClick: clickDelete
-  },
+    },
   ];
 
   // Conexion a API y obtiene datos de Productos y contenido
@@ -254,10 +260,10 @@ export function ProductsPage() {
       const res = await getContents();
       // Obtiene una matriz de promesas que resuelven los nombres de los roles
       const rolePromises = res.data.map((user) => getSupplieName(user.supplies));
-      
+
       // Espera a que todas las promesas se resuelvan
       const roleNames = await Promise.all(rolePromises);
-      
+
       // Combina los datos de usuario con los nombres de roles resueltos
       const usersWithRoles = res.data.map((user, index) => ({
         ...user,
@@ -323,38 +329,51 @@ export function ProductsPage() {
       const res = selectedOptionRef.current
       const ingediente = {
         count: 1,
-        products : "",
-        supplies : res.id
+        products: "",
+        supplies: res.id,
+        name: res.name
       }
       ingredientes1.push(ingediente);
       setIngredientes1([...ingredientes1])
+      console.log(ingredientes1);
     } else {
       console.log("error al añadir");
     }
   };
+  const Combined = (content) => {
+    const ingre = ingredientes1
+    setIngredientes1([])
+    content.map((object) => {
+      ingre.push(object)
+    })
+    setIngredientes1([...ingre])
+  }
   const handleEditClick = async (productId) => {
     const res = await getProduct(productId);
     const product = res.data;
     const content = contents.filter((content) => content.product == productId)
-    const combinedIngredientes = [...content, ...ingredientes1];
-
+    Combined(content)
     const DeleteSuppplies = async (idSupplie) => {
-      const contentIndex = contents.findIndex((content) => content.supplies === idSupplie);
-      if (contentIndex !== -1) {
+      try {
+        const contentIndex = content.filter((content) => content.supplies === idSupplie);
         console.log(contentIndex);
-        // await deleteContent(content[contentIndex].id)
-      } else {
-        const ingredienteIndex = ingredientes1.findIndex((ingrediente) => ingrediente.supplies === idSupplie);
-        if (ingredienteIndex !== -1) {
-        console.log(contentIndex);
+        if (contentIndex.length > 0) {
+          await deleteContent(contentIndex[0].id)
+        } else {
+          const ingredienteIndex = ingredientes1.findIndex((ingrediente) => ingrediente.supplies === idSupplie);
+          if (ingredienteIndex !== -1) {
+            console.log(contentIndex);
 
-          // El ID fue encontrado en el array ingredientes1
-          ingredientes1.splice(ingredienteIndex, 1); // Eliminar el elemento del array ingredientes1
-          setIngredientes1([...ingredientes1]); // Actualizar el estado para reflejar el cambio
+            // El ID fue encontrado en el array ingredientes1
+            ingredientes1.splice(ingredienteIndex, 1); // Eliminar el elemento del array ingredientes1
+            setIngredientes1([...ingredientes1]); // Actualizar el estado para reflejar el cambio
+          }
         }
+      } catch (error) {
+        console.log(error);
       }
     };
-    
+
 
     const fieldsEdit = [
       {
@@ -397,11 +416,13 @@ export function ProductsPage() {
         type: "list",
         columns: ['Nombre'],
         headers: ['name'],
-        data: combinedIngredientes, // Use the combined array here
+        data: ingredientes1,
+        nameSelect: "name",
+        keySelect: "supplies", // Use the combined array here
         delete: true,
-        onDeleteClick : DeleteSuppplies
+        onDeleteClick: DeleteSuppplies
       },
-    {
+      {
         title: "Ingredientes",
         hasButton: true,
         textButton: "+",
@@ -409,18 +430,18 @@ export function ProductsPage() {
         name: "supplies",
         icon: "list",
         required: "false",
-        col : "full",
-        customOptions: [{"name" : "no seleccionado", id : 0}, ...supplies],
-        nameSelect:"name",
+        col: "full",
+        customOptions: [{ "name": "no seleccionado", id: 0 }, ...supplies],
+        nameSelect: "name",
         keySelect: "id",
-        handleOptionChange: handleOptionChange,
+        handleOptionChange: handleOptionChange1,
         actionButton: handleAddSupplies,
-    },
+      },
     ];
 
     const handleEditProduct = async (data) => {
       console.log(data);
-      const {id, name, price, image ,description } = data;
+      const { id, name, price, image, description } = data;
       const product = await (await getProduct(productId)).data;
       const contentss = contents.filter(
         (content) => content.product === product.name
@@ -432,385 +453,388 @@ export function ProductsPage() {
           for (let i = 0; i < ingredientes1.length; i++) {
             const element = ingredientes1[i];
             const suppli = {
-              product : product.id,
-              supplies : element.supplies,
-              count : element.count
-            } 
-            console.log(suppli);
-            await createContent(suppli)
-            
-          }
-        }
-        const updateData = new FormData();
-        updateData.append("name", data.name);
-        updateData.append("price", data.price);
-       // Agrega cada archivo individualmente
-      for (let i = 0; i < data.image.length; i++) {
-        updateData.append("image", data.image[i]);
-      }
-
-        updateData.append("description", data.description);
-
-        const res = await editProduct(productId, updateData);
-        const updatedProduct = res.data;
-
-        if (contentss.length > 0) {
-          for (let i = 0; i < contentss.length; i++) {
-            const content = contents[i];
-            const updateContent = new FormData();
-            updateContent.append("product", id);
-            updateContent.append("supplies", content.supplies);
-            updateContent.append("count", content.count);
-
-            await editContent(content.id, updateContent);
-          }
-        }
-
-        closeModal();
-        reloadDataTable();
-        setNotification({
-          msg: "Producto editado exitosamente!",
-          color: "warning",
-          buttons: false,
-          timeout: 3000,
-        });
-
-        // Actualizar la lista de productos sin recargar la página
-        setProducts((prevProducts) => {
-          const updatedProducts = prevProducts.map((product) => {
-            if (product.id === productId) {
-              // Actualizar los datos del producto editado
-              return {
-                ...product,
-                name: name,
-                price: price,
-                image: updatedProduct.image, // Actualizar el campo "image" con la URL de la nueva imagen
-                description: description,
-                // Actualizar otros campos si es necesario
-              };
+              product: product.id,
+              supplies: element.supplies,
+              count: element.count
             }
-            return product;
-          });
-          return updatedProducts;
-        });
-      } catch (error) {
-        console.error("Error al editar el Producto:", error);
-      }
-    };
+            console.log(suppli);
+            const contentIndex = content.filter((content) => content.supplies === idSupplie);
+            if (contentIndex.length === 0) {
+              await createContent(suppli)
+              // await deleteContent(contentIndex[0].id)
+            } 
+            }
+          }
+          const updateData = new FormData();
+          updateData.append("name", data.name);
+          updateData.append("price", data.price);
+          // Agrega cada archivo individualmente
+          for (let i = 0; i < data.image.length; i++) {
+            updateData.append("image", data.image[i]);
+          }
 
-    openModal(
-      "Editar producto",
-      fieldsEdit,
-      products,
-      "name",
-      true,
-      handleEditProduct
-    );
-  };
+          updateData.append("description", data.description);
 
-  const handleAddclick = async (product) => {
-    const suppliesProduct = await contents.filter(
-      (content) => content.product == product.id
-      //revisar
-    );
-    const content = contents.filter((content) => content.product == product.id)
-//revisar
-    
-    const fieldsAdd = [
-      {
-        title: "Producto",
-        type: "text",
-        name: "name",
-        icon: "burger",
-        col: "half",
-        required: "true",
-        value: product.name,
-        readonly: true,
-      },
-      {
-        title: "Precio",
-        type: "number",
-        name: "price",
-        icon: "dollar",
-        col: "half",
-        required: "true",
-        value: product.price,
-        readonly: true,
-      },
-      {
-        title: "Imagen",
-        type: "image",
-        name: "image",
-        icon: "dollar",
-        col: "full",
-        image: product.image,
-      },
-      {
-        title: "Descripción",
-        type: "text",
-        name: "description",
-        icon: "comment",
-        col: "full",
-        required: "true",
-        value: product.description,
-        readonly: true,
-      },
-      {
-        title: "Ingredientes",
-        hasButton: true,
-        textButton: "+",
-        type: "select",
-        name: "supplies",
-        icon: "list",
-        required: "false",
-        col: "full",
-        customOptions: [
-          { id: 0, name: "No seleccionado" },
-          ...suppliesProduct,
-        ],
-        nameSelect: "name",
-        
-        // handleOptionChange: handleOptionChange,
-        actionButton: anadirIngrediente,
-      },
-      {
-        type : "list",
-        columns: ['Nombre','Precio'],
-        headers: ['name', 'price'],
-        data: ingredientes,
-        delete: true,
-        //onDeleteClick: clickDelete
-    },
-    ];
+          const res = await editProduct(productId, updateData);
+          const updatedProduct = res.data;
 
-    const handleAdd = (data) => {
-      const { name, price, description } = data;
-      const idP = products.filter((product) => product.name == name);
-      //revisar
-      console.log(idP[0].id);
-      try {
-        const data2 = {
-          id: idP[0].id,
-          name,
-          price,
-          description,
-          image: idP[0].image,
-          supplies: content,
-          amount: 1,
-        };
+          if (contentss.length > 0) {
+            for (let i = 0; i < contentss.length; i++) {
+              const content = contents[i];
+              const updateContent = new FormData();
+              updateContent.append("product", id);
+              updateContent.append("supplies", content.supplies);
+              updateContent.append("count", content.count);
 
-        setOrder((prevOrder) => {
-          Cookies.remove("orderDetail");
-          const newOrder = [...prevOrder, data2];
-          Cookies.set("orderDetail", JSON.stringify(newOrder));
-          return newOrder;
-        });
+              await editContent(content.id, updateContent);
+            }
+          }
 
-        closeModal();
-        setNotification({
-          msg: " El Producto fue añadido al Carrito!",
-          color: "warning",
-          buttons: false,
-          timeout: 3000,
-        });
-      } catch (error) {
-        console.log("Error al añadir a carito" + error);
-      }
-    };
-    openModal(
-      "Añadir al Carrito",
-      fieldsAdd,
-      [
-        { id: 0, name: "No seleccionado", price: 0, stock: 0, status: false },
-        ...supplies,
-      ],
-      "name",
-      true,
-      handleAdd
-    );
-  };
-
-  const handleViewDetailsClicks = async (productId) => {
-    const res = await getProduct(productId);
-    const product = res.data;
-    const content = contents.filter((content) => content.product == product.id)
-    console.log(content);
-
-
-    const fieldsview = [
-      {
-        title: "Producto",
-        type: "text",
-        name: "name",
-        icon: "burger",
-        col: "half",
-        required: "true",
-        value: product.name,
-        readonly: true,
-      },
-      {
-        title: "Precio",
-        type: "number",
-        name: "price",
-        icon: "dollar",
-        col: "half",
-        required: "true",
-        value: product.price,
-        readonly: true,
-      },
-      {
-        title: "Imagen",
-        type: "image",
-        name: "image",
-        icon: "dollar",
-        col: "full",
-        image: product.image,
-      },
-      {
-        title: "Descripción",
-        type: "text",
-        name: "description",
-        icon: "comment",
-        col: "full",
-        required: "true",
-        value: product.description,
-        readonly: true,
-      },
-      {
-        type : "list",
-        columns: ['Nombre'],
-        headers: ['name'],
-        data: content,
-    },
-    ];
-
-    openModal("Ver producto", fieldsview, products, "status", false);
-  };
-
-  const handleStatusChange = async (productId, status) => {
-        try {
-          await updateProductStatus(productId, !status);
+          closeModal();
+          reloadDataTable();
           setNotification({
-            msg: "Estado cambiado exitosamente!",
-            color: "info",
+            msg: "Producto editado exitosamente!",
+            color: "warning",
             buttons: false,
             timeout: 3000,
           });
 
+          // Actualizar la lista de productos sin recargar la página
+          setProducts((prevProducts) => {
+            const updatedProducts = prevProducts.map((product) => {
+              if (product.id === productId) {
+                // Actualizar los datos del producto editado
+                return {
+                  ...product,
+                  name: name,
+                  price: price,
+                  image: updatedProduct.image, // Actualizar el campo "image" con la URL de la nueva imagen
+                  description: description,
+                  // Actualizar otros campos si es necesario
+                };
+              }
+              return product;
+            });
+            return updatedProducts;
+          });
         } catch (error) {
-          console.error(error);
+          console.error("Error al editar el Producto:", error);
         }
       };
 
-  const handleDeleteClick = async (productId) => {
-    setNotification({
-      msg: "¿Seguro deseas eliminar el Producto?",
-      color: "warning",
-      buttons: true,
-      timeout: 0,
-      onConfirm: async () => {
-        try{
-          await deleteProduct(productId);
+      openModal(
+        "Editar producto",
+        fieldsEdit,
+        products,
+        "name",
+        true,
+        handleEditProduct
+      );
+    };
+
+    const handleAddclick = async (product) => {
+      const suppliesProduct = await contents.filter(
+        (content) => content.product == product.id
+        //revisar
+      );
+      const content = contents.filter((content) => content.product == product.id)
+      //revisar
+
+      const fieldsAdd = [
+        {
+          title: "Producto",
+          type: "text",
+          name: "name",
+          icon: "burger",
+          col: "half",
+          required: "true",
+          value: product.name,
+          readonly: true,
+        },
+        {
+          title: "Precio",
+          type: "number",
+          name: "price",
+          icon: "dollar",
+          col: "half",
+          required: "true",
+          value: product.price,
+          readonly: true,
+        },
+        {
+          title: "Imagen",
+          type: "image",
+          name: "image",
+          icon: "dollar",
+          col: "full",
+          image: product.image,
+        },
+        {
+          title: "Descripción",
+          type: "text",
+          name: "description",
+          icon: "comment",
+          col: "full",
+          required: "true",
+          value: product.description,
+          readonly: true,
+        },
+        {
+          title: "Ingredientes",
+          hasButton: true,
+          textButton: "+",
+          type: "select",
+          name: "supplies",
+          icon: "list",
+          required: "false",
+          col: "full",
+          customOptions: [
+            { id: 0, name: "No seleccionado" },
+            ...suppliesProduct,
+          ],
+          nameSelect: "name",
+
+          // handleOptionChange: handleOptionChange,
+          actionButton: anadirIngrediente,
+        },
+        {
+          type: "list",
+          columns: ['Nombre', 'Precio'],
+          headers: ['name', 'price'],
+          data: ingredientes,
+          delete: true,
+          //onDeleteClick: clickDelete
+        },
+      ];
+
+      const handleAdd = (data) => {
+        const { name, price, description } = data;
+        const idP = products.filter((product) => product.name == name);
+        //revisar
+        console.log(idP[0].id);
+        try {
+          const data2 = {
+            id: idP[0].id,
+            name,
+            price,
+            description,
+            image: idP[0].image,
+            supplies: content,
+            amount: 1,
+          };
+
+          setOrder((prevOrder) => {
+            Cookies.remove("orderDetail");
+            const newOrder = [...prevOrder, data2];
+            Cookies.set("orderDetail", JSON.stringify(newOrder));
+            return newOrder;
+          });
+
+          closeModal();
           setNotification({
-            msg: "Producto eliminado exitosamente!",
-            color: "info",
+            msg: " El Producto fue añadido al Carrito!",
+            color: "warning",
             buttons: false,
             timeout: 3000,
           });
-          reloadDataTable();
-
-        }catch{
-          console.error("Error al eliminar:");
+        } catch (error) {
+          console.log("Error al añadir a carito" + error);
         }
-     },
-    });
-  };
+      };
+      openModal(
+        "Añadir al Carrito",
+        fieldsAdd,
+        [
+          { id: 0, name: "No seleccionado", price: 0, stock: 0, status: false },
+          ...supplies,
+        ],
+        "name",
+        true,
+        handleAdd
+      );
+    };
 
-  return (
-    <div>
-      <Navbar />
-      <div className="container is-fluid mt-5">
-      <div className="notifications float">
-          {notification && (
-            <Notification
-              msg={notification.msg}
-              color={notification.color}
-              buttons={notification.buttons}
-              timeout={notification.timeout}
-              onClose={() => setNotification(null)}
-              onConfirm={notification.onConfirm}
-            />
-          )}
-        </div>
-        <div className="columns is-centered">
-          <div className="column is-fullwidth">
-            {/* <Table
+    const handleViewDetailsClicks = async (productId) => {
+      const res = await getProduct(productId);
+      const product = res.data;
+      const content = contents.filter((content) => content.product == product.id)
+      console.log(content);
+
+
+      const fieldsview = [
+        {
+          title: "Producto",
+          type: "text",
+          name: "name",
+          icon: "burger",
+          col: "half",
+          required: "true",
+          value: product.name,
+          readonly: true,
+        },
+        {
+          title: "Precio",
+          type: "number",
+          name: "price",
+          icon: "dollar",
+          col: "half",
+          required: "true",
+          value: product.price,
+          readonly: true,
+        },
+        {
+          title: "Imagen",
+          type: "image",
+          name: "image",
+          icon: "dollar",
+          col: "full",
+          image: product.image,
+        },
+        {
+          title: "Descripción",
+          type: "text",
+          name: "description",
+          icon: "comment",
+          col: "full",
+          required: "true",
+          value: product.description,
+          readonly: true,
+        },
+        {
+          type: "list",
+          columns: ['Nombre'],
+          headers: ['name'],
+          data: content,
+        },
+      ];
+
+      openModal("Ver producto", fieldsview, products, "status", false);
+    };
+
+    const handleStatusChange = async (productId, status) => {
+      try {
+        await updateProductStatus(productId, !status);
+        setNotification({
+          msg: "Estado cambiado exitosamente!",
+          color: "info",
+          buttons: false,
+          timeout: 3000,
+        });
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const handleDeleteClick = async (productId) => {
+      setNotification({
+        msg: "¿Seguro deseas eliminar el Producto?",
+        color: "warning",
+        buttons: true,
+        timeout: 0,
+        onConfirm: async () => {
+          try {
+            await deleteProduct(productId);
+            setNotification({
+              msg: "Producto eliminado exitosamente!",
+              color: "info",
+              buttons: false,
+              timeout: 3000,
+            });
+            reloadDataTable();
+
+          } catch {
+            console.error("Error al eliminar:");
+          }
+        },
+      });
+    };
+
+    return (
+      <div>
+        <Navbar />
+        <div className="container is-fluid mt-5">
+          <div className="notifications float">
+            {notification && (
+              <Notification
+                msg={notification.msg}
+                color={notification.color}
+                buttons={notification.buttons}
+                timeout={notification.timeout}
+                onClose={() => setNotification(null)}
+                onConfirm={notification.onConfirm}
+              />
+            )}
+          </div>
+          <div className="columns is-centered">
+            <div className="column is-fullwidth">
+              {/* <Table
               headers =  {[ "Nombre" , "Precio"]}
               key =  {[ "name" , "price"]}
               data = {[]}
             /> */}
-            <Button
-              text="Crear Producto +"
-              color="success"
-              col="fullwidth"
-              action={() =>
-                openModal(
-                  "Nuevo producto",
-                  fieldsNew,
-                  [
-                    {
-                      id: 0,
-                      name: "No seleccionado",
-                      price: 0,
-                      stock: 0,
-                      status: true,
-                    },
-                    ...supplies,
-                  ],
-                  "name",
-                  //revisar
-                  true,
-                  handleCreateProduct
-                )
-              }
-            />
-          </div>
-          <div className="column is-9">
-            <Input holder="Buscar Producto" icon="magnifying-glass" />
-          </div>
-          <div className="column is-fullwidth">
-          <Button
-              text="Generar PDF"
-              color="primary"
-              col="fullwidth"
-              action={generatePDF}
-            />
+              <Button
+                text="Crear Producto +"
+                color="success"
+                col="fullwidth"
+                action={() =>
+                  openModal(
+                    "Nuevo producto",
+                    fieldsNew,
+                    [
+                      {
+                        id: 0,
+                        name: "No seleccionado",
+                        price: 0,
+                        stock: 0,
+                        status: true,
+                      },
+                      ...supplies,
+                    ],
+                    "name",
+                    //revisar
+                    true,
+                    handleCreateProduct
+                  )
+                }
+              />
+            </div>
+            <div className="column is-9">
+              <Input holder="Buscar Producto" icon="magnifying-glass" />
+            </div>
+            <div className="column is-fullwidth">
+              <Button
+                text="Generar PDF"
+                color="primary"
+                col="fullwidth"
+                action={generatePDF}
+              />
 
+            </div>
           </div>
+          <ViewP
+            onStatusClick={handleStatusChange}
+            onEditClick={handleEditClick}
+            onDeleteClick={handleDeleteClick}
+            onViewDetails={handleViewDetailsClicks}
+            onAdd={handleAddclick}
+            data={products}
+            Administrador={true}
+            generatePDF={generatePDF}
+          />
         </div>
-        <ViewP
-          onStatusClick={handleStatusChange}
-          onEditClick={handleEditClick}
-          onDeleteClick={handleDeleteClick}
-          onViewDetails={handleViewDetailsClicks}
-          onAdd={handleAddclick}
-          data={products}
-          Administrador = {true}
-          generatePDF = {generatePDF}
-        />
-      </div>
 
-      {isOpen && (
-        <Modal
-          title={modalConfig.title}
-          fields={modalConfig.fields}
-          dataSelect={modalConfig.dataSelect}
-          nameSelect={modalConfig.nameSelect}
-          onClose={closeModal}
-          buttonSubmit={modalConfig.buttonSubmit}
-          submit={modalConfig.submit}
-        />
-      )}
-    </div>
-  );
-}
+        {isOpen && (
+          <Modal
+            title={modalConfig.title}
+            fields={modalConfig.fields}
+            dataSelect={modalConfig.dataSelect}
+            nameSelect={modalConfig.nameSelect}
+            onClose={closeModal}
+            buttonSubmit={modalConfig.buttonSubmit}
+            submit={modalConfig.submit}
+          />
+        )}
+      </div>
+    );
+  }
