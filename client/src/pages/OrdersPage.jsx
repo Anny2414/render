@@ -13,6 +13,7 @@ import { Modal } from "../components/Modal.jsx";
 import { getclients } from "../api/clients.api.js";
 import { Notification } from "../components/Notification.jsx";
 import jsPDF from "jspdf";
+import CryptoJS from "crypto-js";
 
 export function OrdersPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -71,7 +72,12 @@ export function OrdersPage() {
     }
     // Verifica si los datos han cargado antes de utilizar la variable username
     if (!isLoading) {
-      const name = localStorage.getItem("name");
+      const encryptionKey = 'Yourburger';
+      const encryptedUserData = localStorage.getItem('Token');
+      const decryptedBytes = CryptoJS.AES.decrypt(encryptedUserData, encryptionKey);
+      const decryptedUserDataJSON = decryptedBytes.toString(CryptoJS.enc.Utf8);
+      const userData = JSON.parse(decryptedUserDataJSON);
+      const name = userData.name;
       const user = users.find((user) => user.name === name);
       const cliente = clientes.find((client) => client.name === name);
       if (name) {

@@ -4,19 +4,23 @@ import Logo from "../assets/img/only-text.png";
 import { getclients } from "../api/clients.api"
 import { getUsers } from "../api/users.api"
 import { getPermissions } from "../api/permissions.api"
-import Cookies from "js-cookie";
+import CryptoJS from "crypto-js";
 
 export function Navbar() {
   const [username, setUsername] = useState('');
   const [rol, setRol] = useState();
   const [permisos, setPermisos] = useState();
-
+  const encryptionKey = 'Yourburger';
+  const encryptedUserData = localStorage.getItem('Token');
+  const decryptedBytes = CryptoJS.AES.decrypt(encryptedUserData, encryptionKey);
+  const decryptedUserDataJSON = decryptedBytes.toString(CryptoJS.enc.Utf8);
+  const userData = JSON.parse(decryptedUserDataJSON);
   useEffect(() => {
-    const name = localStorage.getItem('username');
+const name = userData.name;
     const api = async () => {
       try {
         const resUser = await getUsers();
-        const user = resUser.data.filter((user) => user.username === name);
+        const user = resUser.data.filter((user) => user.name === name);
         
         if (user.length > 0) { // Check if the 'user' array has any elements
           setUsername(user[0].username);
@@ -27,7 +31,7 @@ export function Navbar() {
           
         } else {
           const resClient = await getclients();
-          const client = resClient.data.filter((client) => client.username === name);
+          const client = resClient.data.filter((client) => client.name === name);
     
           if (client.length > 0) { // Check if the 'client' array has any elements
             setUsername(client[0].username);
@@ -51,8 +55,10 @@ export function Navbar() {
   }, []);
 
   function cerrarSesion() {
-    localStorage.removeItem('token')
+    localStorage.removeItem('Token')
     localStorage.removeItem('name')
+    localStorage.removeItem('username')
+    location.replace("/")
   }
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -141,6 +147,9 @@ export function Navbar() {
             <a className="navbar-link">{username}</a>
 
             <div className="navbar-dropdown">
+              <Link to="/profile" className="navbar-item">
+               Perfil
+              </Link>
               <Link to="/" className="navbar-item" onClick={cerrarSesion}>
                 Cerrar sesión
               </Link>

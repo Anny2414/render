@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UsersPage } from "./pages/UsersPage";
 import { HomePage } from "./pages/HomePage";
@@ -8,19 +9,23 @@ import { ProductsPage } from "./pages/ProductsPage";
 import { ClientPage } from "./pages/ClientPage";
 import { SuppliesPage } from "./pages/Supplies";
 import { OrderPage } from "./pages/OrderOnePage";
-import { OrdersPage } from "./pages/OrdersPage";  
-import { Loginpage } from "./pages/Loginpage"; 
-import { Registropage } from "./pages/registropage";
-import {PasswordResetForm} from "./pages/PasswordResetForm";
+import { OrdersPage } from "./pages/OrdersPage";
+import { Loginpage } from "./pages/Loginpage";
+import { Registropage } from "./pages/Registropage";
+import { PasswordResetForm } from "./pages/PasswordResetForm";
+import { Profile } from "./pages/Profilepage";
 
 function App() {
+  const token = localStorage.getItem("Token");
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/registro" element={<Registropage/>} />
-        <Route path="/recuperar" element={<PasswordResetForm/>}/>
-        <Route path="/login" element={<Loginpage/>} />
+        {/* Ruta de inicio */}
+        <Route path="/" element={token ? <Navigate to="/home" /> : <Navigate to="/login" />}/>
+        <Route path="/registro" element={<Registropage />} />
+        <Route path="/recuperar" element={<PasswordResetForm />} />
+        <Route path="/login" element={<Loginpage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/roles" element={<RolePage />} />
@@ -31,9 +36,7 @@ function App() {
         <Route path="/supplies" element={<SuppliesPage />} />
         <Route path="/order" element={<OrderPage />} />
         <Route path="/orders" element={<OrdersPage />} />
-
-        
-
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );

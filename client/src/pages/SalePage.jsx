@@ -43,6 +43,7 @@ export function SalePage() {
   const [username, setUsername] = useState('');
   const [rol, setRol] = useState()
   const [users, setUsers] = useState([]);
+  const superuser = useRef()
 
   useEffect(() => {
     async function fetchData() {
@@ -51,9 +52,11 @@ export function SalePage() {
     }
     
     fetchData();
-    const name = localStorage.getItem('name');
-    const user = users.filter((user) => user.name == name)
-    setUsername(user.username);
+    const name = localStorage.getItem('username');
+    const user = users.filter((user) => user.username == name)
+    console.log(user);
+    setUsername(user.id);
+    superuser.current =
     setRol(user.rol)
   }, []);
 
@@ -128,7 +131,9 @@ export function SalePage() {
 
   const handleCreateProduct = async (data) => {
     try {
-      const user = username;
+      const user = superuser.current;
+      console.log(user);
+
       const orderData = { user: user, total: total, status: "Pago" };
       const respOrder = await createSale(orderData);
   
@@ -310,7 +315,7 @@ export function SalePage() {
               delete
               edit
               onEditClick={handleEditClick}
-              onDeleteClick={handleDeleteClick}
+              // onDeleteClick={handleDeleteClick}
               data={detail}
               itemsPorPage={3}
             />

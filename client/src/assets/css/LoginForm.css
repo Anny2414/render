@@ -1,3 +1,36 @@
+
+/* Agrega esta clase CSS para la animación de rotación */
+.slide-in-right {
+  animation: slideRight 1.5s ease-in-out 0.5s forwards; 
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+@keyframes slideRight {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1; 
+  }
+}
+.logo-animation {
+  animation: logoScale 3s ease-in-out forwards;
+  transform-origin: center; /* El origen de la transformación está en el centro */
+}
+
+@keyframes logoScale {
+  0% {
+    transform: scale(1); /* Tamaño normal */
+  }
+  50% {
+    transform: scale(1.2); /* Aumenta el tamaño */
+  }
+  100% {
+    transform: scale(1); /* Vuelve al tamaño normal */
+  }
+}
 .columna{
     border-radius: 5%;
 }
@@ -17,4 +50,43 @@ a:hover {
 .contra:hover {
   color: grey;
   cursor: pointer;
+}
+
+.carta{
+  border-radius: 5%;
+}
+
+.foto{
+  background-color: rgba(255, 255, 255, 0.845);
+  border-radius:10px;
+  border: solid 2px;
+  border-color: #9a9b97;
+}
+
+.imagensita{
+  margin-top: 11px;
+  border-radius:50%;
+}
+.v{
+  border-radius: 10px;
+}
+
+.x{
+
+  border: solid 2px;
+  border-color: #9a9b97;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.873);
+}
+
+.y{
+  border: solid 2px;
+  border-color: #9a9b97;
+  border-radius: 10px;
+  background-color:#eef1e2db;
+}
+.z{
+  margin-left: 14%;
+  margin-right: 14%;
+  margin-top: 2%;
 }
