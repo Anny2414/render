@@ -215,14 +215,14 @@ export function UsersPage() {
       col: "half",
     },
     {
-      title: "Telefono",
+      title: "Teléfono",
       type: "number",
       name: "phone",
       icon: "phone",
       col: "half",
     },
     {
-      title: "Direccion",
+      title: "Dirección",
       type: "text",
       name: "address",
       icon: "location-dot",
@@ -355,7 +355,7 @@ export function UsersPage() {
         value: user.lastname,
       },
       {
-        title: "Telefono",
+        title: "Teléfono",
         type: "number",
         name: "phone",
         icon: "phone",
@@ -363,7 +363,7 @@ export function UsersPage() {
         value: user.phone,
       },
       {
-        title: "Direccion",
+        title: "Dirección",
         type: "text",
         name: "address",
         icon: "location-dot",
@@ -527,8 +527,8 @@ export function UsersPage() {
               "Rol",
               "Usuario",
               "Correo",
-              "Telefono",
-              "Direccion",
+              "Teléfono",
+              "Dirección",
               "Creado en",
             ]}
             data={filteredUsers}
