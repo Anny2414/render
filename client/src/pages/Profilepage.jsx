@@ -199,7 +199,7 @@ export function Profile() {
                         disabled={!camposHabilitados}
                         onChange={handleInputChange}
                       />
-                      <div className="mt-5 mr-5">
+                      <div className="mt-5 ">
                         <Input
                           value={profileData.phone}
                           icon="user"
@@ -213,7 +213,7 @@ export function Profile() {
                     </div>
                   </div>
                 </div>
-                <div className="is-row mb-2 ml-2 mr-2 pl-2 pr-1">
+                <div className="is-row mb-5 ml-2 mr-2 pl-2 pr-1">
                   <div className="is-full m-2 mr-3">
                     <Input
                       value={profileData.address}
