@@ -16,11 +16,12 @@ export function Navbar() {
   const decryptedUserDataJSON = decryptedBytes.toString(CryptoJS.enc.Utf8);
   const userData = JSON.parse(decryptedUserDataJSON);
   useEffect(() => {
-const name = userData.name;
+const id = userData.token.user_id;
     const api = async () => {
       try {
         const resUser = await getUsers();
-        const user = resUser.data.filter((user) => user.name === name);
+        const user = resUser.data.filter((user) => user.id === id);
+        {console.log(userData);}
         
         if (user.length > 0) { // Check if the 'user' array has any elements
           setUsername(user[0].username);
@@ -31,7 +32,7 @@ const name = userData.name;
           
         } else {
           const resClient = await getclients();
-          const client = resClient.data.filter((client) => client.name === name);
+          const client = resClient.data.filter((client) => client.id === id);
     
           if (client.length > 0) { // Check if the 'client' array has any elements
             setUsername(client[0].username);

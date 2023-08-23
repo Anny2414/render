@@ -10,13 +10,7 @@ import "../assets/css/OrderPage.css";
 // CONEXION CON LA API DE USERS Y ROLES
 import { getUsers } from "../api/users.api";
 import { getProducts, getProduct } from "../api/products.api.js";
-import {
-  getSales,
-  createSale,
-  deleteSale,
-  editSale,
-  getSale,
-} from "../api/sales.api.js";
+
 import {
   getDetail,
   createDetail,

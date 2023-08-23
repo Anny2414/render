@@ -26,7 +26,7 @@ export function ClientPage() {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const filteredUsers = users.filter((user) =>
     user.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -95,10 +95,10 @@ export function ClientPage() {
   const [modalConfig, setModalConfig] = useState();
   const [notification, setNotification] = useState(null);
   const reloadDataTable = async () => {
-    setUsers([])
+    setUsers([]);
     const res = await getUsers();
-    setUsers(res.data)
-  }
+    setUsers(res.data);
+  };
 
   const openModal = (title, fields, dataSelect, buttonSubmit, submit) => {
     setModalConfig({ title, fields, dataSelect, buttonSubmit, submit });
@@ -111,21 +111,21 @@ export function ClientPage() {
       buttons: true,
       timeout: 0,
       onConfirm: async () => {
-    try {
-      await updateUserStatus(userId, !status);
-      setNotification({
-        msg: "Estado cambiado Exitosamente  ",
-        color: "info",
-        buttons: false,
-        timeout: 3000,
-      });
-      reloadDataTable()
-    } catch (error) {
-      console.error(error);
-    }
-  }})
-  }
-
+        try {
+          await updateUserStatus(userId, !status);
+          setNotification({
+            msg: "Estado cambiado Exitosamente  ",
+            color: "info",
+            buttons: false,
+            timeout: 3000,
+          });
+          reloadDataTable();
+        } catch (error) {
+          console.error(error);
+        }
+      },
+    });
+  };
 
   const closeModal = () => {
     setIsOpen(false);
@@ -160,46 +160,45 @@ export function ClientPage() {
     },
 
     {
-        title: "Nombre",
-        type: "text",
-        name: "name",
-        icon: "signature",
-        col: "half",
-        required: "true",
-      },
-      {
-        title: "Apellido",
-        type: "text",
-        name: "lastname",
-        icon: "signature",
-        col: "half",
-        required: "true",
-      },
-      {
-        title: "Documento",
-        type: "number",
-        name: "document",
-        icon: "id-card",
-        col: "half",
-        required: "true",
-      },
-      {
-        title: "Dirección",
-        type: "text",
-        name: "address",
-        icon: "location-dot",
-        col: "half",
-        required: "true",
-      },
-      {
-        title: "Telefono",
-        type: "number",
-        name: "phone",
-        icon: "phone",
-        required: "true",
-        col: "half"
-      },
-   
+      title: "Nombre",
+      type: "text",
+      name: "name",
+      icon: "signature",
+      col: "half",
+      required: "true",
+    },
+    {
+      title: "Apellido",
+      type: "text",
+      name: "lastname",
+      icon: "signature",
+      col: "half",
+      required: "true",
+    },
+    {
+      title: "Documento",
+      type: "number",
+      name: "document",
+      icon: "id-card",
+      col: "half",
+      required: "true",
+    },
+    {
+      title: "Dirección",
+      type: "text",
+      name: "address",
+      icon: "location-dot",
+      col: "half",
+      required: "true",
+    },
+    {
+      title: "Telefono",
+      type: "number",
+      name: "phone",
+      icon: "phone",
+      required: "true",
+      col: "half",
+    },
   ];
 
   // Conexion a API y obtiene datos de Users y Roles
@@ -215,21 +214,30 @@ export function ClientPage() {
   }, []);
 
   const handleCreateUser = async (data) => {
-    const {username, email, password,name,lastname,address,document,phone} = data
-    const res = await getRoles()
-    const rol = res.data.filter((rol) => rol.name == "Cliente")
+    const {
+      username,
+      email,
+      password,
+      name,
+      lastname,
+      address,
+      document,
+      phone,
+    } = data;
+    const res = await getRoles();
+    const rol = res.data.filter((rol) => rol.name == "Cliente");
     try {
       const userOne = {
         username,
         email,
         password,
-        role : rol[0].id,
+        role: rol[0].id,
         name,
         lastname,
         address,
         document,
         phone,
-      }
+      };
       await createUser(userOne);
       reloadDataTable();
       closeModal();
@@ -239,7 +247,6 @@ export function ClientPage() {
         buttons: false,
         timeout: 3000,
       });
-
     } catch (error) {
       console.error("Error al crear el usuario:", error);
     }
@@ -293,55 +300,51 @@ export function ClientPage() {
         icon: "phone",
         required: "true",
         value: user.phone,
-        col: "col"
+        col: "col",
       },
     ];
-
 
     const handleEditUser = async (data) => {
       try {
         await editUser(userId, data);
-        reloadDataTable()
-        closeModal()
+        reloadDataTable();
+        closeModal();
         setNotification({
           msg: "Cliente Editado exitosamente!",
           color: "success",
           buttons: false,
           timeout: 3000,
         });
-  
       } catch (error) {
         console.error("Error al editar el usuario:", error);
       }
     };
 
-
     openModal("Editar cliente", fieldsEdit, null, true, handleEditUser);
   };
 
- const handleDeleteClick = async (userId) => {
-  setNotification({
-    msg: "¿Seguro deseas eliminar el cliente?",
-    color: "warning",
-    buttons: true,
-    timeout: 0,
-    onConfirm: async () => {
-      await deleteUser(userId);
-      reloadDataTable();
-      setNotification({
-        msg: "¡Usuario eliminado exitosamente!",
-        color: "info",
-        buttons: false,
-        timeout: 3000,
-      });
-    },
-  });
-};
+  const handleDeleteClick = async (userId) => {
+    setNotification({
+      msg: "¿Seguro deseas eliminar el cliente?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        await deleteUser(userId);
+        reloadDataTable();
+        setNotification({
+          msg: "¡Usuario eliminado exitosamente!",
+          color: "info",
+          buttons: false,
+          timeout: 3000,
+        });
+      },
+    });
+  };
 
   return (
     <div>
       <Navbar />
-      <div className="container is-fluid mt-5">
         <div className="notifications float">
           {notification && (
             <Notification
@@ -354,38 +357,65 @@ export function ClientPage() {
             />
           )}
         </div>
-      <div className="container is-fluid mt-5">
-        <div className="columns is-centered">
-          <div className="column is-fullwidth">
-            <Button
-              text="Crear Cliente +"
-              color="success"
-              col="fullwidth"
-              action={() =>
-                openModal("Nuevo Cliente", fieldsNew, roles,true,handleCreateUser)
-              }
-            />
+        <div className="container is-fluid mt-5">
+          <div className="columns is-centered">
+            <div className="column is-fullwidth">
+              <Button
+                text="Crear Cliente +"
+                color="success"
+                col="fullwidth"
+                action={() =>
+                  openModal(
+                    "Nuevo Cliente",
+                    fieldsNew,
+                    roles,
+                    true,
+                    handleCreateUser
+                  )
+                }
+              />
+            </div>
+            <div className="column is-9">
+              <Input holder="Buscar Cliente " icon="magnifying-glass" />
+            </div>
+            <div className="column is-fullwidth">
+              <Button
+                text="Generar PDF"
+                color="primary"
+                action={generatePDF}
+                col="fullwidth"
+              />
+            </div>
           </div>
-          <div className="column is-9">
-            <Input holder="Buscar usuario" icon="magnifying-glass" />
-          </div>
-          <div className="column is-fullwidth">
-            <Button text="Generar PDF" color="primary"action={generatePDF}col="fullwidth" />
-          </div>
+          <Table
+            headers={[
+              "#",
+              "document",
+              "username",
+              "name",
+              "lastname",
+              "address",
+              "phone",
+            ]}
+            columns={[
+              "#",
+              "Documento",
+              "Usuario",
+              "Nombre",
+              "Apellido",
+              "Dirección",
+              "Teléfono",
+            ]}
+            data={users}
+            status
+            edit
+            delete
+            onStatusClick={handleStatusChange}
+            onEditClick={handleEditClick}
+            onDeleteClick={handleDeleteClick}
+          />
         </div>
-        <Table
-          headers={["#","document", "username","name", "lastname", "address", "phone"]}
-          columns={["#","Documento", "usuario","Nombre", "Apellido", "Direccion", "Telefono"]}
-          data={users}
-          status
-          edit
-          delete
-          onStatusClick={handleStatusChange}
-          onEditClick={handleEditClick}
-          onDeleteClick={handleDeleteClick}
-        />
-      </div>
-      </div>
+
       {isOpen && (
         <Modal
           title={modalConfig.title}

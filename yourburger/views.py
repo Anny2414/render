@@ -47,16 +47,22 @@ class LoginView(APIView):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            return Response({'message': 'Credenciales inválidas', 'status' : 401 }, status=status.HTTP_401_UNAUTHORIZED)
-
+            return Response({'message': 'Credenciales inválidas', 'status': 401}, status=status.HTTP_401_UNAUTHORIZED)
+        
         if user.password == password:
             refresh = RefreshToken.for_user(user)
-            token = {
+            token_content = {
+                'user_id': user.id,
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
             }
-            request.session['user_id'] = user.id
-            return Response({'message': 'Inicio de sesión exitoso', 'status' : 400, 'token': token, 'name': user.name}, status=status.HTTP_200_OK)
+            response_data = {
+                'message': 'Inicio de sesión exitoso',
+                'status': status.HTTP_200_OK,
+                'token': token_content,
+                'name': user.name,
+            }
+            return JsonResponse(response_data)
         else:
             return Response({'message': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
         

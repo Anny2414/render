@@ -14,8 +14,7 @@ const LoginForm = () => {
     event.preventDefault();
     try {
       const response = await Login(username, password);
-      console.log(response.status);
-      if (response.status == 400) {
+      if (response.status == 200) {
         location.replace("/home");
       } // Realiza acciones adicionales después de iniciar sesión exitosamente
     } catch (error) {
