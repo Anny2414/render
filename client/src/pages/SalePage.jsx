@@ -34,30 +34,58 @@ export function SalePage() {
   // const ingredientes = useRef([]);
   const selectedOptionRef = useRef();
   const [notification, setNotification] = useState(null);
+  const [users, setUsers] = useState([]);
   const [username, setUsername] = useState('');
   const [rol, setRol] = useState()
-  const [users, setUsers] = useState([]);
-  const superuser = useRef()
+  const [clientes, setClientes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
-      const resUser = await getUsers();
-      setUsers(resUser.data);
+      try {
+        const resUser = await getUsers();
+        const resclient = await getclients();
+        console.log(resclient.data);
+        console.log(resUser.data);
+        setUsers(resUser.data);
+        setClientes(resclient.data);
+        setIsLoading(false); // Los datos han cargado, establece isLoading a false
+      } catch (error) {
+        console.error("Error al obtener los datos:", error);
+        setIsLoading(false); // Si ocurre un error, también establece isLoading a false
+      }
     }
-    
+
     fetchData();
-    const name = localStorage.getItem('username');
-    const user = users.filter((user) => user.username == name)
-    console.log(user);
-    setUsername(user.id);
-    superuser.current =
-    setRol(user.rol)
+
   }, []);
 
 
+
+  useEffect(() => {
+    // Verifica si los datos han cargado antes de utilizar la variable username
+    if (!isLoading) {
+      const name = localStorage.getItem("username");
+      const user = users.find((user) => user.username === name);
+      const cliente = clientes.find((client) => client.username === name);
+      if (name) {
+        if (user) {
+          setUsername(user.id);
+          setRol(user.rol);
+        } else if (cliente) {
+          setUsername(cliente.id);
+          setRol(cliente.rol);
+        }
+
+      } else {
+        window.location.replace("/")
+      }
+    }
+  }, [users, clientes, isLoading]);
   useEffect(() => {
     const currentIngredients = ingredientes;
-  }, [ingredientes]);
+    console.log(users);
+  }, [ingredientes, users]);
 
   const handleOptionChange = (event) => {
     const option = contents.find(
@@ -125,43 +153,42 @@ export function SalePage() {
 
   const handleCreateProduct = async (data) => {
     try {
-      const user = superuser.current;
-      console.log(user);
+      console.log(users);
 
-      const orderData = { user: user, total: total, status: "Pago" };
+      const orderData = { user: username, total: total, status: "Pago" };
       const respOrder = await createSale(orderData);
-  
+
       const formDataDetails = [];
-  
+
       for (let i = 0; i < detail.length; i++) {
         const product = detail[i];
         const contentsO = contents.filter(
           (content) => content.product === product.name
         );
-  
+
         const formDataDetail = new FormData();
         formDataDetail.append("order", respOrder.data.id);
         formDataDetail.append("product", product.name);
         formDataDetail.append("amount", product.amount);
         formDataDetail.append("price", product.price);
         formDataDetail.append("contentOrder", JSON.stringify(contentsO));
-  
+
         formDataDetails.push(formDataDetail);
       }
-  
+
       const createdDetails = [];
-  
+
       for (const formDataDetail of formDataDetails) {
         const respDetail = await createDetail(formDataDetail);
         createdDetails.push(respDetail.data);
-  
+
         const contentOrder = JSON.parse(formDataDetail.get("contentOrder"));
-  
+
         for (const content of contentOrder) {
           const formData = new FormData();
           formData.append("detail", respDetail.data.id);
           formData.append("supplies", content.supplies);
-  
+
           await createContentO(formData);
         }
       }
@@ -178,7 +205,7 @@ export function SalePage() {
       console.error("Error al crear la venta:", error);
     }
   };
-  
+
   const handleDeleteClick = (productId) => {
     setDetail((prevDetail) => {
       const updatedDetail = prevDetail.filter(
@@ -273,7 +300,7 @@ export function SalePage() {
     });
   };
 
-   
+
   const borrarDetalle = () => {
     setDetail([]);
     setIngredientes([]);
@@ -284,7 +311,7 @@ export function SalePage() {
     <div>
       <Navbar />
       <div className="container mt-5">
-      <div className="notifications float">
+        <div className="notifications float">
           {notification && (
             <Notification
               msg={notification.msg}

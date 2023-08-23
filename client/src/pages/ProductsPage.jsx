@@ -594,7 +594,7 @@ export function ProductsPage() {
           ],
           nameSelect: "name",
 
-          // handleOptionChange: handleOptionChange,
+          handleOptionChange: handleOptionChange,
           actionButton: anadirIngrediente,
         },
         {
@@ -603,15 +603,16 @@ export function ProductsPage() {
           headers: ['name', 'price'],
           data: ingredientes,
           delete: true,
-          //onDeleteClick: clickDelete
+          // onDeleteClick: clickDelete
         },
       ];
 
       const handleAdd = (data) => {
         const { name, price, description } = data;
         const idP = products.filter((product) => product.name == name);
-        //revisar
+        
         console.log(idP[0].id);
+       
         try {
           const data2 = {
             id: idP[0].id,
@@ -619,10 +620,14 @@ export function ProductsPage() {
             price,
             description,
             image: idP[0].image,
-            supplies: content,
+            supplies: [],
             amount: 1,
           };
-
+          if (ingredientes.length>0) {
+            data2.supplies = ingredientes
+          } else {
+            data2.supplies = content
+          }
           setOrder((prevOrder) => {
             Cookies.remove("orderDetail");
             const newOrder = [...prevOrder, data2];
