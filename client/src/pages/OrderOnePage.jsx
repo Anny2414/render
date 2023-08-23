@@ -62,10 +62,10 @@ export function OrderPage() {
         const cliente = clientes.find((client) => client.username === name);
         if (name) {
           if (user) {
-            setUsername(user.username);
+            setUsername(user.id);
             setRol(user.rol);
           } else if(cliente){
-            setUsername(cliente.username);
+            setUsername(cliente.id);
             setRol(cliente.rol);
           }
           
