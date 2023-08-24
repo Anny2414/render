@@ -276,6 +276,8 @@ export function UsersPage() {
       const errorMessages = {
         '{"username":["user with this username already exists."]}': "Ya existe este usuario!",
         '{"username":["Ensure this field has no more than 50 characters."]}': "El usuario sobrepasa los 50 caracteres!",
+        '{"name":["Ensure this field has no more than 50 characters."]}': "El nombre sobrepasa los 50 caracteres!",
+        '{"lastname":["Ensure this field has no more than 50 characters."]}': "El apellido sobrepasa los 50 caracteres!",
       };
 
       const errorMessage = errorMessages[error.response.request.responseText];
