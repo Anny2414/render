@@ -134,9 +134,16 @@ export function RolePage() {
         timeout: 3000,
       });
     } catch (error) {
-      if (error.response.status == 400) {
+      const errorMessages = {
+        '{"name":["role with this name already exists."]}': "Ya existe este rol!",
+        '{"name":["Ensure this field has no more than 50 characters."]}': "El nombre del rol sobrepasa los 50 caracteres!",
+      };
+
+      const errorMessage = errorMessages[error.response.request.responseText];
+
+      if (errorMessage) {
         return setNotification({
-          msg: "Ya existe un rol con este nombre!",
+          msg: errorMessage,
           color: "primary",
           buttons: false,
           timeout: 3000,
@@ -233,11 +240,25 @@ export function RolePage() {
           timeout: 3000,
         });
       } catch (error) {
-        console.error("Error al editar el rol:", error);
+        const errorMessages = {
+          '{"name":["role with this name already exists."]}': "Ya existe este rol!",
+          '{"name":["Ensure this field has no more than 50 characters."]}': "El nombre del rol sobrepasa los 50 caracteres!",
+        };
+  
+        const errorMessage = errorMessages[error.response.request.responseText];
+  
+        if (errorMessage) {
+          return setNotification({
+            msg: errorMessage,
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        }
       }
 
       try {
-        await deletePermissionsByRole(roleId);
+        deletePermissionsByRole(roleId);
       } catch (error) {
         console.error("Error al eliminar los permisos del rol:", error);
       }
