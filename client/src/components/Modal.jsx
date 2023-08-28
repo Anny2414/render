@@ -242,15 +242,15 @@ export function Modal(props) {
           </section>
 
           <footer className="modal-card-foot">
+            {buttonSubmit && (
+              <Button text="Confirmar" color="success" type="submit" />
+            )}
             <Button
               text="Cancelar"
               color="primary"
               action={onClose}
               type="button"
             />
-            {buttonSubmit && (
-              <Button text="Confirmar" color="success" type="submit" />
-            )}
           </footer>
           <div className="notifications">
             {Object.keys(errors).length > 0 && (

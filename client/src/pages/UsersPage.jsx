@@ -262,7 +262,7 @@ export function UsersPage() {
 
   const handleCreateUser = async (data) => {
     try {
-      await createUser(data);
+      await createUser  
 
       setNotification({
         msg: "Usuario creado exitosamente!",

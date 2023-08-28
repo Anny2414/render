@@ -175,7 +175,8 @@ export function OrderPage() {
     };
     const submitButton = async (data) => {
         try {
-            const user = username;
+            if (products.length > 0) {
+              const user = username;
             const orderData = { user: user, total: total, status: "Por Pagar" };
             const respOrder = await createOrder(orderData);
         
@@ -215,6 +216,14 @@ export function OrderPage() {
             Cookies.remove("orderDetail");
             setProducts([]);
             setIngredientes([]);
+            }else{
+              setNotification({
+                msg: "No tienes productos añadidos!",
+                color: "danger",
+                buttons: false,
+                timeout: 3000,
+              });
+            }
           } catch (error) {
             console.error("Error al crear el pedido:", error);
           }
@@ -286,7 +295,12 @@ export function OrderPage() {
                 reloadDataTable();
               }
             } else {
-              console.log("error al añadir");
+              setNotification({
+                msg: "No haz selecionado un ingrediente",
+                color: "danger",
+                buttons: false,
+                timeout: 3000,
+              });
             }
           };
           

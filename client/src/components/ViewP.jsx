@@ -77,7 +77,7 @@ export function ViewP(props) {
                   type="button"
                   text={
                     <span className="icon">
-                      Ver mas
+                      Ver más
                     </span>
                   }
                   action={() => onViewDetails(product.id)}

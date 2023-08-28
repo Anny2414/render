@@ -54,7 +54,7 @@ export function ProductsPage() {
       "#",
       "Nombre",
       "Precio",
-      "Descripcion",
+      "Descripción",
     ];
     const tableData = await Promise.all(
       products.map(async (product, index) => [
@@ -229,7 +229,7 @@ export function ProductsPage() {
       name: "description",
       icon: "comment",
       col: "half",
-      required: "true",
+      required: "false",
     },
     {
       title: "Ingredientes",
@@ -321,7 +321,46 @@ export function ProductsPage() {
       });
     } catch (error) {
       console.error("Error al crear el Producto:", error);
+      const errorMessages = {
+        '{"name":["products with this name already exists."]}': "Ya existe ese Producto!",
+        '{"name":["Ensure this field has no more than 50 characters."]}': "El producto sobrepasa los 50 caracteres!",
+        '{"price":["Ensure this field has no more than 15 characters."]}': "El precio sobrepasa los 15 digitos!",
+
+      };
+      const errorMessage = errorMessages[error.response.request.responseText];
+      if (errorMessage) {
+        return setNotification({
+          msg: errorMessage,
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      } else if (error.response.data.name == "products with this name already exists.") {
+        return setNotification({
+          msg: "Ya existe un Producto con ese Nombre",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      } else if (error.response.data.name == "Ensure this field has no more than 50 characters.") {
+        return setNotification({
+          msg: "El nombre sobrepasa los 50 caracteres!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      }else if (error.response.data.price) {
+        return setNotification({
+          msg: "El precio sobrepasa los 15 digitos!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      }
     }
+    //si algo quitar esto
+    reloadDataTable();
+    closeModal();
   };
 
   const handleAddSupplies = () => {
@@ -409,7 +448,7 @@ export function ProductsPage() {
         name: "description",
         icon: "comment",
         col: "half",
-        required: "true",
+        required: "false",
         value: product.description,
       },
       {
@@ -499,6 +538,7 @@ export function ProductsPage() {
             timeout: 3000,
           });
 
+
           // Actualizar la lista de productos sin recargar la página
           setProducts((prevProducts) => {
             const updatedProducts = prevProducts.map((product) => {
@@ -518,6 +558,43 @@ export function ProductsPage() {
             return updatedProducts;
           });
         } catch (error) {
+          const errorMessages = {
+            '{"name":["products with this name already exists."]}': "Ya existe ese producto!",
+            '{"name":["Ensure this field has no more than 50 characters."]}': "El nombre del producto sobrepasa los 50 caracteres!",
+            '{"price":["Ensure this field has no more than 15 characters."]}': "El precio del producto sobrepasa los 15 digitos!",
+
+          };
+          const errorMessage = errorMessages[error.response.request.responseText];
+          if (errorMessage) {
+            return setNotification({
+              msg: errorMessage,
+              color: "primary",
+              buttons: false,
+              timeout: 3000,
+            });
+          } else if (error.response.data.name == "products with this name already exists." ) {
+            return setNotification({
+              msg: "Ya existe un producto con ese nombre!",
+              color: "primary",
+              buttons: false,
+              timeout: 3000,
+            });
+          } else if (error.response.data.name == "Ensure this field has no more than 50 characters.") {
+            return setNotification({
+              msg: "El nombre del producto sobrepasa los 50 caracteres!",
+              color: "primary",
+              buttons: false,
+              timeout: 3000,
+            });
+          } else if (error.response.data.price) {
+            return setNotification({
+              msg: "El precio  sobrepasa los 15 digitos!",
+              color: "primary",
+              buttons: false,
+              timeout: 3000,
+            });
+          }
+
           console.error("Error al editar el Producto:", error);
         }
       };
