@@ -420,7 +420,7 @@ const generatePDF = async() => {
             <Button
               text={
                 <span className="icon">
-                  <i class="fa-solid fa-user"></i>
+                  <i class="fa-solid fa-burger"></i>
                   <i class="fa-solid fa-plus"></i>
                 </span>
               }
