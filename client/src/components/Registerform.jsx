@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { set, useForm } from "react-hook-form";
+import "../assets/css/accesos.css";
 import axios from "axios";
 import { Notification } from "./Notification";
 const RegisterForm = () => {
@@ -119,7 +120,7 @@ const RegisterForm = () => {
         <div className="hero-body has-text-centered">
           <div className="container">
             <div className="columns is-centered">
-              <div className="column is-half has-background-white">
+              <div className="column is-half has-background-white columna">
                 <div className="card">
                   <header className="card-header">
                     <p className="pt-5" style={{ fontSize: "30px" }}>

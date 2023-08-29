@@ -21,7 +21,7 @@ const id = userData.token.user_id;
       try {
         const resUser = await getUsers();
         const user = resUser.data.filter((user) => user.id === id);
-        {console.log(userData);}
+      
         
         if (user.length > 0) { // Check if the 'user' array has any elements
           setUsername(user[0].username);
