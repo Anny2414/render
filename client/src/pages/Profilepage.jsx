@@ -2,25 +2,37 @@ import React, { useState, useEffect } from "react";
 import { Carga } from "../components/Carga";
 import CryptoJS from "crypto-js";
 import user from "../assets/img/user.png";
-import { getUser as getClientUser, editUser as editClientUser } from "../api/clients.api";
+import { Notification } from "../components/Notification";
+import {
+  getUser as getClientUser,
+  editUser as editClientUser,
+} from "../api/clients.api";
 import { Navbar } from "../components/Navbar";
 import { Input } from "../components/Form/Input";
 import { Button } from "../components/Form/Button";
 import { getUser, editUser } from "../api/users.api";
-import "../assets/css/LoginForm.css";
+import "../assets/css/accesos.css";
 
 export function Profile() {
   const [mostrarCarga, setMostrarCarga] = useState(false);
+  const [mensajeCarga, setMensajeCarga] = useState("");
   const [camposHabilitados, setCamposHabilitados] = useState(false);
+  const [mostrarCambiarClave, setMostrarCambiarClave] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
-  const [datosProvenientesDeClientsAPI, setDatosProvenientesDeClientsAPI] = useState(false); // Cambié el nombre de la variable
-  
-  const mostrarPantallaDeCarga = () => {
+  const [datosProvenientesDeClientsAPI, setDatosProvenientesDeClientsAPI] =
+    useState(false);
+  const [botonCambiarClaveTexto, setBotonCambiarClaveTexto] =
+    useState("Cambiar Clave");
+
+  const mostrarPantallaDeCarga = (mensaje) => {
     setMostrarCarga(true);
+    setMensajeCarga(mensaje);
     setTimeout(() => {
       setMostrarCarga(false);
-    }, 2000); // Cambia 2000 por el tiempo que quieras mostrar la carga (en milisegundos)
+      setMensajeCarga("");
+    }, 1500);
   };
+
   const encryptionKey = "Yourburger";
   const encryptedUserData = localStorage.getItem("Token");
   const decryptedBytes = CryptoJS.AES.decrypt(encryptedUserData, encryptionKey);
@@ -28,50 +40,57 @@ export function Profile() {
   const userData = JSON.parse(decryptedUserDataJSON);
   const userId = userData.token.user_id;
 
-  // Estado para los datos del perfil
   const [profileData, setProfileData] = useState({
     name: "",
     lastname: "",
     email: "",
     phone: "",
-    address: "", // Cambiado de "direccion" a "address"
+    address: "",
+    password: "", // Agregamos un campo para la contraseña
   });
-
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [notification, setNotification] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // First, try to fetch user data from userapi
         const userApiResponse = await getUser(userId);
 
-        // If user data is found in userapi, update the state
         setProfileData({
           name: userApiResponse.data.name,
           lastname: userApiResponse.data.lastname,
           email: userApiResponse.data.email,
           phone: userApiResponse.data.phone,
           address: userApiResponse.data.address,
+          password: userApiResponse.data.password,
         });
         return;
       } catch (error) {
-        console.error("Error al obtener datos del perfil desde userapi:", error);
+        console.error(
+          "Error al obtener datos del perfil desde userapi:",
+          error
+        );
       }
 
-      // If user data is not found in userapi, fetch it from clients api
       try {
         const clientUserResponse = await getClientUser(userId);
         const clientUserData = clientUserResponse.data;
 
-        // Update the state with data from clients api
         setProfileData({
           name: clientUserData.name,
           lastname: clientUserData.lastname,
           email: clientUserData.email,
           phone: clientUserData.phone,
           address: clientUserData.address,
+          password: clientUserData.data.password,
         });
         setDatosProvenientesDeClientsAPI(true);
       } catch (error) {
-        console.error("Error al obtener datos del perfil desde clients api:", error);
+        console.error(
+          "Error al obtener datos del perfil desde clients api:",
+          error
+        );
       }
     };
 
@@ -82,154 +101,388 @@ export function Profile() {
     setCamposHabilitados(true);
     setModoEdicion(true);
   };
+  const validateAdress = (value) => {
+    if (!value.match(/^[a-zA-Z0-9#\- ]+$/)) {
+      return {
+        isValid: false,
+        errorMessage: "Caracteres no válidos",
+      };
+    }
+    return { isValid: true, errorMessage: "" };
+  };
+  const validateName = (value) => {
+    if (!value.match(/^[A-Za-zÁ-ú\s]+$/)) {
+      return {
+        isValid: false,
+        errorMessage: "Solo debe contener letras y espacios.",
+      };
+    }
+    return { isValid: true, errorMessage: "" };
+  };
+  const validatenumber = (value) => {
+    if (!value.match(/^[0-9]+$/)) {
+      return {
+        isValid: false,
+        errorMessage: "Solo numeros",
+      };
+    }
+    return { isValid: true, errorMessage: "" };
+  };
+  const validateEmail = (value) => {
+    if (!value.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
+      return {
+        isValid: false,
+        errorMessage: "Formato inválido.",
+      };
+    }
+    return { isValid: true, errorMessage: "" };
+  };
+  const [nameValidation, setNameValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  });
+  const [lastnameValidation, setlastnameValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  });
+  const [numberValidation, setnumberValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  });
+  const [emailValidation, setEmailValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  });
+  const [AddressValidation, setAddressValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === "name") {
+      const validation = validateName(value);
+      setNameValidation(validation);
+    } else if (name == "lastname") {
+      const validation = validateName(value);
+      setlastnameValidation(validation);
+    } else if (name === "email") {
+      const validation = validateEmail(value);
+      setEmailValidation(validation);
+    }else if (name === "phone") {
+      const validation = validatenumber(value);
+      setnumberValidation(validation);
+    }else if (name === "address") {
+      const validation = validateAdress(value);
+      setAddressValidation(validation);
+    }
     setProfileData({
       ...profileData,
       [name]: value,
     });
   };
 
+  const cambiarClave = async () => {
+    setNotification({
+      msg: "¿Seguro deseas cambiar la contraseña?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        try {
+          setNotification(null); 
+          mostrarPantallaDeCarga("Realizando Cambios...");
+          if (
+            profileData.password === oldPassword &&
+            newPassword === confirmPassword
+          ) {
+            if (datosProvenientesDeClientsAPI) {
+              await editClientUser(userId, { password: newPassword });
+            } else {
+              await editUser(userId, { password: newPassword });
+            }
+            setNotification({
+              msg: "Cambios realizados",
+              color: "success",
+              buttons: false,
+              timeout: 1500,
+            });
+            setCamposHabilitados(false);
+            setMostrarCambiarClave(false);
+
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } else {
+            setNotification({
+              msg: "La contraseña actual es incorrecta o las nuevas contraseñas no coinciden",
+              color: "primary",
+              buttons: false,
+              timeout: 3000,
+            });
+          }
+        } catch (error) {
+          console.error("Error al cambiar la contraseña:", error);
+        }
+      },
+    });
+  };
+
   const guardarCambios = async () => {
-    try {
-      // Enviar los datos actualizados al servidor
-      mostrarPantallaDeCarga();
+    setNotification({
+      msg: "¿Seguro deseas cambiar Los datos del perfil ?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        try {
+        setNotification(null); 
+        mostrarPantallaDeCarga("Guardando cambios...");
   
-      // Utiliza editClientUser si los datos provienen de clients api, de lo contrario, utiliza editUser
-      if (datosProvenientesDeClientsAPI) {
-        await editClientUser(userId, profileData);
-      } else {
-        await editUser(userId, profileData);
-      }
+        if (datosProvenientesDeClientsAPI) {
+          await editClientUser(userId, profileData);
+        } else {
+          await editUser(userId, profileData);
+        }
+        setNotification({
+          msg: "Cambios realizados",
+          color: "success",
+          buttons: false,
+          timeout: 2000,
+        });
+        setCamposHabilitados(false);
+        setModoEdicion(false); // Cambiar a modo visualización después de guardar los cambios
   
-      console.log("Cambios guardados exitosamente.");
-      setCamposHabilitados(false);
-  
-      // Esperar un momento antes de recargar la página
-      setTimeout(() => {
-        window.location.reload(); // Cambié location.reload() a window.location.reload()
-      }, 1000); // Cambia 1000 por el tiempo que desees en milisegundos
-    } catch (error) {
-      console.error("Error al guardar los cambios:", error);
-      // Puedes mostrar una notificación o mensaje de error aquí
-    }
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      } catch (error) {
+        console.error("Error al guardar los cambios:", error);
+      }}})
   };
 
   const handleButtonClick = () => {
-    if (modoEdicion) {
-      // Estamos en modo "Guardar", llama a la función para guardar cambios
+    if (mostrarCambiarClave) {
+      // Si los campos de cambiar clave están visibles, cambiar la contraseña
+      cambiarClave();
+    } else if (modoEdicion) {
+      // Si estamos en modo edición, guardar los cambios generales
       guardarCambios();
     } else {
-      // Estamos en modo "Editar", habilita los campos para la edición
       habilitarCampos();
     }
+  };
+
+  const handleCambiarClaveClick = () => {
+    if (mostrarCambiarClave) {
+      // Si se muestra la pantalla de cambiar clave, cambia el texto del botón a "Perfil"
+      setBotonCambiarClaveTexto("Cambiar Clave");
+    } else {
+      // Si no se muestra la pantalla de cambiar clave, cambia el texto del botón a "Cambiar Clave"
+      setBotonCambiarClaveTexto("Perfil");
+    }
+    setMostrarCambiarClave(!mostrarCambiarClave);
+    setModoEdicion(false); // Cambiar a modo visualización cuando se muestra la pantalla de cambiar clave
   };
 
   return (
     <div>
       <Navbar />
-      <div className="hero-body has-text-centered  z ">
+
+      <div className="hero-body has-text-centered z">
         {mostrarCarga ? (
-          <Carga />
+          <Carga Texto={mensajeCarga} />
         ) : (
-          <div className="columns y ">
-            <div className="column is-two-fifths v ">
-              <div className="mr-3 mt-2 ml-1">
-                <div className="foto ">
-                  <img
-                    className="imagensita "
-                    src={user}
-                    alt="Logo"
-                    width="30%"
+          <div className="columns y">
+            <div className="column m-1">
+              <div className="is-one-third">
+                {notification && (
+                  <Notification
+                    msg={notification.msg}
+                    color={notification.color}
+                    buttons={notification.buttons}
+                    timeout={notification.timeout}
+                    onClose={() => setNotification(null)}
+                    onConfirm={notification.onConfirm}
                   />
-                  <div className="mb-3 mt-2">
-                    <h5>{localStorage.getItem("username")}</h5>
-                  </div>
+                )}
+              </div>
+              <div className="foto">
+                <img className="imagensita" src={user} alt="Logo" width="30%" />
+                <div className="mb-3 mt-2">
+                  <h5>{localStorage.getItem("username")}</h5>
                 </div>
               </div>
-              <div className="is-flex is-justify-content-center m-3">
-                <div className="m-2">
-                  <Button
-                    text={modoEdicion ? "Guardar" : "Editar"}
-                    color="primary"
-                    action={handleButtonClick}
-                  />
-                </div>
-                <div className="m-2">
-                  <Button text="Cambiar Clave" color="primary" action="submit" />
-                </div>
-              </div>
-            </div>
-            <div className="m-4">
-              <div className="column is-full x">
-                <div className="columns">
+              {!mostrarCambiarClave ? (
+                <div className="columns mt-2">
                   <div className="column">
-                    <div className="mt-5 ml-5">
+                    <div className="mt-3 ml-3">
                       <Input
                         value={profileData.name}
                         icon="user"
                         type="text"
                         name="name"
-                        error={false}
                         disabled={!camposHabilitados}
+                       error={!nameValidation.isValid}
                         onChange={handleInputChange}
                       />
+                      {!nameValidation.isValid && (
+                        <p className="error-message" style={{ color: "red", fontSize:13}}>
+                        {nameValidation.errorMessage}
+                      </p>
+                      )}
                     </div>
-                    <div className="mt-5 ml-5">
+                    <div className="mt-3 ml-3">
                       <Input
                         value={profileData.email}
-                        icon="user"
+                        icon="envelope"
                         type="text"
                         name="email"
-                        error={false}
+                        error={!emailValidation.isValid}
                         disabled={!camposHabilitados}
                         onChange={handleInputChange}
                       />
+                      {!emailValidation.isValid && (
+                        <p className="error-message" style={{ color: "red", fontSize:13}}>
+                          {emailValidation.errorMessage}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="column">
-                    <div className="mt-5 mr-5">
+                    <div className="mt-3 mr-3">
                       <Input
                         value={profileData.lastname}
                         icon="user"
                         type="text"
                         name="lastname"
-                        error={false}
+                        error={!lastnameValidation.isValid}
                         disabled={!camposHabilitados}
                         onChange={handleInputChange}
                       />
-                      <div className="mt-5 ">
+                      {!lastnameValidation.isValid && (
+                        <p className="error-message" style={{ color: "red", fontSize:13}}>
+                          {lastnameValidation.errorMessage}
+                        </p>
+                      )}
+                      <div className="mt-3 ">
                         <Input
                           value={profileData.phone}
-                          icon="user"
+                          icon="phone"
                           type="text"
                           name="phone"
-                          error={false}
+                          error={!numberValidation.isValid}
                           disabled={!camposHabilitados}
                           onChange={handleInputChange}
                         />
+                        {!numberValidation.isValid && (
+                        <p className="error-message" style={{ color: "red", fontSize:13}}>
+                          {numberValidation.errorMessage}
+                        </p>
+                      )}
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="is-row mb-5 ml-2 mr-2 pl-2 pr-1">
+              ) : null}
+              {!mostrarCambiarClave ? (
+                <div className="is-row mb-3 ml-1">
                   <div className="is-full m-2 mr-3">
                     <Input
                       value={profileData.address}
-                      icon="user"
+                      icon="location-dot"
                       type="text"
                       name="address"
-                      error={false}
+                      error={!AddressValidation.isValid}
                       disabled={!camposHabilitados}
                       onChange={handleInputChange}
                     />
+                     {!AddressValidation.isValid && (
+                        <p className="error-message" style={{ color: "red", fontSize:13}}>
+                          {AddressValidation.errorMessage}
+                        </p>
+                      )}
                   </div>
                 </div>
-              </div>
+              ) : null}
+              {mostrarCambiarClave && (
+                <div className="columns mt-2 ml-5 mr-5">
+                  <div className="column is-full">
+                    <div className="">
+                      <Input
+                        placeholder="Antigua contraseña"
+                        holder="Antigua Clave"
+                        icon="lock"
+                        type="password"
+                        name="oldPassword"
+                        value={oldPassword}
+                        error={false}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {mostrarCambiarClave && (
+                <div className="columns ml-5 mr-5">
+                  <div className="column is-half">
+                    <div className="">
+                      <Input
+                        placeholder="Nueva Clave"
+                        holder="Nueva Contraseña "
+                        icon="lock"
+                        type="password"
+                        name="newPassword"
+                        value={newPassword}
+                        error={false}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="column is-half">
+                    <div className="mb-4">
+                      <Input
+                        placeholder="Confirmar Contraseña"
+                        holder="Confirmar Contraseña "
+                        icon="lock"
+                        type="password"
+                        name="confirmPassword"
+                        value={confirmPassword}
+                        error={false}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
+        <div className="is-flex is-justify-content-center m-3">
+          {!mostrarCarga && (
+            <div className="m-2">
+              {mostrarCambiarClave ? (
+                <Button text="Guardar" color="primary" action={cambiarClave} />
+              ) : (
+                <Button
+                  text={modoEdicion ? "Guardar" : "Editar"}
+                  color="primary"
+                  action={handleButtonClick}
+                />
+              )}
+            </div>
+          )}
+          {!mostrarCarga && (
+            <div className="m-2">
+              <Button
+                text={botonCambiarClaveTexto}
+                color="primary"
+                action={handleCambiarClaveClick}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

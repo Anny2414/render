@@ -23,7 +23,7 @@ export function Notification(props) {
   };
 
   return (
-    <div className={`notification has-text-centered is-${color} mt-5`}>
+    <div className={`notification has-text-centered is-${color} mt-4`}>
       <b>{msg}</b>
       {isLoading && (
         <div className="carga">

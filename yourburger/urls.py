@@ -3,7 +3,7 @@ from rest_framework import routers
 from yourburger import views
 from django.conf.urls.static import static
 from django.conf import settings
-from .views import UserRegistrationView,PasswordResetView
+from .views import UserRegistrationView
 router = routers.DefaultRouter()
 router.register(r'users', views.UserView, 'users')
 router.register(r'permisos', views.PermissionView, 'permisos')
@@ -19,7 +19,7 @@ router.register(r'Supplies', views.SupplesView, 'supplies')
 router.register(r'content', views.ContentView, 'content')
 
 urlpatterns = [
-    path('email/', PasswordResetView.as_view(), name="reset"),
+   path('enviar-correo/', views.enviar_correo, name='enviar-correo'),
     path('register/', UserRegistrationView.as_view(), name='user-registration'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('api/v1/', include(router.urls)),
