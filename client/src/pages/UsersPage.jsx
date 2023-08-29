@@ -262,7 +262,7 @@ export function UsersPage() {
 
   const handleCreateUser = async (data) => {
     try {
-      await createUser  
+      await createUser(data)
 
       setNotification({
         msg: "Usuario creado exitosamente!",
@@ -280,8 +280,7 @@ export function UsersPage() {
         '{"lastname":["Ensure this field has no more than 50 characters."]}': "El apellido sobrepasa los 50 caracteres!",
       };
 
-      const errorMessage = errorMessages[error.response.request.responseText];
-
+      const errorMessage = errorMessages[error.response.data];
 
       if (errorMessage) {
         return setNotification({
@@ -293,20 +292,6 @@ export function UsersPage() {
       } else if (error.response.data.email) {
         return setNotification({
           msg: "El correo ingresado es invalido!",
-          color: "primary",
-          buttons: false,
-          timeout: 3000,
-        });
-      } else if (error.response.data.document) {
-        return setNotification({
-          msg: "El documento sobrepasa los 10 caracteres!",
-          color: "primary",
-          buttons: false,
-          timeout: 3000,
-        });
-      } else if (error.response.data.phone) {
-        return setNotification({
-          msg: "El teléfono sobrepasa los 10 caracteres!",
           color: "primary",
           buttons: false,
           timeout: 3000,
@@ -536,8 +521,8 @@ export function UsersPage() {
             <Button
                text={
                 <span className="icon">
-                  <i class="fa-solid fa-burger"></i>
-                  <i class="fa-solid fa-plus"></i>
+                  <i className="fa-solid fa-user"></i>
+                  <i className="fa-solid fa-plus"></i>
                 </span>
               }
               color="success"
@@ -557,7 +542,7 @@ export function UsersPage() {
           <div className="column is-fullwidth">
             <Button
               text={<span className="icon">
-              <i class="fa-solid fa-file-pdf"></i>
+              <i className="fa-solid fa-file-pdf"></i>
             </span>}
               color="primary"
               col="fullwidth"
