@@ -25,7 +25,7 @@ class DetallePermiso(models.Model):
 class User(models.Model):
     role = models.ForeignKey(Role, on_delete=models.PROTECT)
     username = models.CharField(max_length=50, unique=True)
-    email = models.EmailField(max_length=254)
+    email = models.EmailField(max_length=254, unique = True)
     password = models.CharField(max_length=50)
     document = models.CharField(max_length=10, null=True, blank=True)
     name = models.CharField(max_length=50, null=True, blank=True)
