@@ -362,7 +362,7 @@ export function ClientPage() {
       <div className="container is-fluid mt-5">
         <div className="columns is-centered">
           <div className="column is-9">
-            <Input holder="Buscar Cliente " icon="magnifying-glass" />
+            <Input holder="Buscar " icon="magnifying-glass" />
           </div>
           <div className="column is-fullwidth">
             <Button

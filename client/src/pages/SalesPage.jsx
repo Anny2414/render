@@ -251,7 +251,7 @@ export function SalesPage() {
         <div className="columns is-centered">
           <div className="column is-9">
             <Input
-              holder="Buscar usuario"
+              holder="Buscar"
               icon="magnifying-glass"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

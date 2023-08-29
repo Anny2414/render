@@ -526,7 +526,7 @@ export function UsersPage() {
 
           <div className="column is-9">
             <Input
-              holder="Buscar usuario"
+              holder="Buscar"
               icon="magnifying-glass"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -536,7 +536,7 @@ export function UsersPage() {
             <Button
                text={
                 <span className="icon">
-                  <i class="fa-solid fa-user"></i>
+                  <i class="fa-solid fa-burger"></i>
                   <i class="fa-solid fa-plus"></i>
                 </span>
               }

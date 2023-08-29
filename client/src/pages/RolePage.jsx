@@ -355,7 +355,7 @@ export function RolePage() {
         <div className="columns is-centered">
           <div className="column is-10">
             <Input
-              holder="Buscar rol"
+              holder="Buscar"
               icon="magnifying-glass"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

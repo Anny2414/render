@@ -246,7 +246,7 @@ export function OrdersPage() {
         </div>
         <div className="columns is-centered">
           <div className="column is-9">
-            <Input holder="Buscar usuario" icon="magnifying-glass" />
+            <Input holder="Buscar" icon="magnifying-glass" />
           </div>
           <div className="column is-fullwidth">
             {rol === "Administrador" ? (<Link to="/sale" className="button is-success is-fullwidth">

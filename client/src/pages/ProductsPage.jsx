@@ -877,7 +877,7 @@ export function ProductsPage() {
         </div>
         <div className="columns is-centered">
           <div className="column  is-fullwidth">
-            <Input holder="Buscar Producto" icon="magnifying-glass" />
+            <Input holder="Buscar" icon="magnifying-glass" />
           </div>
           {User.current == "Administrador" &&<div className="column is-1">
             {/* <Table

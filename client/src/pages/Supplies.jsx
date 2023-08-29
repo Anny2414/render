@@ -407,9 +407,23 @@ const generatePDF = async() => {
           )}
         </div>
         <div className="columns is-centered">
+          
+          <div className="column is-9">
+          <Input
+              holder="Buscar"
+              icon="magnifying-glass"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           <div className="column is-fullwidth">
             <Button
-              text="Crear Ingrediente +"
+              text={
+                <span className="icon">
+                  <i class="fa-solid fa-user"></i>
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+              }
               color="success"
               col="fullwidth"
               action={() =>
@@ -424,17 +438,11 @@ const generatePDF = async() => {
               }
             />
           </div>
-          <div className="column is-9">
-          <Input
-              holder="Buscar usuario"
-              icon="magnifying-glass"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
           <div className="column is-fullwidth">
           <Button
-              text="Generar PDF"
+              text={<span className="icon">
+              <i class="fa-solid fa-file-pdf"></i>
+            </span>}
               color="primary"
               col="fullwidth"
               action={generatePDF}
