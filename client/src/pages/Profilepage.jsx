@@ -56,34 +56,30 @@ export function Profile() {
     const fetchData = async () => {
       try {
         const userApiResponse = await getUser(userId);
-
+        console.log(userApiResponse);
         setProfileData({
           name: userApiResponse.data.name,
           lastname: userApiResponse.data.lastname,
           email: userApiResponse.data.email,
           phone: userApiResponse.data.phone,
           address: userApiResponse.data.address,
+          document: userApiResponse.data.document,
           password: userApiResponse.data.password,
         });
         return;
-      } catch (error) {
-        console.error(
-          "Error al obtener datos del perfil desde userapi:",
-          error
-        );
-      }
+      } catch (error) {}
 
       try {
         const clientUserResponse = await getClientUser(userId);
         const clientUserData = clientUserResponse.data;
-
         setProfileData({
           name: clientUserData.name,
           lastname: clientUserData.lastname,
           email: clientUserData.email,
           phone: clientUserData.phone,
           address: clientUserData.address,
-          password: clientUserData.data.password,
+          password: clientUserData.password,
+          document: clientUserData.document,
         });
         setDatosProvenientesDeClientsAPI(true);
       } catch (error) {
@@ -169,10 +165,10 @@ export function Profile() {
     } else if (name === "email") {
       const validation = validateEmail(value);
       setEmailValidation(validation);
-    }else if (name === "phone") {
+    } else if (name === "phone") {
       const validation = validatenumber(value);
       setnumberValidation(validation);
-    }else if (name === "address") {
+    } else if (name === "address") {
       const validation = validateAdress(value);
       setAddressValidation(validation);
     }
@@ -190,7 +186,7 @@ export function Profile() {
       timeout: 0,
       onConfirm: async () => {
         try {
-          setNotification(null); 
+          setNotification(null);
           mostrarPantallaDeCarga("Realizando Cambios...");
           if (
             profileData.password === oldPassword &&
@@ -229,6 +225,23 @@ export function Profile() {
   };
 
   const guardarCambios = async () => {
+    // Verificar las validaciones antes de intentar guardar los cambios
+    if (
+      !nameValidation.isValid ||
+      !lastnameValidation.isValid ||
+      !numberValidation.isValid ||
+      !emailValidation.isValid ||
+      !AddressValidation.isValid
+    ) {
+      setNotification({
+        msg: "Por favor, corrige los errores en el formulario.",
+        color: "primary",
+        buttons: false,
+        timeout: 3000,
+      });
+      return;
+    }
+
     setNotification({
       msg: "¿Seguro deseas cambiar Los datos del perfil ?",
       color: "warning",
@@ -236,31 +249,28 @@ export function Profile() {
       timeout: 0,
       onConfirm: async () => {
         try {
-        setNotification(null); 
-        mostrarPantallaDeCarga("Guardando cambios...");
-  
-        if (datosProvenientesDeClientsAPI) {
-          await editClientUser(userId, profileData);
-        } else {
-          await editUser(userId, profileData);
-        }
-        setNotification({
-          msg: "Cambios realizados",
-          color: "success",
-          buttons: false,
-          timeout: 2000,
-        });
-        setCamposHabilitados(false);
-        setModoEdicion(false); // Cambiar a modo visualización después de guardar los cambios
-  
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-      } catch (error) {
-        console.error("Error al guardar los cambios:", error);
-      }}})
-  };
+          setNotification(null);
+          mostrarPantallaDeCarga("Guardando cambios...");
 
+          if (datosProvenientesDeClientsAPI) {
+            await editClientUser(userId, profileData);
+          } else {
+            await editUser(userId, profileData);
+          }
+          setNotification({
+            msg: "Cambios realizados",
+            color: "success",
+            buttons: false,
+            timeout: 2000,
+          });
+          setCamposHabilitados(false);
+          setModoEdicion(false); // Cambiar a modo visualización después de guardar los cambios
+        } catch (error) {
+          console.error("Error al guardar los cambios:", error);
+        }
+      },
+    });
+  };
   const handleButtonClick = () => {
     if (mostrarCambiarClave) {
       // Si los campos de cambiar clave están visibles, cambiar la contraseña
@@ -283,19 +293,80 @@ export function Profile() {
     }
     setMostrarCambiarClave(!mostrarCambiarClave);
     setModoEdicion(false); // Cambiar a modo visualización cuando se muestra la pantalla de cambiar clave
-  };
 
+    // Si se muestra la pantalla de cambiar clave, deshabilita los campos; de lo contrario, habilítalos.
+    setCamposHabilitados(!mostrarCambiarClave);
+  };
   return (
     <div>
       <Navbar />
 
-      <div className="hero-body has-text-centered z">
+      <div className="hero-body z">
         {mostrarCarga ? (
           <Carga Texto={mensajeCarga} />
         ) : (
-          <div className="columns y">
-            <div className="column m-1">
-              <div className="is-one-third">
+          <div className="columns">
+            <div className="column is-two-fifths m-2 y">
+              <div className="foto p-2">
+                <img className="imagensita" src={user} alt="Logo" width="60%" />
+                <div className="mb-3 mt-2">
+                  <p>{localStorage.getItem("username")}</p>
+                </div>
+              </div>
+              <div className="m-5 ">
+                <div className=" border has-text-centered">
+                  <b>IDENTIFICACIÓN</b>
+                  <p>{profileData.document}</p>
+                </div>
+              </div>
+              <div className="is-flex is-justify-content-center m-3">
+                {!mostrarCarga && (
+                  <div className="m-2">
+                    {mostrarCambiarClave ? (
+                      <Button
+                        text="Guardar"
+                        color="primary"
+                        action={cambiarClave}
+                      />
+                    ) : (
+                      <Button
+                        text={modoEdicion ? "Guardar" : "Editar"}
+                        color="primary"
+                        action={handleButtonClick}
+                      />
+                    )}
+                  </div>
+                )}
+                {!mostrarCarga && (
+                  <div className="m-2">
+                    <Button
+                      text={botonCambiarClaveTexto}
+                      color="primary"
+                      action={handleCambiarClaveClick}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="column is-half m-5 y">
+              <div className=" has-text-centered">
+                {!notification && (
+                  <div
+                    className="m-3 mb-3"
+                    style={{ borderBottom: "0.05px solid #abaaaa5b" }}
+                  >
+                    <h2
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: "28px",
+                      }}
+                    >
+                      ACTUALIZA
+                    </h2>
+
+                    <small>LA INFORMACIÓN DE TU PERFIL </small>
+                  </div>
+                )}
                 {notification && (
                   <Notification
                     msg={notification.msg}
@@ -307,87 +378,66 @@ export function Profile() {
                   />
                 )}
               </div>
-              <div className="foto">
-                <img className="imagensita" src={user} alt="Logo" width="30%" />
-                <div className="mb-3 mt-2">
-                  <h5>{localStorage.getItem("username")}</h5>
-                </div>
-              </div>
               {!mostrarCambiarClave ? (
-                <div className="columns mt-2">
-                  <div className="column">
-                    <div className="mt-3 ml-3">
-                      <Input
-                        value={profileData.name}
-                        icon="user"
-                        type="text"
-                        name="name"
-                        disabled={!camposHabilitados}
-                       error={!nameValidation.isValid}
-                        onChange={handleInputChange}
-                      />
-                      {!nameValidation.isValid && (
-                        <p className="error-message" style={{ color: "red", fontSize:13}}>
+                <div className="column m-4">
+                  <div className="mt-3 ml-3">
+                    <Input
+                      value={profileData.name}
+                      icon="user"
+                      type="text"
+                      name="name"
+                      disabled={!camposHabilitados}
+                      error={!nameValidation.isValid}
+                      onChange={handleInputChange}
+                    />
+                    {!nameValidation.isValid && (
+                      <p
+                        className="error-message"
+                        style={{ color: "red", fontSize: 12 }}
+                      >
                         {nameValidation.errorMessage}
                       </p>
-                      )}
-                    </div>
-                    <div className="mt-3 ml-3">
-                      <Input
-                        value={profileData.email}
-                        icon="envelope"
-                        type="text"
-                        name="email"
-                        error={!emailValidation.isValid}
-                        disabled={!camposHabilitados}
-                        onChange={handleInputChange}
-                      />
-                      {!emailValidation.isValid && (
-                        <p className="error-message" style={{ color: "red", fontSize:13}}>
-                          {emailValidation.errorMessage}
-                        </p>
-                      )}
-                    </div>
+                    )}
                   </div>
-                  <div className="column">
-                    <div className="mt-3 mr-3">
-                      <Input
-                        value={profileData.lastname}
-                        icon="user"
-                        type="text"
-                        name="lastname"
-                        error={!lastnameValidation.isValid}
-                        disabled={!camposHabilitados}
-                        onChange={handleInputChange}
-                      />
-                      {!lastnameValidation.isValid && (
-                        <p className="error-message" style={{ color: "red", fontSize:13}}>
-                          {lastnameValidation.errorMessage}
-                        </p>
-                      )}
-                      <div className="mt-3 ">
-                        <Input
-                          value={profileData.phone}
-                          icon="phone"
-                          type="text"
-                          name="phone"
-                          error={!numberValidation.isValid}
-                          disabled={!camposHabilitados}
-                          onChange={handleInputChange}
-                        />
-                        {!numberValidation.isValid && (
-                        <p className="error-message" style={{ color: "red", fontSize:13}}>
-                          {numberValidation.errorMessage}
-                        </p>
-                      )}
-                      </div>
-                    </div>
+                  <div className="mt-3 ml-3">
+                    <Input
+                      value={profileData.lastname}
+                      icon="user"
+                      type="text"
+                      name="lastname"
+                      error={!lastnameValidation.isValid}
+                      disabled={!camposHabilitados}
+                      onChange={handleInputChange}
+                    />
+                    {!lastnameValidation.isValid && (
+                      <p
+                        className="error-message"
+                        style={{ color: "red", fontSize: 11 }}
+                      >
+                        {lastnameValidation.errorMessage}
+                      </p>
+                    )}
                   </div>
-                </div>
-              ) : null}
-              {!mostrarCambiarClave ? (
-                <div className="is-row mb-3 ml-1">
-                  <div className="is-full m-2 mr-3">
+                  <div className="mt-3 ml-3">
+                    <Input
+                      value={profileData.phone}
+                      icon="phone"
+                      type="text"
+                      name="phone"
+                      error={!numberValidation.isValid}
+                      disabled={!camposHabilitados}
+                      onChange={handleInputChange}
+                    />
+                    {!numberValidation.isValid && (
+                      <p
+                        className="error-message"
+                        style={{ color: "red", fontSize: 11 }}
+                      >
+                        {numberValidation.errorMessage}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-3 ml-3">
                     <Input
                       value={profileData.address}
                       icon="location-dot"
@@ -397,16 +447,40 @@ export function Profile() {
                       disabled={!camposHabilitados}
                       onChange={handleInputChange}
                     />
-                     {!AddressValidation.isValid && (
-                        <p className="error-message" style={{ color: "red", fontSize:13}}>
-                          {AddressValidation.errorMessage}
-                        </p>
-                      )}
+                    {!AddressValidation.isValid && (
+                      <p
+                        className="error-message"
+                        style={{ color: "red", fontSize: 11 }}
+                      >
+                        {AddressValidation.errorMessage}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="mt-3 ml-3">
+                    <Input
+                      value={profileData.email}
+                      icon="envelope"
+                      type="text"
+                      name="email"
+                      error={!emailValidation.isValid}
+                      disabled={!camposHabilitados}
+                      onChange={handleInputChange}
+                    />
+                    {!emailValidation.isValid && (
+                      <p
+                        className="error-message"
+                        style={{ color: "red", fontSize: 11 }}
+                      >
+                        {emailValidation.errorMessage}
+                      </p>
+                    )}
                   </div>
                 </div>
               ) : null}
+
               {mostrarCambiarClave && (
-                <div className="columns mt-2 ml-5 mr-5">
+                <div className="claves">
                   <div className="column is-full">
                     <div className="">
                       <Input
@@ -425,7 +499,7 @@ export function Profile() {
               )}
 
               {mostrarCambiarClave && (
-                <div className="columns ml-5 mr-5">
+                <div className="columns ml-1 mr-1">
                   <div className="column is-half">
                     <div className="">
                       <Input
@@ -459,30 +533,6 @@ export function Profile() {
             </div>
           </div>
         )}
-        <div className="is-flex is-justify-content-center m-3">
-          {!mostrarCarga && (
-            <div className="m-2">
-              {mostrarCambiarClave ? (
-                <Button text="Guardar" color="primary" action={cambiarClave} />
-              ) : (
-                <Button
-                  text={modoEdicion ? "Guardar" : "Editar"}
-                  color="primary"
-                  action={handleButtonClick}
-                />
-              )}
-            </div>
-          )}
-          {!mostrarCarga && (
-            <div className="m-2">
-              <Button
-                text={botonCambiarClaveTexto}
-                color="primary"
-                action={handleCambiarClaveClick}
-              />
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

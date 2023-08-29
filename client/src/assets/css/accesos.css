@@ -101,7 +101,7 @@ a:hover {
   background-color: rgba(255, 255, 255, 0.429);
   border-radius: 15px;
   border-color: #9a9b97;
-  width: 40%;
+  width: 65%;
   margin: 0 auto; /* Agrega esta línea para centrar horizontalmente el div */
 }
 
@@ -119,7 +119,17 @@ a:hover {
 
 }
 .z {
-  margin-left: 22%;
-  margin-right: 22%;
+  margin-left: 20%;
+  margin-right: 15%;
   margin-top: 2%;
 }
+
+.border{
+  border-bottom: 0.5px solid #abaaaa5b;
+  padding-bottom: 20px;
+}
+
+.claves{
+  margin-top:10%;
+}
+
