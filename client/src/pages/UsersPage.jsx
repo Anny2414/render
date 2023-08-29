@@ -262,7 +262,7 @@ export function UsersPage() {
 
   const handleCreateUser = async (data) => {
     try {
-      await createUser  
+      await createUser(data);
 
       setNotification({
         msg: "Usuario creado exitosamente!",
@@ -270,53 +270,47 @@ export function UsersPage() {
         buttons: false,
         timeout: 3000,
       });
+
+      reloadDataTable();
+      closeModal();
     } catch (error) {
       console.log(error.response);
 
       const errorMessages = {
-        '{"username":["user with this username already exists."]}': "Ya existe este usuario!",
-        '{"username":["Ensure this field has no more than 50 characters."]}': "El usuario sobrepasa los 50 caracteres!",
-        '{"name":["Ensure this field has no more than 50 characters."]}': "El nombre sobrepasa los 50 caracteres!",
-        '{"lastname":["Ensure this field has no more than 50 characters."]}': "El apellido sobrepasa los 50 caracteres!",
+        "username": "Ya existe este usuario!",
+        "name": "El nombre sobrepasa los 50 caracteres!",
+        "lastname": "El apellido sobrepasa los 50 caracteres!",
+        "document": "El documento sobrepasa los 10 caracteres!",
+        "phone": "El teléfono sobrepasa los 10 caracteres!",
+        "email": "El correo ingresado es inválido"
       };
 
-      const errorMessage = errorMessages[error.response.request.responseText];
+      if (error.response && error.response.data) {
+        const errorData = error.response.data;
 
-
-      if (errorMessage) {
-        return setNotification({
-          msg: errorMessage,
-          color: "primary",
-          buttons: false,
-          timeout: 3000,
-        });
-      } else if (error.response.data.email) {
-        return setNotification({
-          msg: "El correo ingresado es invalido!",
-          color: "primary",
-          buttons: false,
-          timeout: 3000,
-        });
-      } else if (error.response.data.document) {
-        return setNotification({
-          msg: "El documento sobrepasa los 10 caracteres!",
-          color: "primary",
-          buttons: false,
-          timeout: 3000,
-        });
-      } else if (error.response.data.phone) {
-        return setNotification({
-          msg: "El teléfono sobrepasa los 10 caracteres!",
+        for (const key in errorData) {
+          const errorMessage = errorMessages[key];
+          if (errorMessage) {
+            setNotification({
+              msg: errorMessage,
+              color: "primary",
+              buttons: false,
+              timeout: 3000,
+            });
+            break;
+          }
+        }
+      } else {
+        setNotification({
+          msg: "Hubo un error en la creación del usuario.",
           color: "primary",
           buttons: false,
           timeout: 3000,
         });
       }
     }
-
-    reloadDataTable();
-    closeModal();
   };
+
 
   const handleEditClick = async (userId) => {
     const res = await getUser(userId);
@@ -411,42 +405,41 @@ export function UsersPage() {
         reloadDataTable();
         closeModal();
       } catch (error) {
+        console.log(error.response);
+
         const errorMessages = {
-          '{"username":["user with this username already exists."]}': "Ya existe este usuario!",
-          '{"username":["Ensure this field has no more than 50 characters."]}': "El usuario sobrepasa los 50 caracteres!",
+          "username": "Ya existe este usuario!",
+          "name": "El nombre sobrepasa los 50 caracteres!",
+          "lastname": "El apellido sobrepasa los 50 caracteres!",
+          "document": "El documento sobrepasa los 10 caracteres!",
+          "phone": "El teléfono sobrepasa los 10 caracteres!",
+          "email": "El correo ingresado es inválido"
         };
-  
-        const errorMessage = errorMessages[error.response.request.responseText];
-  
-        if (errorMessage) {
-          return setNotification({
-            msg: errorMessage,
-            color: "primary",
-            buttons: false,
-            timeout: 3000,
-          });
-        } else if (error.response.data.email) {
-          return setNotification({
-            msg: "El correo ingresado es invalido!",
-            color: "primary",
-            buttons: false,
-            timeout: 3000,
-          });
-        } else if (error.response.data.document) {
-          return setNotification({
-            msg: "El documento sobrepasa los 10 caracteres!",
-            color: "primary",
-            buttons: false,
-            timeout: 3000,
-          });
-        } else if (error.response.data.phone) {
-          return setNotification({
-            msg: "El teléfono sobrepasa los 10 caracteres!",
+
+        if (error.response && error.response.data) {
+          const errorData = error.response.data;
+
+          for (const key in errorData) {
+            const errorMessage = errorMessages[key];
+            if (errorMessage) {
+              setNotification({
+                msg: errorMessage,
+                color: "primary",
+                buttons: false,
+                timeout: 3000,
+              });
+              break;
+            }
+          }
+        } else {
+          setNotification({
+            msg: "Hubo un error en la creación del usuario.",
             color: "primary",
             buttons: false,
             timeout: 3000,
           });
         }
+
       }
     };
 
@@ -534,10 +527,10 @@ export function UsersPage() {
           </div>
           <div className="column is-fullwidth">
             <Button
-               text={
+              text={
                 <span className="icon">
-                  <i class="fa-solid fa-burger"></i>
-                  <i class="fa-solid fa-plus"></i>
+                  <i className="fa-solid fa-user"></i>
+                  <i className="fa-solid fa-plus"></i>
                 </span>
               }
               color="success"
@@ -557,8 +550,8 @@ export function UsersPage() {
           <div className="column is-fullwidth">
             <Button
               text={<span className="icon">
-              <i class="fa-solid fa-file-pdf"></i>
-            </span>}
+                <i className="fa-solid fa-file-pdf"></i>
+              </span>}
               color="primary"
               col="fullwidth"
               action={generatePDF}
