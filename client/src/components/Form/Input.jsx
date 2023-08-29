@@ -17,6 +17,12 @@ export const Input = (props) => {
 
   const styls = style || "";
 
+  const handleKeyDown = (e) => {
+    if (type === "number" && (e.key === "e" || e.key === "E")) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="field-body">
       <div className="field">
@@ -29,6 +35,7 @@ export const Input = (props) => {
             defaultValue={value}
             disabled={disabled}
             onChange={onChange}
+            onKeyDown={handleKeyDown} // Agregar este manejador de eventos
             name={name}
             readOnly={!!read_only}
             {...action}

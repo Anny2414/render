@@ -186,7 +186,56 @@ const generatePDF = async() => {
       });
     } catch (error) {
       console.error("Error al crear el Ingrediente:", error);
+      const errorMessages = {
+        '{"name":["supplies with this name already exists."]}': "Ya existe ese Ingrediente!",
+        '{"name":["Ensure this field has no more than 50 characters."]}': "El ingrediente sobrepasa los 50 caracteres!",
+        '{"price":["Ensure this field has no more than 15 characters."]}': "El precio sobrepasa los 15 caracteres!",
+        '{"stock":["Ensure this field has no more than 10 characters."]}': "El stock sobrepasa los 10 caracteres!",
+
+
+      };
+
+      const errorMessage = errorMessages[error.response.request.responseText];
+      if (errorMessage) {
+        return setNotification({
+          msg: errorMessage,
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      } else if (error.response.data.name == "supplies with this name already exists.") {
+        return setNotification({
+          msg: "Ya existe un ingrediente con ese Nombre",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      } else if (error.response.data.name == "Ensure this field has no more than 50 characters.") {
+        return setNotification({
+          msg: "El nombre sobrepasa los 50 caracteres!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+        
+      }else if (error.response.data.price) {
+        return setNotification({
+          msg: "El precio sobrepasa los 15 digitos!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      }else if (error.response.data.stock) {
+        return setNotification({
+          msg: "El stock sobrepasa los 10 digitos!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      }
     }
+    reloadDataTable();
+    closeModal();
   };
 
   const handleEditClick = async (supplieId) => {
@@ -238,6 +287,53 @@ const generatePDF = async() => {
           timeout: 3000,
         });
       } catch (error) {
+        const errorMessages = {
+          '{"name":["supplies with this name already exists."]}': "Ya existe ese producto!",
+          '{"name":["Ensure this field has no more than 50 characters."]}': "El nombre del ingrediente sobrepasa los 50 caracteres!",
+          '{"price":["Ensure this field has no more than 15 characters."]}': "El precio del ingrediente sobrepasa los 15 digitos!",
+          '{"stock":["Ensure this field has no more than 10 characters."]}': "El stock del ingrediente sobrepasa los 10 digitos!",
+
+
+        };
+        const errorMessage = errorMessages[error.response.request.responseText];
+        if (errorMessage) {
+          return setNotification({
+            msg: errorMessage,
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        } else if (error.response.data.name == "supplies with this name already exists." ) {
+          return setNotification({
+            msg: "Ya existe un Ingrediente con ese nombre!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        } else if (error.response.data.name == "Ensure this field has no more than 50 characters.") {
+          return setNotification({
+            msg: "El nombre del ingrediente sobrepasa los 50 caracteres!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        } else if (error.response.data.price) {
+          return setNotification({
+            msg: "El precio  sobrepasa los 15 digitos!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        }else if (error.response.data.stock) {
+          return setNotification({
+            msg: "El stock  sobrepasa los 10 digitos!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        }
+
+
         console.error("Error al editar el Ingrediente:", error);
       }
     };

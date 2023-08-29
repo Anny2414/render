@@ -10,6 +10,7 @@ import { Input } from "../components/Form/Input.jsx";
 import { Notification } from "../components/Notification.jsx";
 import { Modal } from "../components/Modal.jsx";
 
+
 // CONEXION CON LA API DE USERS Y ROLES
 import {
   getUsers,
@@ -344,77 +345,85 @@ export function ClientPage() {
 
   return (
     <div>
+
       <Navbar />
-        <div className="notifications float">
-          {notification && (
-            <Notification
-              msg={notification.msg}
-              color={notification.color}
-              buttons={notification.buttons}
-              timeout={notification.timeout}
-              onClose={() => setNotification(null)}
-              onConfirm={notification.onConfirm}
-            />
-          )}
-        </div>
-        <div className="container is-fluid mt-5">
-          <div className="columns is-centered">
-            <div className="column is-fullwidth">
-              <Button
-                text="Crear Cliente +"
-                color="success"
-                col="fullwidth"
-                action={() =>
-                  openModal(
-                    "Nuevo Cliente",
-                    fieldsNew,
-                    roles,
-                    true,
-                    handleCreateUser
-                  )
-                }
-              />
-            </div>
-            <div className="column is-9">
-              <Input holder="Buscar Cliente " icon="magnifying-glass" />
-            </div>
-            <div className="column is-fullwidth">
-              <Button
-                text="Generar PDF"
-                color="primary"
-                action={generatePDF}
-                col="fullwidth"
-              />
-            </div>
-          </div>
-          <Table
-            headers={[
-              "#",
-              "document",
-              "username",
-              "name",
-              "lastname",
-              "address",
-              "phone",
-            ]}
-            columns={[
-              "#",
-              "Documento",
-              "Usuario",
-              "Nombre",
-              "Apellido",
-              "Dirección",
-              "Teléfono",
-            ]}
-            data={users}
-            status
-            edit
-            delete
-            onStatusClick={handleStatusChange}
-            onEditClick={handleEditClick}
-            onDeleteClick={handleDeleteClick}
+      <div className="notifications float">
+        {notification && (
+          <Notification
+            msg={notification.msg}
+            color={notification.color}
+            buttons={notification.buttons}
+            timeout={notification.timeout}
+            onClose={() => setNotification(null)}
+            onConfirm={notification.onConfirm}
           />
+        )}
+      </div>
+      <div className="container is-fluid mt-5">
+        <div className="columns is-centered">
+          <div className="column is-9">
+            <Input holder="Buscar Cliente " icon="magnifying-glass" />
+          </div>
+          <div className="column is-fullwidth">
+            <Button
+              text={
+                <span className="icon">
+                  <i class="fa-solid fa-user"></i>
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+              }
+              color="success"
+              col="fullwidth"
+              action={() =>
+                openModal(
+                  "Nuevo Cliente",
+                  fieldsNew,
+                  roles,
+                  true,
+                  handleCreateUser
+                )
+              }
+            />
+          </div>
+          <div className="column is-fullwidth">
+            <Button
+              text={<span className="icon">
+                <i class="fa-solid fa-file-pdf"></i>
+              </span>}
+              color="primary"
+              action={generatePDF}
+              col="fullwidth"
+            />
+          </div>
         </div>
+        <Table
+          headers={[
+            "#",
+            "document",
+            "username",
+            "name",
+            "lastname",
+            "address",
+            "phone",
+          ]}
+          columns={[
+            "#",
+            "Documento",
+            "Usuario",
+            "Nombre",
+            "Apellido",
+            "Dirección",
+            "Teléfono",
+          ]}
+          data={users}
+          status
+          edit
+          delete
+          onStatusClick={handleStatusChange}
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteClick}
+        />
+      </div>
 
       {isOpen && (
         <Modal

@@ -262,7 +262,7 @@ export function UsersPage() {
 
   const handleCreateUser = async (data) => {
     try {
-      await createUser(data);
+      await createUser  
 
       setNotification({
         msg: "Usuario creado exitosamente!",
@@ -271,10 +271,21 @@ export function UsersPage() {
         timeout: 3000,
       });
     } catch (error) {
-      console.log(error);
-      if (error.response.data.username) {
+      console.log(error.response);
+
+      const errorMessages = {
+        '{"username":["user with this username already exists."]}': "Ya existe este usuario!",
+        '{"username":["Ensure this field has no more than 50 characters."]}': "El usuario sobrepasa los 50 caracteres!",
+        '{"name":["Ensure this field has no more than 50 characters."]}': "El nombre sobrepasa los 50 caracteres!",
+        '{"lastname":["Ensure this field has no more than 50 characters."]}': "El apellido sobrepasa los 50 caracteres!",
+      };
+
+      const errorMessage = errorMessages[error.response.request.responseText];
+
+
+      if (errorMessage) {
         return setNotification({
-          msg: "Ya existe este usuario!",
+          msg: errorMessage,
           color: "primary",
           buttons: false,
           timeout: 3000,
@@ -282,6 +293,20 @@ export function UsersPage() {
       } else if (error.response.data.email) {
         return setNotification({
           msg: "El correo ingresado es invalido!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      } else if (error.response.data.document) {
+        return setNotification({
+          msg: "El documento sobrepasa los 10 caracteres!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      } else if (error.response.data.phone) {
+        return setNotification({
+          msg: "El teléfono sobrepasa los 10 caracteres!",
           color: "primary",
           buttons: false,
           timeout: 3000,
@@ -386,9 +411,16 @@ export function UsersPage() {
         reloadDataTable();
         closeModal();
       } catch (error) {
-        if (error.response.data.username) {
+        const errorMessages = {
+          '{"username":["user with this username already exists."]}': "Ya existe este usuario!",
+          '{"username":["Ensure this field has no more than 50 characters."]}': "El usuario sobrepasa los 50 caracteres!",
+        };
+  
+        const errorMessage = errorMessages[error.response.request.responseText];
+  
+        if (errorMessage) {
           return setNotification({
-            msg: "Ya existe este usuario!",
+            msg: errorMessage,
             color: "primary",
             buttons: false,
             timeout: 3000,
@@ -396,6 +428,20 @@ export function UsersPage() {
         } else if (error.response.data.email) {
           return setNotification({
             msg: "El correo ingresado es invalido!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        } else if (error.response.data.document) {
+          return setNotification({
+            msg: "El documento sobrepasa los 10 caracteres!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        } else if (error.response.data.phone) {
+          return setNotification({
+            msg: "El teléfono sobrepasa los 10 caracteres!",
             color: "primary",
             buttons: false,
             timeout: 3000,

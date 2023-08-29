@@ -40,8 +40,8 @@ class User(models.Model):
 
 class Supplies(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    price = models.FloatField(default = 0)
-    stock = models.IntegerField(default = 0)
+    price = models.FloatField(max_length=15, default = 0)
+    stock = models.IntegerField(max_length=10, default = 0)
     status = models.BooleanField(default=True)
 
     def __str__(self):
@@ -49,7 +49,7 @@ class Supplies(models.Model):
 
 class Products(models.Model):
     name = models.CharField(max_length=50,unique=True)
-    price = models.FloatField()
+    price = models.FloatField(max_length=15)
     image = models.ImageField(upload_to='media/', default= "")
     description = models.TextField()
     status = models.BooleanField(default=True)

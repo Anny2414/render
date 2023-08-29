@@ -68,18 +68,19 @@ function TableRow({
         <td>
           <Button
             color="warning"
-            type="button"
+            type="button "
             text={
-              <span className="icon">
+              <span className="icon has-text-white">
                 <i className="fa-solid fa-pencil"></i>
               </span>
             }
             action={() => {
-              row.indexer != undefined
+              row.indexer != undefined 
                 ? onEditClick(row, row.indexer)
                 : onEditClick(row.id);
             }}
             disabled={isAdministradorOrCliente || currentUser === row.username}
+            
           />
         </td>
       )}

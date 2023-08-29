@@ -37,18 +37,18 @@ export function Notification(props) {
         <div>
           <br />
           <button
-            className="button is-small is-error mt-3"
-            type="button"
-            onClick={handleCancelClick}
-          >
-            Cancelar
-          </button>
-          <button
-            className="button is-small is-success mt-3 ml-4"
+            className="button is-small is-success mt-3"
             type="button"
             onClick={onConfirm}
           >
             Confirmar
+          </button>
+          <button
+            className="button is-small is-error mt-3 ml-4"
+            type="button"
+            onClick={handleCancelClick}
+          >
+            Cancelar
           </button>
         </div>
       )}
