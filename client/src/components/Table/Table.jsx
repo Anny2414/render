@@ -67,7 +67,7 @@ function TableRow({
       {edit && (
         <td>
           <Button
-            color="warning"
+            colorHTML = "#FFC436"
             type="button "
             text={
               <span className="icon has-text-white">

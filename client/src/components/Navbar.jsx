@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/img/only-text.png";
 import { getclients } from "../api/clients.api"
@@ -43,7 +43,6 @@ const id = userData.token.user_id;
           } else {
             window.location.replace("/login");
           }
-          console.log(username);
         }
       } catch (error) {
         // Handle any errors that occur during the API calls
@@ -53,7 +52,6 @@ const id = userData.token.user_id;
     };
     api()
   }, []);
-
   function cerrarSesion() {
     localStorage.removeItem('Token')
     localStorage.removeItem('name')

@@ -523,9 +523,23 @@ export function UsersPage() {
           )}
         </div>
         <div className="columns is-centered">
+
+          <div className="column is-9">
+            <Input
+              holder="Buscar usuario"
+              icon="magnifying-glass"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           <div className="column is-fullwidth">
             <Button
-              text="Crear Usuario +"
+               text={
+                <span className="icon">
+                  <i class="fa-solid fa-user"></i>
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+              }
               color="success"
               col="fullwidth"
               action={() =>
@@ -540,17 +554,11 @@ export function UsersPage() {
               }
             />
           </div>
-          <div className="column is-9">
-            <Input
-              holder="Buscar usuario"
-              icon="magnifying-glass"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
           <div className="column is-fullwidth">
             <Button
-              text="Generar PDF"
+              text={<span className="icon">
+              <i class="fa-solid fa-file-pdf"></i>
+            </span>}
               color="primary"
               col="fullwidth"
               action={generatePDF}

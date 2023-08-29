@@ -373,7 +373,7 @@ export function OrderPage() {
 
                     <div className="is-flex">
                         <div className="is-justify-content-flex-start mr-auto">
-                            <h1 className="h1">Pedido</h1>
+                            <h1 className="h1">Carrito</h1>
                         </div>
                         <div className="is-justify-content-flex-end ml-auto  mt-3">
                             <Link to="/orders" className="button is-warning">Tus pedidos</Link>
@@ -403,11 +403,11 @@ export function OrderPage() {
 <div className="card card-info">
         <div className="card-header px-2">
           <h1 className="h1" >Detalle</h1>
-          <div className="hr"></div>
         </div>
         <div className="card-content p-6">
           {products.map((product) => (
-            <div className="mb-3" key={product.id}>
+            <div>
+              <div className="my-3" key={product.id}>
               <div className="is-flex ">
                 <div className="producto">
                   <p>{product.name}</p>
@@ -416,6 +416,10 @@ export function OrderPage() {
                   <p>{product.price}</p>
                 </div>
               </div>
+            </div>
+            <div className="hr">
+
+            </div>
             </div>
           ))}
           {/* <div className="mb-3">
@@ -450,7 +454,8 @@ export function OrderPage() {
           </div> */}
         </div>
         <div className="card-footer ">
-          <div className="mb-3 p-6">
+
+          <div className="mb-3 p-6 ">
             <div className="is-flex">
               <div className="producto">
                 <h2>Total</h2>
@@ -459,6 +464,7 @@ export function OrderPage() {
                 <h2>{total}</h2>
               </div>
             </div>
+          <div className="hr"></div>
           </div>
           <div className="is-flex is-full">
             <div className="m-auto pb-5">

@@ -161,8 +161,8 @@ export function OrdersPage() {
   };
 
 
-  const onContentClick = async(SalesId) =>{
-    
+  const onContentClick = async (SalesId) => {
+
   }
   const handleEditClick = async (SalesId) => {
     const res = await getOrder(SalesId);
@@ -245,17 +245,28 @@ export function OrdersPage() {
           )}
         </div>
         <div className="columns is-centered">
-          <div className="column is-fullwidth">
-            {rol === "Administrador" ? (<Link to="/sale" className="button is-success is-fullwidth">Nuevo Pedido + </Link>) : (<Link to="/order" className="button is-success is-fullwidth">Nuevo Pedido + </Link>)}
-          </div>
           <div className="column is-9">
             <Input holder="Buscar usuario" icon="magnifying-glass" />
+          </div>
+          <div className="column is-fullwidth">
+            {rol === "Administrador" ? (<Link to="/sale" className="button is-success is-fullwidth">
+              <span className="icon">
+              <i class="fa-solid fa-file-invoice"></i>
+                <i class="fa-solid fa-plus"></i>
+              </span>
+            </Link>) : (<Link to="/order" className="button is-success is-fullwidth">
+              <span className="icon">
+                <i class="fa-solid fa-file-invoice"></i>
+                <i class="fa-solid fa-plus"></i>
+              </span> </Link>)}
           </div>
           {rol === "Administrador" && (
             <div className="column is-fullwidth">
               <Button
-                text="Generar PDF"
-                color="primary" 
+                text={<span className="icon">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </span>}
+                 color="primary"
                 col="fullwidth"
                 action={generatePDF}
               />            </div>
@@ -278,7 +289,7 @@ export function OrdersPage() {
             delete={true}
             onEditClick={handleEditClick}
             onDeleteClick={handleDeleteClick}
-            onContentClick = {onContentClick}
+            onContentClick={onContentClick}
             data={order}
           />
         ) : (

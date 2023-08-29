@@ -7,7 +7,7 @@ import { SwitchP } from "../components/Form/SwitchP";
 import { useState } from "react";
 
 export function ViewP(props) {
-  const { data, onEditClick, onDeleteClick, onViewDetails, onStatusClick, onAdd } = props;
+  const { data, onEditClick, onDeleteClick, onViewDetails, onStatusClick, onAdd, Administrador } = props;
 
   return (
     <div className="product-grid">
@@ -24,13 +24,13 @@ export function ViewP(props) {
         
         return (
           <div className="card card-pedido p-5" key={product.id}>
-            <div className="is-flex is-justify-content-center">
+            {Administrador == "Administrador" && <div className="is-flex is-justify-content-center">
               <div className=" mx-2">
                 <Button
-                  color="warning"
-                  type="button"
+                  colorHTML = "#FFC436"
+                  type="button "
                   text={
-                    <span className="icon">
+                    <span className="icon has-text-white">
                       <i className="fa-solid fa-pencil"></i>
                     </span>
                   }
@@ -54,7 +54,7 @@ export function ViewP(props) {
                 change={() => handleSwitchChange(product.id, statusSlider)}
                 checked={statusSlider}
               />
-            </div>
+            </div>}
             <br />
             <br />
             {/* <Link to="/"> */}
@@ -85,7 +85,13 @@ export function ViewP(props) {
               </div>
               <div className="is-justify-content-flex-end ml-auto mt-3">
                 <Button
-                text = "Agregar"
+                text = {
+                  <span>
+                    {/* Agregar */}
+                    <i class="fa-solid fa-cart-plus"></i>
+
+                  </span>
+                }
                 color = "success"
                 action = {() => onAdd(product)}
                 />

@@ -1,6 +1,8 @@
 // GENERACION DE PDF
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import CryptoJS from "crypto-js";
+
 
 import Logo from "../assets/img/Logo.png"; // Imagen que sera usada en el PDF
 
@@ -29,7 +31,8 @@ import {
 } from "../api/products.api.js";
 import { getSupplies, getSupplie, getSupplieName } from "../api/supplies.api.js";
 import { createContent, deleteContent, editContent, getContents } from "../api/content.api.js";
-
+import { getUser } from "../api/users.api";
+import { getUser as getclient } from "../api/clients.api";
 // import {createContent} from "../api/"
 
 export function ProductsPage() {
@@ -40,8 +43,15 @@ export function ProductsPage() {
   const [ingredientes, setIngredientes] = useState([]);
   const [ingredientes1, setIngredientes1] = useState([]);
 
-  const ingredientesPrueba = useRef([]);
+  const User = useRef([]);
   const selectedOptionRef = useRef();
+
+  const encryptionKey = 'Yourburger';
+  const encryptedUserData = localStorage.getItem('Token');
+  const decryptedBytes = CryptoJS.AES.decrypt(encryptedUserData, encryptionKey);
+  const decryptedUserDataJSON = decryptedBytes.toString(CryptoJS.enc.Utf8);
+  const userData = JSON.parse(decryptedUserDataJSON);
+  
 
   //Generar PDF
   const generatePDF = async () => {
@@ -113,12 +123,29 @@ export function ProductsPage() {
 
 
   useEffect(() => {
+
     const currentIngredients = ingredientes;
     const storedDetail = Cookies.get("orderDetail");
     if (storedDetail) {
       setOrder(JSON.parse(storedDetail));
     }
   }, [ingredientes]);
+  useEffect(() => {
+    const id = userData.token.user_id;
+        const api = async () => {
+          
+          try {
+            const resUser = await getUser(id);
+            User.current = "Administrador"
+            console.log("admin");
+          } catch (error) {
+            User.current = "Cliente"
+          }
+           
+         
+        };
+        api()
+      }, []);
 
   const reloadDataTable = async () => {
     setProducts([]);
@@ -349,7 +376,7 @@ export function ProductsPage() {
           buttons: false,
           timeout: 3000,
         });
-      }else if (error.response.data.price) {
+      } else if (error.response.data.price) {
         return setNotification({
           msg: "El precio sobrepasa los 15 digitos!",
           color: "primary",
@@ -501,422 +528,430 @@ export function ProductsPage() {
             if (contentIndex.length === 0) {
               await createContent(suppli)
               // await deleteContent(contentIndex[0].id)
-            } 
             }
           }
-          const updateData = new FormData();
-          updateData.append("name", data.name);
-          updateData.append("price", data.price);
-          // Agrega cada archivo individualmente
-          for (let i = 0; i < data.image.length; i++) {
-            updateData.append("image", data.image[i]);
-          }
-
-          updateData.append("description", data.description);
-
-          const res = await editProduct(productId, updateData);
-          const updatedProduct = res.data;
-
-          if (contentss.length > 0) {
-            for (let i = 0; i < contentss.length; i++) {
-              const content = contents[i];
-              const updateContent = new FormData();
-              updateContent.append("product", id);
-              updateContent.append("supplies", content.supplies);
-              updateContent.append("count", content.count);
-
-              await editContent(content.id, updateContent);
-            }
-          }
-
-          closeModal();
-          reloadDataTable();
-          setNotification({
-            msg: "Producto editado exitosamente!",
-            color: "warning",
-            buttons: false,
-            timeout: 3000,
-          });
-
-
-          // Actualizar la lista de productos sin recargar la página
-          setProducts((prevProducts) => {
-            const updatedProducts = prevProducts.map((product) => {
-              if (product.id === productId) {
-                // Actualizar los datos del producto editado
-                return {
-                  ...product,
-                  name: name,
-                  price: price,
-                  image: updatedProduct.image, // Actualizar el campo "image" con la URL de la nueva imagen
-                  description: description,
-                  // Actualizar otros campos si es necesario
-                };
-              }
-              return product;
-            });
-            return updatedProducts;
-          });
-        } catch (error) {
-          const errorMessages = {
-            '{"name":["products with this name already exists."]}': "Ya existe ese producto!",
-            '{"name":["Ensure this field has no more than 50 characters."]}': "El nombre del producto sobrepasa los 50 caracteres!",
-            '{"price":["Ensure this field has no more than 15 characters."]}': "El precio del producto sobrepasa los 15 digitos!",
-
-          };
-          const errorMessage = errorMessages[error.response.request.responseText];
-          if (errorMessage) {
-            return setNotification({
-              msg: errorMessage,
-              color: "primary",
-              buttons: false,
-              timeout: 3000,
-            });
-          } else if (error.response.data.name == "products with this name already exists." ) {
-            return setNotification({
-              msg: "Ya existe un producto con ese nombre!",
-              color: "primary",
-              buttons: false,
-              timeout: 3000,
-            });
-          } else if (error.response.data.name == "Ensure this field has no more than 50 characters.") {
-            return setNotification({
-              msg: "El nombre del producto sobrepasa los 50 caracteres!",
-              color: "primary",
-              buttons: false,
-              timeout: 3000,
-            });
-          } else if (error.response.data.price) {
-            return setNotification({
-              msg: "El precio  sobrepasa los 15 digitos!",
-              color: "primary",
-              buttons: false,
-              timeout: 3000,
-            });
-          }
-
-          console.error("Error al editar el Producto:", error);
         }
-      };
-
-      openModal(
-        "Editar producto",
-        fieldsEdit,
-        products,
-        "name",
-        true,
-        handleEditProduct
-      );
-    };
-
-    const handleAddclick = async (product) => {
-      const suppliesProduct = await contents.filter(
-        (content) => content.product == product.id
-        //revisar
-      );
-      const content = contents.filter((content) => content.product == product.id)
-      //revisar
-
-      const fieldsAdd = [
-        {
-          title: "Producto",
-          type: "text",
-          name: "name",
-          icon: "burger",
-          col: "half",
-          required: "true",
-          value: product.name,
-          readonly: true,
-        },
-        {
-          title: "Precio",
-          type: "number",
-          name: "price",
-          icon: "dollar",
-          col: "half",
-          required: "true",
-          value: product.price,
-          readonly: true,
-        },
-        {
-          title: "Imagen",
-          type: "image",
-          name: "image",
-          icon: "dollar",
-          col: "full",
-          image: product.image,
-        },
-        {
-          title: "Descripción",
-          type: "text",
-          name: "description",
-          icon: "comment",
-          col: "full",
-          required: "true",
-          value: product.description,
-          readonly: true,
-        },
-        {
-          title: "Ingredientes",
-          hasButton: true,
-          textButton: "+",
-          type: "select",
-          name: "supplies",
-          icon: "list",
-          required: "false",
-          col: "full",
-          customOptions: [
-            { id: 0, name: "No seleccionado" },
-            ...suppliesProduct,
-          ],
-          nameSelect: "name",
-
-          handleOptionChange: handleOptionChange,
-          actionButton: anadirIngrediente,
-        },
-        {
-          type: "list",
-          columns: ['Nombre', 'Precio'],
-          headers: ['name', 'price'],
-          data: ingredientes,
-          delete: true,
-          // onDeleteClick: clickDelete
-        },
-      ];
-
-      const handleAdd = (data) => {
-        const { name, price, description } = data;
-        const idP = products.filter((product) => product.name == name);
-        
-        console.log(idP[0].id);
-       
-        try {
-          const data2 = {
-            id: idP[0].id,
-            name,
-            price,
-            description,
-            image: idP[0].image,
-            supplies: [],
-            amount: 1,
-          };
-          if (ingredientes.length>0) {
-            data2.supplies = ingredientes
-          } else {
-            data2.supplies = content
-          }
-          setOrder((prevOrder) => {
-            Cookies.remove("orderDetail");
-            const newOrder = [...prevOrder, data2];
-            Cookies.set("orderDetail", JSON.stringify(newOrder));
-            return newOrder;
-          });
-
-          closeModal();
-          setNotification({
-            msg: " El Producto fue añadido al Carrito!",
-            color: "warning",
-            buttons: false,
-            timeout: 3000,
-          });
-        } catch (error) {
-          console.log("Error al añadir a carito" + error);
+        const updateData = new FormData();
+        updateData.append("name", data.name);
+        updateData.append("price", data.price);
+        // Agrega cada archivo individualmente
+        for (let i = 0; i < data.image.length; i++) {
+          updateData.append("image", data.image[i]);
         }
-      };
-      openModal(
-        "Añadir al Carrito",
-        fieldsAdd,
-        [
-          { id: 0, name: "No seleccionado", price: 0, stock: 0, status: false },
-          ...supplies,
-        ],
-        "name",
-        true,
-        handleAdd
-      );
-    };
 
-    const handleViewDetailsClicks = async (productId) => {
-      const res = await getProduct(productId);
-      const product = res.data;
-      const content = contents.filter((content) => content.product == product.id)
-      console.log(content);
+        updateData.append("description", data.description);
 
+        const res = await editProduct(productId, updateData);
+        const updatedProduct = res.data;
 
-      const fieldsview = [
-        {
-          title: "Producto",
-          type: "text",
-          name: "name",
-          icon: "burger",
-          col: "half",
-          required: "true",
-          value: product.name,
-          readonly: true,
-        },
-        {
-          title: "Precio",
-          type: "number",
-          name: "price",
-          icon: "dollar",
-          col: "half",
-          required: "true",
-          value: product.price,
-          readonly: true,
-        },
-        {
-          title: "Imagen",
-          type: "image",
-          name: "image",
-          icon: "dollar",
-          col: "full",
-          image: product.image,
-        },
-        {
-          title: "Descripción",
-          type: "text",
-          name: "description",
-          icon: "comment",
-          col: "full",
-          required: "true",
-          value: product.description,
-          readonly: true,
-        },
-        {
-          type: "list",
-          columns: ['Nombre'],
-          headers: ['name'],
-          data: content,
-        },
-      ];
+        if (contentss.length > 0) {
+          for (let i = 0; i < contentss.length; i++) {
+            const content = contents[i];
+            const updateContent = new FormData();
+            updateContent.append("product", id);
+            updateContent.append("supplies", content.supplies);
+            updateContent.append("count", content.count);
 
-      openModal("Ver producto", fieldsview, products, "status", false);
-    };
+            await editContent(content.id, updateContent);
+          }
+        }
 
-    const handleStatusChange = async (productId, status) => {
-      try {
-        await updateProductStatus(productId, !status);
+        closeModal();
+        reloadDataTable();
         setNotification({
-          msg: "Estado cambiado exitosamente!",
-          color: "info",
+          msg: "Producto editado exitosamente!",
+          color: "warning",
           buttons: false,
           timeout: 3000,
         });
 
+
+        // Actualizar la lista de productos sin recargar la página
+        setProducts((prevProducts) => {
+          const updatedProducts = prevProducts.map((product) => {
+            if (product.id === productId) {
+              // Actualizar los datos del producto editado
+              return {
+                ...product,
+                name: name,
+                price: price,
+                image: updatedProduct.image, // Actualizar el campo "image" con la URL de la nueva imagen
+                description: description,
+                // Actualizar otros campos si es necesario
+              };
+            }
+            return product;
+          });
+          return updatedProducts;
+        });
       } catch (error) {
-        console.error(error);
+        const errorMessages = {
+          '{"name":["products with this name already exists."]}': "Ya existe ese producto!",
+          '{"name":["Ensure this field has no more than 50 characters."]}': "El nombre del producto sobrepasa los 50 caracteres!",
+          '{"price":["Ensure this field has no more than 15 characters."]}': "El precio del producto sobrepasa los 15 digitos!",
+
+        };
+        const errorMessage = errorMessages[error.response.request.responseText];
+        if (errorMessage) {
+          return setNotification({
+            msg: errorMessage,
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        } else if (error.response.data.name == "products with this name already exists.") {
+          return setNotification({
+            msg: "Ya existe un producto con ese nombre!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        } else if (error.response.data.name == "Ensure this field has no more than 50 characters.") {
+          return setNotification({
+            msg: "El nombre del producto sobrepasa los 50 caracteres!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        } else if (error.response.data.price) {
+          return setNotification({
+            msg: "El precio  sobrepasa los 15 digitos!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        }
+
+        console.error("Error al editar el Producto:", error);
       }
     };
 
-    const handleDeleteClick = async (productId) => {
-      setNotification({
-        msg: "¿Seguro deseas eliminar el Producto?",
-        color: "warning",
-        buttons: true,
-        timeout: 0,
-        onConfirm: async () => {
-          try {
-            await deleteProduct(productId);
-            setNotification({
-              msg: "Producto eliminado exitosamente!",
-              color: "info",
-              buttons: false,
-              timeout: 3000,
-            });
-            reloadDataTable();
+    openModal(
+      "Editar producto",
+      fieldsEdit,
+      products,
+      "name",
+      true,
+      handleEditProduct
+    );
+  };
 
-          } catch {
-            console.error("Error al eliminar:");
-          }
-        },
-      });
+  const handleAddclick = async (product) => {
+    const suppliesProduct = await contents.filter(
+      (content) => content.product == product.id
+      //revisar
+    );
+    const content = contents.filter((content) => content.product == product.id)
+    //revisar
+
+    const fieldsAdd = [
+      {
+        title: "Producto",
+        type: "text",
+        name: "name",
+        icon: "burger",
+        col: "half",
+        required: "true",
+        value: product.name,
+        readonly: true,
+      },
+      {
+        title: "Precio",
+        type: "number",
+        name: "price",
+        icon: "dollar",
+        col: "half",
+        required: "true",
+        value: product.price,
+        readonly: true,
+      },
+      {
+        title: "Imagen",
+        type: "image",
+        name: "image",
+        icon: "dollar",
+        col: "full",
+        image: product.image,
+      },
+      {
+        title: "Descripción",
+        type: "text",
+        name: "description",
+        icon: "comment",
+        col: "full",
+        required: "true",
+        value: product.description,
+        readonly: true,
+      },
+      {
+        title: "Ingredientes",
+        hasButton: true,
+        textButton: "+",
+        type: "select",
+        name: "supplies",
+        icon: "list",
+        required: "false",
+        col: "full",
+        customOptions: [
+          { id: 0, name: "No seleccionado" },
+          ...suppliesProduct,
+        ],
+        nameSelect: "name",
+
+        handleOptionChange: handleOptionChange,
+        actionButton: anadirIngrediente,
+      },
+      {
+        type: "list",
+        columns: ['Nombre', 'Precio'],
+        headers: ['name', 'price'],
+        data: ingredientes,
+        delete: true,
+        // onDeleteClick: clickDelete
+      },
+    ];
+
+    const handleAdd = (data) => {
+      const { name, price, description } = data;
+      const idP = products.filter((product) => product.name == name);
+
+      console.log(idP[0].id);
+
+      try {
+        const data2 = {
+          id: idP[0].id,
+          name,
+          price,
+          description,
+          image: idP[0].image,
+          supplies: [],
+          amount: 1,
+        };
+        if (ingredientes.length > 0) {
+          data2.supplies = ingredientes
+        } else {
+          data2.supplies = content
+        }
+        setOrder((prevOrder) => {
+          Cookies.remove("orderDetail");
+          const newOrder = [...prevOrder, data2];
+          Cookies.set("orderDetail", JSON.stringify(newOrder));
+          return newOrder;
+        });
+
+        closeModal();
+        setNotification({
+          msg: " El Producto fue añadido al Carrito!",
+          color: "warning",
+          buttons: false,
+          timeout: 3000,
+        });
+      } catch (error) {
+        console.log("Error al añadir a carito" + error);
+      }
     };
+    openModal(
+      "Añadir al Carrito",
+      fieldsAdd,
+      [
+        { id: 0, name: "No seleccionado", price: 0, stock: 0, status: false },
+        ...supplies,
+      ],
+      "name",
+      true,
+      handleAdd
+    );
+  };
 
-    return (
-      <div>
-        <Navbar />
-        <div className="container is-fluid mt-5">
-          <div className="notifications float">
-            {notification && (
-              <Notification
-                msg={notification.msg}
-                color={notification.color}
-                buttons={notification.buttons}
-                timeout={notification.timeout}
-                onClose={() => setNotification(null)}
-                onConfirm={notification.onConfirm}
-              />
-            )}
+  const handleViewDetailsClicks = async (productId) => {
+    const res = await getProduct(productId);
+    const product = res.data;
+    const content = contents.filter((content) => content.product == product.id)
+    console.log(content);
+
+
+    const fieldsview = [
+      {
+        title: "Producto",
+        type: "text",
+        name: "name",
+        icon: "burger",
+        col: "half",
+        required: "true",
+        value: product.name,
+        readonly: true,
+      },
+      {
+        title: "Precio",
+        type: "number",
+        name: "price",
+        icon: "dollar",
+        col: "half",
+        required: "true",
+        value: product.price,
+        readonly: true,
+      },
+      {
+        title: "Imagen",
+        type: "image",
+        name: "image",
+        icon: "dollar",
+        col: "full",
+        image: product.image,
+      },
+      {
+        title: "Descripción",
+        type: "text",
+        name: "description",
+        icon: "comment",
+        col: "full",
+        required: "true",
+        value: product.description,
+        readonly: true,
+      },
+      {
+        type: "list",
+        columns: ['Nombre'],
+        headers: ['name'],
+        data: content,
+      },
+    ];
+
+    openModal("Ver producto", fieldsview, products, "status", false);
+  };
+
+  const handleStatusChange = async (productId, status) => {
+    try {
+      await updateProductStatus(productId, !status);
+      setNotification({
+        msg: "Estado cambiado exitosamente!",
+        color: "info",
+        buttons: false,
+        timeout: 3000,
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteClick = async (productId) => {
+    setNotification({
+      msg: "¿Seguro deseas eliminar el Producto?",
+      color: "warning",
+      buttons: true,
+      timeout: 0,
+      onConfirm: async () => {
+        try {
+          await deleteProduct(productId);
+          setNotification({
+            msg: "Producto eliminado exitosamente!",
+            color: "info",
+            buttons: false,
+            timeout: 3000,
+          });
+          reloadDataTable();
+
+        } catch {
+          console.error("Error al eliminar:");
+        }
+      },
+    });
+  };
+
+  return (
+    <div>
+      <Navbar />
+      <div className="container is-fluid mt-5">
+        <div className="notifications float">
+          {notification && (
+            <Notification
+              msg={notification.msg}
+              color={notification.color}
+              buttons={notification.buttons}
+              timeout={notification.timeout}
+              onClose={() => setNotification(null)}
+              onConfirm={notification.onConfirm}
+            />
+          )}
+        </div>
+        <div className="columns is-centered">
+          <div className="column  is-fullwidth">
+            <Input holder="Buscar Producto" icon="magnifying-glass" />
           </div>
-          <div className="columns is-centered">
-            <div className="column is-fullwidth">
-              {/* <Table
+          {User.current == "Administrador" &&<div className="column is-1">
+            {/* <Table
               headers =  {[ "Nombre" , "Precio"]}
               key =  {[ "name" , "price"]}
               data = {[]}
             /> */}
-              <Button
-                text="Crear Producto +"
-                color="success"
-                col="fullwidth"
-                action={() =>
-                  openModal(
-                    "Nuevo producto",
-                    fieldsNew,
-                    [
-                      {
-                        id: 0,
-                        name: "No seleccionado",
-                        price: 0,
-                        stock: 0,
-                        status: true,
-                      },
-                      ...supplies,
-                    ],
-                    "name",
-                    //revisar
-                    true,
-                    handleCreateProduct
-                  )
-                }
-              />
-            </div>
-            <div className="column is-9">
-              <Input holder="Buscar Producto" icon="magnifying-glass" />
-            </div>
-            <div className="column is-fullwidth">
-              <Button
-                text="Generar PDF"
-                color="primary"
-                col="fullwidth"
-                action={generatePDF}
-              />
-
-            </div>
+            <Button
+              text={
+                <span className="icon">
+                  <i class="fa-solid fa-burger"></i>
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+              }
+              color="success"
+              col="fullwidth"
+              action={() =>
+                openModal(
+                  "Nuevo producto",
+                  fieldsNew,
+                  [
+                    {
+                      id: 0,
+                      name: "No seleccionado",
+                      price: 0,
+                      stock: 0,
+                      status: true,
+                    },
+                    ...supplies,
+                  ],
+                  "name",
+                  //revisar
+                  true,
+                  handleCreateProduct
+                )
+              }
+            />
           </div>
-          <ViewP
-            onStatusClick={handleStatusChange}
-            onEditClick={handleEditClick}
-            onDeleteClick={handleDeleteClick}
-            onViewDetails={handleViewDetailsClicks}
-            onAdd={handleAddclick}
-            data={products}
-            Administrador={true}
-            generatePDF={generatePDF}
-          />
-        </div>
+          }
+          {User.current == "Administrador" &&<div className="column is-1">
+            <Button
+              text={<span className="icon">
+                <i class="fa-solid fa-file-pdf"></i>
+              </span>}
+              color="primary"
+              col="fullwidth"
+              action={generatePDF}
+            />
 
-        {isOpen && (
-          <Modal
-            title={modalConfig.title}
-            fields={modalConfig.fields}
-            dataSelect={modalConfig.dataSelect}
-            nameSelect={modalConfig.nameSelect}
-            onClose={closeModal}
-            buttonSubmit={modalConfig.buttonSubmit}
-            submit={modalConfig.submit}
-          />
-        )}
+          </div>}
+        </div>
+        <ViewP
+          onStatusClick={handleStatusChange}
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteClick}
+          onViewDetails={handleViewDetailsClicks}
+          onAdd={handleAddclick}
+          data={products}
+          Administrador={User.current}
+          generatePDF={generatePDF}
+        />
       </div>
-    );
-  }
+
+      {isOpen && (
+        <Modal
+          title={modalConfig.title}
+          fields={modalConfig.fields}
+          dataSelect={modalConfig.dataSelect}
+          nameSelect={modalConfig.nameSelect}
+          onClose={closeModal}
+          buttonSubmit={modalConfig.buttonSubmit}
+          submit={modalConfig.submit}
+        />
+      )}
+    </div>
+  );
+}

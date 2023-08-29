@@ -244,9 +244,9 @@ export function RolePage() {
           '{"name":["role with this name already exists."]}': "Ya existe este rol!",
           '{"name":["Ensure this field has no more than 50 characters."]}': "El nombre del rol sobrepasa los 50 caracteres!",
         };
-  
+
         const errorMessage = errorMessages[error.response.request.responseText];
-  
+
         if (errorMessage) {
           return setNotification({
             msg: errorMessage,
@@ -353,10 +353,22 @@ export function RolePage() {
           )}
         </div>
         <div className="columns is-centered">
+          <div className="column is-10">
+            <Input
+              holder="Buscar rol"
+              icon="magnifying-glass"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           <div className="column is-fullwidth">
             <Button
-              text="Crear Rol +"
-              color="success"
+              text={
+                <span className="icon">
+                  <i class="fa-solid fa-user"></i>
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+              } color="success"
               col="fullwidth"
               action={() =>
                 openModal(
@@ -368,14 +380,6 @@ export function RolePage() {
                   handleCreateRole
                 )
               }
-            />
-          </div>
-          <div className="column is-10">
-            <Input
-              holder="Buscar rol"
-              icon="magnifying-glass"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>

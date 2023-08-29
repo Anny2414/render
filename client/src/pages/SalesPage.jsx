@@ -29,10 +29,10 @@ export function SalesPage() {
     const statusMatches = sale.status.toLowerCase().includes(searchString);
     const createAtMatches = sale.create_at.toLowerCase().includes(searchString);
     const updateAtMatches = sale.update_at.toLowerCase().includes(searchString);
-  
+
     return userMatches || statusMatches || createAtMatches || updateAtMatches;
   });
-  
+
 
   const generatePDF = () => {
     const doc = new jsPDF();
@@ -236,7 +236,7 @@ export function SalesPage() {
     <div>
       <Navbar />
       <div className="container is-fluid mt-5">
-      <div className="notifications float">
+        <div className="notifications float">
           {notification && (
             <Notification
               msg={notification.msg}
@@ -249,11 +249,8 @@ export function SalesPage() {
           )}
         </div>
         <div className="columns is-centered">
-          <div className="column is-fullwidth">
-            <Link to="/sale" className="button is-success is-fullwidth">Crear Venta +</Link>
-          </div>
           <div className="column is-9">
-          <Input
+            <Input
               holder="Buscar usuario"
               icon="magnifying-glass"
               value={searchQuery}
@@ -261,31 +258,40 @@ export function SalesPage() {
             />
           </div>
           <div className="column is-fullwidth">
+            <Link to="/sale" className="button is-success is-fullwidth">
+              <span className="icon">
+                <i class="fa-solid fa-file-invoice"></i>
+                <i class="fa-solid fa-plus"></i>
+              </span></Link>
+          </div>
+          <div className="column is-fullwidth">
             <Button
-              text="Generar PDF"
-              color="primary"
+              text={<span className="icon">
+                <i class="fa-solid fa-file-pdf"></i>
+              </span>}
+               color="primary"
               col="fullwidth"
               action={generatePDF}
             />
           </div>
         </div>
         {filteredUsers.length > 0 ? (
-        <Table
-          headers={["#", "user", "create_at", "update_at", "total", "status"]}
-          columns={[
-            "ID",
-            "Usuario",
-            "Creado en",
-            "Actualizado en",
-            "Total",
-            "Estado de venta",
-          ]}
-          edit
-          delete
-          onEditClick={handleEditClick}
-          onDeleteClick={handleDeleteClick}
-          data={filteredUsers}
-          />):(
+          <Table
+            headers={["#", "user", "create_at", "update_at", "total", "status"]}
+            columns={[
+              "ID",
+              "Usuario",
+              "Creado en",
+              "Actualizado en",
+              "Total",
+              "Estado de venta",
+            ]}
+            edit
+            delete
+            onEditClick={handleEditClick}
+            onDeleteClick={handleDeleteClick}
+            data={filteredUsers}
+          />) : (
           <div className="notification has-text-centered mt-4">
             No se encontraron registros.
           </div>
