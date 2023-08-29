@@ -83,7 +83,7 @@ export function Profile() {
           email: clientUserData.email,
           phone: clientUserData.phone,
           address: clientUserData.address,
-          password: clientUserData.data.password,
+          password: clientUserData.password,
         });
         setDatosProvenientesDeClientsAPI(true);
       } catch (error) {
