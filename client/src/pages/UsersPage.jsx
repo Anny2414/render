@@ -277,27 +277,37 @@ export function UsersPage() {
       console.log(error.response);
 
       const errorMessages = {
-        "username": "Ya existe este usuario!",
-        "name": "El nombre sobrepasa los 50 caracteres!",
-        "lastname": "El apellido sobrepasa los 50 caracteres!",
-        "document": "El documento sobrepasa los 10 caracteres!",
-        "phone": "El teléfono sobrepasa los 10 caracteres!",
-        "email": "El correo ingresado es inválido"
+        username_exists: "Ya existe este usuario!",
+        username_length: "El usuario sobrepasa los 50 caracteres!",
+        name: "El nombre sobrepasa los 50 caracteres!",
+        lastname: "El apellido sobrepasa los 50 caracteres!",
+        document: "El documento sobrepasa los 10 caracteres!",
+        phone: "El teléfono sobrepasa los 10 caracteres!",
+        email: "El correo ingresado es inválido",
       };
 
-      if (error.response && error.response.data) {
-        const errorData = error.response.data;
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.username
+      ) {
+        const usernameErrors = error.response.data.username;
 
-        for (const key in errorData) {
-          const errorMessage = errorMessages[key];
-          if (errorMessage) {
+        for (const errorMessage of usernameErrors) {
+          if (errorMessage.includes("already exists")) {
             setNotification({
-              msg: errorMessage,
+              msg: errorMessages.username_exists,
               color: "primary",
               buttons: false,
               timeout: 3000,
             });
-            break;
+          } else if (errorMessage.includes("no more than 50 characters")) {
+            setNotification({
+              msg: errorMessages.username_length,
+              color: "primary",
+              buttons: false,
+              timeout: 3000,
+            });
           }
         }
       } else {
@@ -310,7 +320,6 @@ export function UsersPage() {
       }
     }
   };
-
 
   const handleEditClick = async (userId) => {
     const res = await getUser(userId);
@@ -408,12 +417,12 @@ export function UsersPage() {
         console.log(error.response);
 
         const errorMessages = {
-          "username": "Ya existe este usuario!",
-          "name": "El nombre sobrepasa los 50 caracteres!",
-          "lastname": "El apellido sobrepasa los 50 caracteres!",
-          "document": "El documento sobrepasa los 10 caracteres!",
-          "phone": "El teléfono sobrepasa los 10 caracteres!",
-          "email": "El correo ingresado es inválido"
+          username: "Ya existe este usuario!",
+          name: "El nombre sobrepasa los 50 caracteres!",
+          lastname: "El apellido sobrepasa los 50 caracteres!",
+          document: "El documento sobrepasa los 10 caracteres!",
+          phone: "El teléfono sobrepasa los 10 caracteres!",
+          email: "El correo ingresado es inválido",
         };
 
         if (error.response && error.response.data) {
@@ -439,7 +448,6 @@ export function UsersPage() {
             timeout: 3000,
           });
         }
-
       }
     };
 
@@ -516,7 +524,6 @@ export function UsersPage() {
           )}
         </div>
         <div className="columns is-centered">
-
           <div className="column is-9">
             <Input
               holder="Buscar"
@@ -549,9 +556,11 @@ export function UsersPage() {
           </div>
           <div className="column is-fullwidth">
             <Button
-              text={<span className="icon">
-                <i className="fa-solid fa-file-pdf"></i>
-              </span>}
+              text={
+                <span className="icon">
+                  <i className="fa-solid fa-file-pdf"></i>
+                </span>
+              }
               color="primary"
               col="fullwidth"
               action={generatePDF}
