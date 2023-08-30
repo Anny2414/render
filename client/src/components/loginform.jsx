@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import Logo from "../assets/img/Logo.png";
 import "../assets/css/accesos.css";
 import { Login } from "../api/login.api";
@@ -24,8 +25,8 @@ const LoginForm = () => {
     }, 1300);
   };
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
     try {
       mostrarPantallaDeCarga("Cargando...");
       const response = await Login(username, password);
@@ -195,7 +196,7 @@ const LoginForm = () => {
                     </button>
                     <br />
                     <br />
-                    <a className="is-link contra " href="/registro">
+                    <a className="is-link contra " href="/reset">
                       ¿ Perdiste tu contraseña  ?
                     </a>
                     <br />

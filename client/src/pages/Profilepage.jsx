@@ -347,7 +347,7 @@ export function Profile() {
                 )}
               </div>
             </div>
-            <div className="column is-half m-5 y">
+            <div className="column is-half m-2 y">
               <div className=" has-text-centered">
                 {!notification && (
                   <div
@@ -357,7 +357,7 @@ export function Profile() {
                     <h2
                       style={{
                         fontWeight: "bold",
-                        fontSize: "28px",
+                        fontSize: "18px",
                       }}
                     >
                       ACTUALIZA

@@ -12,7 +12,7 @@ import { OrderPage } from "./pages/OrderOnePage";
 import { OrdersPage } from "./pages/OrdersPage";
 import { Loginpage } from "./pages/Loginpage";
 import { Registropage } from "./pages/Registropage";
-import { PasswordResetForm } from "./pages/PasswordResetForm";
+import { ResetPassword } from "./pages/ResetPassword";
 import { Profile } from "./pages/Profilepage";
 
 function App() {
@@ -24,8 +24,8 @@ function App() {
         {/* Ruta de inicio */}
         <Route path="/" element={token ? <Navigate to="/home" /> : <Navigate to="/login" />}/>
         <Route path="/registro" element={<Registropage />} />
-        <Route path="/recuperar" element={<PasswordResetForm />} />
         <Route path="/login" element={<Loginpage />} />
+        <Route path="/reset" element={<ResetPassword/>}/>
         <Route path="/home" element={<HomePage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/roles" element={<RolePage />} />

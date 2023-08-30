@@ -1,3 +1,4 @@
+import random
 from django.http import JsonResponse
 from django.core.mail import send_mail
 from rest_framework import viewsets, status
@@ -36,8 +37,8 @@ from .models import (
     ContentOrder,
     Content,
 )
+
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from django.core.mail import send_mail
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.core.mail import EmailMultiAlternatives
@@ -57,16 +58,24 @@ def enviar_correo(request):
 
         if not destinatario:
             return Response({'error': 'Debes proporcionar un destinatario en el cuerpo de la solicitud.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=destinatario)
+        except User.DoesNotExist:
+            return Response({'error': 'No hay usuarios asociados a este correo'}, status=status.HTTP_404_NOT_FOUND)
+        
+        x = random.randint(1000000, 9999999) 
+        user.password = (x)
+        user.save()
+
         html_content = """
-       <!DOCTYPE html>
-<html>
+        <!DOCTYPE html>
+       <html>
   <head>
   
     <style>
       /* Aquí puedes agregar tus estilos CSS inline */
       body {
-       
-        background-color: pink; 
         background-position: center; 
         background-repeat: no-repeat; 
       
@@ -109,39 +118,34 @@ def enviar_correo(request):
     }
     </style>
   </head>
-  <div class="x">
-
-  </div>
-  <div class="carta">
-    <div class="encabezado">
-      ¡Recupera tu cuenta!
-    </div>
-  
-    <div class="contenido">
-        <p>Hola,</p>
-        <p>Hemos recibido una solicitud para acceder a tu cuenta </p>
-        <p>Puedes hacer click en el siguiente enlace para cambiar tu contraseña </p>
-       
-    </div>
-    <div class="firma">
-        Atentamente,<br>
-        El equipo de cuentas Auntie's Burger
-    </div>
-</div>
-</body>
-</html>
-        """
-
-        # Envía el correo electrónico con contenido HTML.
+        <body>
+            <div class="carta">
+                <div class="encabezado">
+                    ¡Recupera tu cuenta!
+                </div>
+            
+                <div class="contenido">
+                    <p>Hola,</p>
+                    <p>Hemos recibido una solicitud para acceder a tu cuenta.</p>
+                    <p>Tu nueva contraseña temporal es: <strong>%s</strong></p>
+                    <p>Por razones de seguridad, te recomendamos que modifiques esta contraseña lo más pronto posible a través de tu perfil de usuario.</p>
+                </div>
+            
+                <div class="firma">
+                    Atentamente,<br>
+                    El equipo de cuentas Auntie's Burger
+                </div>
+            </div>
+        </body>
+        </html>
+        """% x
         msg = EmailMultiAlternatives(asunto, strip_tags(html_content), remitente, [destinatario])
         msg.attach_alternative(html_content, "text/html")
         msg.send()
 
-        return Response({'mensaje': 'Correo enviado exitosamente'})
+        return Response({'mensaje': 'Correo enviado exitosamente','status':200})
 
-
-   
-
+       
 class UserRegistrationView(APIView):
     def post(self, request):
         role_cliente = Role.objects.get(name="Cliente")
