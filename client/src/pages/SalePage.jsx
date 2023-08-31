@@ -334,8 +334,6 @@ export function SalePage() {
               headers={["#", "name", "price", "amount", "subtotal"]}
               columns={["#", "Nombre", "Precio", "Cantidad", "Subtotal"]}
               delete
-              edit
-              onEditClick={handleEditClick}
               // onDeleteClick={handleDeleteClick}
               data={detail}
               itemsPorPage={3}

@@ -25,12 +25,12 @@ export function SalesPage() {
 
   const filteredUsers = sales.filter((sale) => {
     const searchString = searchQuery.toLowerCase();
-    const userMatches = sale.user.toLowerCase().includes(searchString);
+    // const userMatches = sale.user.toLowerCase().includes(searchString);
     const statusMatches = sale.status.toLowerCase().includes(searchString);
     const createAtMatches = sale.create_at.toLowerCase().includes(searchString);
     const updateAtMatches = sale.update_at.toLowerCase().includes(searchString);
 
-    return userMatches || statusMatches || createAtMatches || updateAtMatches;
+    return  statusMatches || createAtMatches || updateAtMatches;
   });
 
 
@@ -201,7 +201,7 @@ export function SalesPage() {
       }
     };
 
-    openModal("Editar venta", fieldsEdit, users, 'username', true, handleEditUser);
+    openModal("Editar venta", fieldsEdit, customOptions, 'status', true, handleEditUser);
   };
 
 

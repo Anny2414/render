@@ -77,7 +77,7 @@ export function ResetPassword() {
                 <div className="card">
                   <header className="card-header">
                     <p className="pt-5" style={{ fontSize: "30px" }}>
-                      Recuperación...
+                      Recuperación
                     </p>
                   </header>
                   <div className="card-content">
@@ -94,7 +94,7 @@ export function ResetPassword() {
                         type="email"
                         name="email"
                         value={email}
-                        holder="Ingresa tu correo electrónico"
+                        holder="Ingrese su correo electrónico"
                         onChange={(e) => setEmail(e.target.value)}
                       />
                     </div>

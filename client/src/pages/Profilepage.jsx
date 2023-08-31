@@ -78,6 +78,7 @@ export function Profile() {
           email: clientUserData.email,
           phone: clientUserData.phone,
           address: clientUserData.address,
+          document: clientUserData.document,
           password: clientUserData.password,
         });
         setDatosProvenientesDeClientsAPI(true);
@@ -314,7 +315,7 @@ export function Profile() {
               </div>
               <div className="m-5 ">
                 <div className=" border has-text-centered">
-                  <b>IDENTIFICACIÓN</b>
+                  <b>Identificación</b>
                   <p>{profileData.document}</p>
                 </div>
               </div>
@@ -360,10 +361,10 @@ export function Profile() {
                         fontSize: "18px",
                       }}
                     >
-                      ACTUALIZA
+                      Actualiza
                     </h2>
 
-                    <small>LA INFORMACIÓN DE TU PERFIL </small>
+                    <small>La Información de tu Perfil </small>
                   </div>
                 )}
                 {notification && (
@@ -479,8 +480,8 @@ export function Profile() {
               ) : null}
 
               {mostrarCambiarClave && (
-                <div className="claves">
-                  <div className="column is-full">
+
+                  <div className="column is-full mt-6">
                     <div className="">
                       <Input
                         placeholder="Antigua contraseña"
@@ -494,26 +495,24 @@ export function Profile() {
                       />
                     </div>
                   </div>
-                </div>
+                
+                
               )}
 
               {mostrarCambiarClave && (
-                <div className="columns ml-1 mr-1">
-                  <div className="column is-half">
-                    <div className="">
-                      <Input
-                        placeholder="Nueva Clave"
-                        holder="Nueva Contraseña "
-                        icon="lock"
-                        type="password"
-                        name="newPassword"
-                        value={newPassword}
-                        error={false}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                      />
-                    </div>
+                <div className="column is-full">
+                  <div className="mb-3">
+                    <Input
+                      placeholder="Nueva Clave"
+                      holder="Nueva Contraseña "
+                      icon="lock"
+                      type="password"
+                      name="newPassword"
+                      value={newPassword}
+                      error={false}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                    />
                   </div>
-                  <div className="column is-half">
                     <div className="mb-4">
                       <Input
                         placeholder="Confirmar Contraseña"
@@ -526,7 +525,6 @@ export function Profile() {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                       />
                     </div>
-                  </div>
                 </div>
               )}
             </div>

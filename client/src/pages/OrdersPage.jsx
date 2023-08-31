@@ -197,7 +197,7 @@ export function OrdersPage() {
       }
     };
 
-    openModal("Editar venta", fieldsEdit, users, 'username', true, handleEditUser);
+    openModal("Editar venta", fieldsEdit, customOptions, 'status', true, handleEditUser);
   };
 
   const handleDeleteClick = async (userId) => {
