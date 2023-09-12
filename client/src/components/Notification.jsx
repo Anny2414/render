@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../assets/css/barra-carga.css"
 export function Notification(props) {
-  const { msg, color, buttons, timeout, onConfirm } = props;
+  const { msg, color, buttons, timeout, onConfirm, buttonCancel } = props;
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,9 +21,10 @@ export function Notification(props) {
   const handleCancelClick = () => {
     props.onClose();
   };
+  
 
   return (
-    <div className={`notification has-text-centered is-${color} mt-4`}>
+    <div className={`notification has-text-centered is-${color} mt-3`}>
       <b>{msg}</b>
       {isLoading && (
         <div className="carga">
@@ -46,7 +47,7 @@ export function Notification(props) {
           <button
             className="button is-small is-error mt-3 ml-4"
             type="button"
-            onClick={handleCancelClick}
+            onClick={buttonCancel || handleCancelClick}
           >
             Cancelar
           </button>

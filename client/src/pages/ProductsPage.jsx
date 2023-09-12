@@ -42,16 +42,21 @@ export function ProductsPage() {
   const [order, setOrder] = useState([]);
   const [ingredientes, setIngredientes] = useState([]);
   const [ingredientes1, setIngredientes1] = useState([]);
+  const [adicion, setadicion] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const User = useRef([]);
   const selectedOptionRef = useRef();
+  const selectedOptionRef2 = useRef();
+  const ingrediente = useRef();
 
   const encryptionKey = 'Yourburger';
   const encryptedUserData = localStorage.getItem('Token');
   const decryptedBytes = CryptoJS.AES.decrypt(encryptedUserData, encryptionKey);
   const decryptedUserDataJSON = decryptedBytes.toString(CryptoJS.enc.Utf8);
   const userData = JSON.parse(decryptedUserDataJSON);
-  
+
 
   //Generar PDF
   const generatePDF = async () => {
@@ -132,20 +137,20 @@ export function ProductsPage() {
   }, [ingredientes]);
   useEffect(() => {
     const id = userData.token.user_id;
-        const api = async () => {
-          
-          try {
-            const resUser = await getUser(id);
-            User.current = "Administrador"
-            console.log("admin");
-          } catch (error) {
-            User.current = "Cliente"
-          }
-           
-         
-        };
-        api()
-      }, []);
+    const api = async () => {
+
+      try {
+        const resUser = await getUser(id);
+        User.current = "Administrador"
+      } catch (error) {
+        User.current = "Cliente"
+      }
+
+
+    };
+    api()
+  }, []);
+
 
   const reloadDataTable = async () => {
     setProducts([]);
@@ -170,11 +175,23 @@ export function ProductsPage() {
     setProducts(resProduct.data)
   };
 
+  useEffect(() => {
+    const filtered = products.filter((product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  }, [products, searchTerm]);
   const handleOptionChange = (event) => {
     const option = supplies.find(
       (supplie) => supplie.name === event.target.value,
     );
     selectedOptionRef.current = option;
+  };
+  const handleOptionChangeaditions = (event) => {
+    const option = supplies.find(
+      (supplie) => supplie.name === event.target.value,
+    );
+    selectedOptionRef2.current = option;
   };
   const handleOptionChange1 = (event) => {
     const option = supplies.filter(
@@ -191,6 +208,85 @@ export function ProductsPage() {
       console.log("error al añadir");
     }
   };
+  const anadiradicion = () => {
+    if (selectedOptionRef2.current != undefined) {
+      adicion.push(selectedOptionRef2.current);
+      setadicion([...ingredientes]); // Actualiza el estado de ingredientes
+    } else {
+      console.log("error al añadir adicion");
+    }
+  };
+
+  const DeleteSuppplie = async (idSupplie) => {
+    try {
+      
+        const ingredienteIndex = ingredientes.findIndex((ingrediente) => ingrediente.id === idSupplie);
+
+        if (ingredienteIndex !== -1) {
+          // Elimina el elemento del array ingredientes
+          ingredientes.splice(ingredienteIndex, 1);
+          // Actualiza el estado para reflejar el cambio
+          setIngredientes([...ingredientes]);
+
+        }else{
+          console.log("error al eliminar");
+        }
+      
+      
+      setNotification({
+        msg: "Ingrediente eliminado exitosamente!",
+        color: "info",
+        buttons: false,
+        timeout: 3000,
+      });
+    } catch (error) {
+      console.log(error);
+      setNotification({
+        msg: "Error al eliminar ingrediente!",
+        color: "primary",
+        buttons: false,
+        timeout: 3000,
+      });
+    }
+  };
+  const DeleteAditions = async (idSupplie) => {
+    try {
+      
+        const ingredienteIndex = adicion.findIndex((ingrediente) => ingrediente.id === idSupplie);
+
+        if (ingredienteIndex !== -1) {
+          // Elimina el elemento del array ingredientes
+          adicion.splice(ingredienteIndex, 1);
+          // Actualiza el estado para reflejar el cambio
+          setadicion([...adicion]);
+          
+          setNotification({
+            msg: "Adición eliminada exitosamente!",
+            color: "info",
+            buttons: false,
+            timeout: 3000,
+        
+        });
+        }else{
+          setNotification({
+            msg: "Error al eliminar adición!",
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        }
+        
+    } catch (error) {
+      console.log(error);
+      setNotification({
+        msg: "Error al eliminar adición!",
+        color: "primary",
+        buttons: false,
+        timeout: 3000,
+      });
+    }
+  };
+
 
 
   const openModal = (
@@ -272,11 +368,11 @@ export function ProductsPage() {
     },
     {
       type: "list",
-      columns: ['Nombre', 'Precio'],
-      headers: ['name', 'price'],
+      columns: ['Nombre'],
+      headers: ['name'],
       data: ingredientes,
       delete: true,
-      //onDeleteClick: clickDelete
+      onDeleteClick: DeleteSuppplie
     },
   ];
 
@@ -302,7 +398,10 @@ export function ProductsPage() {
 
     async function fetchSupplies() {
       const res = await getSupplies();
-      setSupplies(res.data);
+      const ingre =  res.data
+      setSupplies(ingre);
+      ingrediente.current = ingre.filter((content) => !removeAccents(content.name.toLowerCase()).includes("adicion"));
+
     }
 
     fetchSupplies();
@@ -419,26 +518,45 @@ export function ProductsPage() {
     const product = res.data;
     const content = contents.filter((content) => content.product == productId)
     Combined(content)
+
+
     const DeleteSuppplies = async (idSupplie) => {
       try {
         const contentIndex = content.filter((content) => content.supplies === idSupplie);
-        console.log(contentIndex);
+
         if (contentIndex.length > 0) {
-          await deleteContent(contentIndex[0].id)
+          await deleteContent(contentIndex[0].id);
+          const ingredienteIndex = ingredientes1.findIndex((ingrediente) => ingrediente.supplies === idSupplie);
+            ingredientes1.splice(ingredienteIndex, 1);
+            setIngredientes1([...ingredientes1]);
         } else {
           const ingredienteIndex = ingredientes1.findIndex((ingrediente) => ingrediente.supplies === idSupplie);
-          if (ingredienteIndex !== -1) {
-            console.log(contentIndex);
 
-            // El ID fue encontrado en el array ingredientes1
-            ingredientes1.splice(ingredienteIndex, 1); // Eliminar el elemento del array ingredientes1
-            setIngredientes1([...ingredientes1]); // Actualizar el estado para reflejar el cambio
+          if (ingredienteIndex !== -1) {
+            // Elimina el elemento del array ingredientes1
+            ingredientes1.splice(ingredienteIndex, 1);
+            // Actualiza el estado para reflejar el cambio
+            setIngredientes1([...ingredientes1]);
           }
         }
+        
+        setNotification({
+          msg: "Ingrediente eliminado exitosamente!",
+          color: "info",
+          buttons: false,
+          timeout: 3000,
+        });
       } catch (error) {
         console.log(error);
+        setNotification({
+          msg: "Error al eliminar ingrediente!",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
       }
     };
+
 
 
     const fieldsEdit = [
@@ -484,9 +602,9 @@ export function ProductsPage() {
         headers: ['name'],
         data: ingredientes1,
         nameSelect: "name",
-        keySelect: "supplies", // Use the combined array here
+        keySelect: "supplies", // Utiliza el estado actualizado aquí
         delete: true,
-        onDeleteClick: DeleteSuppplies
+        onDeleteClick: DeleteSuppplies, // Usa la función modificada
       },
       {
         title: "Ingredientes",
@@ -635,15 +753,18 @@ export function ProductsPage() {
       handleEditProduct
     );
   };
-
+  function removeAccents(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+  
   const handleAddclick = async (product) => {
     const suppliesProduct = await contents.filter(
       (content) => content.product == product.id
       //revisar
     );
-    const content = contents.filter((content) => content.product == product.id)
-    //revisar
 
+    const adiciones = supplies.filter((content) => removeAccents(content.name.toLowerCase()).includes("adicion"));
+    //revisar
     const fieldsAdd = [
       {
         title: "Producto",
@@ -703,11 +824,37 @@ export function ProductsPage() {
       },
       {
         type: "list",
-        columns: ['Nombre', 'Precio'],
-        headers: ['name', 'price'],
+        columns: ['Nombre'],
+        headers: ['name'],
         data: ingredientes,
         delete: true,
-        // onDeleteClick: clickDelete
+        onDeleteClick: DeleteSuppplie
+      },
+      {
+        title: "Adiciones",
+        hasButton: true,
+        textButton: "+",
+        type: "select",
+        name: "supplies",
+        icon: "list",
+        required: "false",
+        col: "full",
+        customOptions: [
+          { id: 0, name: "No seleccionado" },
+          ...adiciones,
+        ],
+        nameSelect: "name",
+
+        handleOptionChange: handleOptionChangeaditions,
+        actionButton: anadiradicion,
+      },
+      {
+        type: "list",
+        columns: ['Nombre', 'Precio'],
+        headers: ['name', 'price'],
+        data: adicion,
+        delete: true,
+        onDeleteClick: DeleteAditions
       },
     ];
 
@@ -725,13 +872,15 @@ export function ProductsPage() {
           description,
           image: idP[0].image,
           supplies: [],
+          aditions : adicion,
           amount: 1,
         };
         if (ingredientes.length > 0) {
           data2.supplies = ingredientes
         } else {
-          data2.supplies = content
+          data2.supplies = suppliesProduct
         }
+
         setOrder((prevOrder) => {
           Cookies.remove("orderDetail");
           const newOrder = [...prevOrder, data2];
@@ -753,10 +902,7 @@ export function ProductsPage() {
     openModal(
       "Añadir al Carrito",
       fieldsAdd,
-      [
-        { id: 0, name: "No seleccionado", price: 0, stock: 0, status: false },
-        ...supplies,
-      ],
+      false,
       "name",
       true,
       handleAdd
@@ -877,9 +1023,12 @@ export function ProductsPage() {
         </div>
         <div className="columns is-centered">
           <div className="column  is-fullwidth">
-            <Input holder="Buscar" icon="magnifying-glass" />
-          </div>
-          {User.current == "Administrador" &&<div className="column is-1">
+          <Input
+            holder="Buscar"
+            icon="magnifying-glass"
+            onChange={(e) => setSearchTerm(e.target.value)} // Actualiza el término de búsqueda
+          />          </div>
+          {User.current == "Administrador" && <div className="column is-1">
             {/* <Table
               headers =  {[ "Nombre" , "Precio"]}
               key =  {[ "name" , "price"]}
@@ -906,7 +1055,7 @@ export function ProductsPage() {
                       stock: 0,
                       status: true,
                     },
-                    ...supplies,
+                    ...ingrediente.current,
                   ],
                   "name",
                   //revisar
@@ -917,7 +1066,7 @@ export function ProductsPage() {
             />
           </div>
           }
-          {User.current == "Administrador" &&<div className="column is-1">
+          {User.current == "Administrador" && <div className="column is-1">
             <Button
               text={<span className="icon">
                 <i class="fa-solid fa-file-pdf"></i>
@@ -935,7 +1084,7 @@ export function ProductsPage() {
           onDeleteClick={handleDeleteClick}
           onViewDetails={handleViewDetailsClicks}
           onAdd={handleAddclick}
-          data={products}
+          data={filteredProducts}
           Administrador={User.current}
           generatePDF={generatePDF}
         />

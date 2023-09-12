@@ -1,62 +1,92 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/img/only-text.png";
-import { getclients } from "../api/clients.api"
-import { getUsers } from "../api/users.api"
-import { getPermissions } from "../api/permissions.api"
+import { getclients } from "../api/clients.api";
+import { Notification } from "./Notification";
+import { getUsers } from "../api/users.api";
+import { getPermissions } from "../api/permissions.api";
 import CryptoJS from "crypto-js";
+import Cookies from "js-cookie";
 
 export function Navbar() {
-  const [username, setUsername] = useState('');
+  const [notification, setNotification] = useState(null);
+  const [username, setUsername] = useState("");
   const [rol, setRol] = useState();
   const [permisos, setPermisos] = useState();
-  const encryptionKey = 'Yourburger';
-  const encryptedUserData = localStorage.getItem('Token');
+  const [bandera1, setBandera1] = useState(false)
+
+  const encryptionKey = "Yourburger";
+  const encryptedUserData = localStorage.getItem("Token");
+  if (!encryptedUserData) {
+    window.location.replace("/login")
+  }
   const decryptedBytes = CryptoJS.AES.decrypt(encryptedUserData, encryptionKey);
   const decryptedUserDataJSON = decryptedBytes.toString(CryptoJS.enc.Utf8);
   const userData = JSON.parse(decryptedUserDataJSON);
   useEffect(() => {
-const id = userData.token.user_id;
+    const id = userData.token.user_id;
     const api = async () => {
       try {
         const resUser = await getUsers();
         const user = resUser.data.filter((user) => user.id === id);
-        
-        if (user.length > 0) { // Check if the 'user' array has any elements
+  
+        if (user.length > 0) {
           setUsername(user[0].username);
           setRol(user[0].role);
           const resPermiso = await getPermissions(user[0].role);
           setPermisos(resPermiso);
-          localStorage.setItem('username', user[0].username); 
-          
+          localStorage.setItem('username', user[0].username);
         } else {
           const resClient = await getclients();
           const client = resClient.data.filter((client) => client.id === id);
-    
-          if (client.length > 0) { // Check if the 'client' array has any elements
+  
+          if (client.length > 0) {
             setUsername(client[0].username);
             setRol(client[0].role);
             const resPermiso = await getPermissions(client[0].role);
             setPermisos(resPermiso);
-          localStorage.setItem('username', client[0].username); 
-
+            setBandera1(true)
+            localStorage.setItem('username', client[0].username);
           } else {
             window.location.replace("/login");
           }
         }
       } catch (error) {
-        // Handle any errors that occur during the API calls
         console.error("Error:", error);
-        // Optionally, you might want to redirect to an error page or display an error message.
       }
     };
-    api()
+  
+    api();
   }, []);
+    useEffect(() => {
+      const base = {
+        Usuarios: "/users",
+        Clientes: "/clients",
+        Productos: "/products",
+        Ingredientes: "/supplies",
+        Pedidos: "/order",
+        Roles: "/roles",
+        Ventas: "/sales",
+      }
+      const pathname = window.location.pathname
+      var bandera = true
+      if (permisos) {
+          permisos.forEach(element => {
+            if (base[element] == pathname || pathname == "/" || pathname == "/home" || pathname == "/profile" || pathname == "/orders" || pathname == "/sale") {
+              bandera = false
+            }
+          })
+          if (bandera) {
+            window.location.replace("/login")
+          }
+        }
+    }, [permisos, bandera1])
   function cerrarSesion() {
-    localStorage.removeItem('Token')
-    localStorage.removeItem('name')
-    localStorage.removeItem('username')
-    location.replace("/")
+    localStorage.removeItem("Token");
+    localStorage.removeItem("name");
+    localStorage.removeItem("username");
+    Cookies.remove("orderDetail");
+    location.replace("/");
   }
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -72,7 +102,6 @@ const id = userData.token.user_id;
             <img src={Logo} width="110" />
           </Link>
         </div>
-
         <a
           role="button"
           className="navbar-burger"
@@ -89,8 +118,9 @@ const id = userData.token.user_id;
 
       <div className={`navbar-menu ${isMenuOpen ? "is-active" : ""}`}>
         <div className="navbar-start">
-          {permisos && (
+          {permisos &&
             permisos.map((obj) => {
+              
               if (obj === "Usuarios") {
                 return (
                   <Link to="/users" className="navbar-item" key="Usuarios">
@@ -111,7 +141,11 @@ const id = userData.token.user_id;
                 );
               } else if (obj === "Ingredientes") {
                 return (
-                  <Link to="/supplies" className="navbar-item" key="Ingredientes">
+                  <Link
+                    to="/supplies"
+                    className="navbar-item"
+                    key="Ingredientes"
+                  >
                     Ingredientes
                   </Link>
                 );
@@ -135,9 +169,7 @@ const id = userData.token.user_id;
                 );
               }
               return null; // Return null for cases where obj does not match any condition
-            })
-          ) }
-
+            })}
         </div>
 
         <div className="navbar-end">
@@ -146,10 +178,24 @@ const id = userData.token.user_id;
 
             <div className="navbar-dropdown">
               <Link to="/profile" className="navbar-item">
-               Perfil
+                Perfil
               </Link>
-              <Link to="/" className="navbar-item" onClick={cerrarSesion}>
+              <Link to="#" className="navbar-item" onClick={cerrarSesion}>
                 Cerrar sesión
+                {notification && (
+                  <div className="o">
+                    <div className="has-background-warning p-6 m-6">
+                      <Notification
+                        msg={notification.msg}
+                        color={notification.color}
+                        buttons={notification.buttons}
+                        timeout={notification.timeout}
+                        onClose={notification.onClose} 
+                        onConfirm={notification.onConfirm}
+                      />
+                    </div>
+                  </div>
+                )}
               </Link>
             </div>
           </div>

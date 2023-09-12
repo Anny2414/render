@@ -14,6 +14,9 @@ import { getclients } from "../api/clients.api.js";
 import { Notification } from "../components/Notification.jsx";
 import jsPDF from "jspdf";
 import CryptoJS from "crypto-js";
+import { getProducts } from "../api/products.api.js";
+import { getSale } from "../api/sales.api.js";
+import { getDetails } from "../api/detail.api.js";
 
 export function OrdersPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,6 +26,8 @@ export function OrdersPage() {
   const [clientes, setClientes] = useState([])
   const [rol, setRol] = useState()
   const [notification, setNotification] = useState(null);
+  const [products, setProducts] = useState([])
+  const [details, setDetails] = useState([])
 
 
   //
@@ -52,6 +57,10 @@ export function OrdersPage() {
         const resUser = await getUsers();
         const resclient = await getclients();
         const resOrder = await getOrders()
+        const res = await getProducts();
+        const resDetail = await getDetails()
+        setDetails(resDetail.data)
+        setProducts(res.data)
         setUsers(resUser.data);
         setClientes(resclient.data);
         setOrder(resOrder.data)
@@ -162,7 +171,40 @@ export function OrdersPage() {
 
 
   const onContentClick = async (SalesId) => {
+    const sale = order.find((order) => order.id == SalesId)
+    let dato 
+    const  user = users.filter((user) => user.id == sale.user)
+    const  clien = clientes.filter((user) => user.id == sale.user)
+    if (user.length > 0) {
+      dato =user[0].address
+    }else{
+      dato = clien[0].address
+    }
+    const res =details.filter((detail) => detail.order == SalesId) 
 
+    console.log(res);
+    const fieldsEdit = [
+      {
+        title: "Dirección",
+        type: "text",
+        name: "name",
+        icon: "",
+        col: "full",
+        required: "true",
+        value: dato || "No especificado ",
+        readonly: true,
+      },
+      {
+        type : "list",
+        columns: ["Producto", "Cantidad" , "Precio"],
+        headers: ["product","amount", "price"],
+        data : res,
+
+      },
+
+    ];
+
+    openModal("Detalle pedido" , fieldsEdit , false , false,false,false)
   }
   const handleEditClick = async (SalesId) => {
     const res = await getOrder(SalesId);
@@ -290,6 +332,8 @@ export function OrdersPage() {
             onEditClick={handleEditClick}
             onDeleteClick={handleDeleteClick}
             onContentClick={onContentClick}
+            onDetail = {onContentClick}
+            detail = {true}
             data={order}
           />
         ) : (

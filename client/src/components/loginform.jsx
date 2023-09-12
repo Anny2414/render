@@ -107,7 +107,7 @@ const LoginForm = () => {
                     />
                   )}
                 </div>
-                <header className="card-header">
+                <header className="card-header p-6">
                   <div className="media">
                     <img
                       src={Logo}

@@ -10,7 +10,6 @@ import { Input } from "../components/Form/Input.jsx";
 import { Notification } from "../components/Notification.jsx";
 import { Modal } from "../components/Modal.jsx";
 
-
 // CONEXION CON LA API DE USERS Y ROLES
 import {
   getUsers,
@@ -105,6 +104,7 @@ export function ClientPage() {
     setModalConfig({ title, fields, dataSelect, buttonSubmit, submit });
     setIsOpen(true);
   };
+
   const handleStatusChange = async (userId, status) => {
     setNotification({
       msg: "¿Seguro deseas cambiar el estado?",
@@ -242,6 +242,7 @@ export function ClientPage() {
       await createUser(userOne);
       reloadDataTable();
       closeModal();
+
       setNotification({
         msg: "Cliente creado exitosamente!",
         color: "success",
@@ -249,12 +250,62 @@ export function ClientPage() {
         timeout: 3000,
       });
     } catch (error) {
-      console.error("Error al crear el usuario:", error);
+      const errorMessages = {
+        name: "El nombre sobrepasa los 50 caracteres!",
+        lastname: "El apellido sobrepasa los 50 caracteres!",
+        document: "El documento sobrepasa los 10 caracteres!",
+        phone: "El teléfono sobrepasa los 10 caracteres!"
+      };
+    
+      let errorMessage = "Hubo un error en la creación del usuario.";
+    
+      if (error.response && error.response.data) {
+        const errorData = error.response.data;
+        console.log("errorData:", errorData);
+        if (errorData.username) {
+          if (errorData.username[0].includes("already exists")) {
+            errorMessage = "Ya existe este usuario!";
+          } else if (errorData.username[0].includes("no more than 50 characters")) {
+            errorMessage = "El usuario sobrepasa los 50 caracteres!";
+          }
+        }else if (errorData.email){
+          if (errorData.email[0].includes("already exists")) {
+            errorMessage = "Ya existe este Correo!";
+          } else if (errorData.email[0].includes(" valid email address.")) {
+            errorMessage = "El correo ingresado es inválido";
+          }
+        }
+    
+        for (const key in errorData) {
+          const ErrorMessage = errorMessages[key];
+    
+          if (ErrorMessage) {
+            errorMessage = ErrorMessage;
+            break;
+          }
+        }
+        
+        setNotification({
+          msg: errorMessage,
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      } else {
+        console.log(errorData);
+        setNotification({
+          msg: errorMessage,
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      }
     }
   };
 
   const handleEditClick = async (userId) => {
     const res = await getUser(userId);
+    console.log(res);
     const user = res.data;
 
     const fieldsEdit = [
@@ -301,8 +352,17 @@ export function ClientPage() {
         icon: "phone",
         required: "true",
         value: user.phone,
-        col: "col",
-      },
+        col: "half",
+      },{
+        title: "Correo",
+        type: "text",
+        name: "email",
+        icon: "phone",
+        required: "true",
+        value: user.email,
+        col: "half",
+      }
+      
     ];
 
     const handleEditUser = async (data) => {
@@ -317,7 +377,56 @@ export function ClientPage() {
           timeout: 3000,
         });
       } catch (error) {
-        console.error("Error al editar el usuario:", error);
+        const errorMessages = {
+          name: "El nombre sobrepasa los 50 caracteres!",
+          lastname: "El apellido sobrepasa los 50 caracteres!",
+          document: "El documento sobrepasa los 10 caracteres!",
+          phone: "El teléfono sobrepasa los 10 caracteres!"
+        };
+      
+        let errorMessage = "Hubo un error en la creación del usuario.";
+      
+        if (error.response && error.response.data) {
+          const errorData = error.response.data;
+          console.log("errorData:", errorData);
+          if (errorData.username) {
+            if (errorData.username[0].includes("already exists")) {
+              errorMessage = "Ya existe este usuario!";
+            } else if (errorData.username[0].includes("no more than 50 characters")) {
+              errorMessage = "El usuario sobrepasa los 50 caracteres!";
+            }
+          }else if (errorData.email){
+            if (errorData.email[0].includes("already exists")) {
+              errorMessage = "Ya existe este Correo!";
+            } else if (errorData.email[0].includes(" valid email address.")) {
+              errorMessage = "El correo ingresado es inválido";
+            }
+          }
+      
+          for (const key in errorData) {
+            const ErrorMessage = errorMessages[key];
+      
+            if (ErrorMessage) {
+              errorMessage = ErrorMessage;
+              break;
+            }
+          }
+          
+          setNotification({
+            msg: errorMessage,
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        } else {
+          console.log(errorData);
+          setNotification({
+            msg: errorMessage,
+            color: "primary",
+            buttons: false,
+            timeout: 3000,
+          });
+        }
       }
     };
 
@@ -345,7 +454,6 @@ export function ClientPage() {
 
   return (
     <div>
-
       <Navbar />
       <div className="notifications float">
         {notification && (
@@ -387,9 +495,11 @@ export function ClientPage() {
           </div>
           <div className="column is-fullwidth">
             <Button
-              text={<span className="icon">
-                <i class="fa-solid fa-file-pdf"></i>
-              </span>}
+              text={
+                <span className="icon">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </span>
+              }
               color="primary"
               action={generatePDF}
               col="fullwidth"
@@ -403,6 +513,7 @@ export function ClientPage() {
             "username",
             "name",
             "lastname",
+            "email",
             "address",
             "phone",
           ]}
@@ -412,6 +523,7 @@ export function ClientPage() {
             "Usuario",
             "Nombre",
             "Apellido",
+            "Correo",
             "Dirección",
             "Teléfono",
           ]}

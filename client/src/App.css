@@ -1,6 +1,6 @@
 div.main-container {
     height: 100vh;
-    background: url("https://themeholy.com/wordpress/pizzan/wp-content/uploads/2023/06/offer_banner_1.jpg");
+    background: url("assets/img/fondoP.png");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -13,4 +13,13 @@ div.main-container2 {
     background-size: cover;
     background-position: center;
 }
+
+div.main-container3 {
+    height: 100vh;
+    background-image: url("./assets/img/fondo4.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
 

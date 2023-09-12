@@ -14,7 +14,7 @@ const RegisterForm = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword,setconfirmPassword] = useState("")
+  const [confirmPassword, setconfirmPassword] = useState("");
   const [document, setDocument] = useState("");
   const [name, setName] = useState("");
   const [lastname, setLastname] = useState("");
@@ -37,10 +37,95 @@ const RegisterForm = () => {
       console.error(error);
     }
   };
-
+  const validateAdress = (value) => {
+    if (!value.match(/^[a-zA-Z0-9#\- ]+$/)) {
+      return {
+        isValid: false,
+        errorMessage: "Caracteres no válidos",
+      };
+    }
+    return { isValid: true, errorMessage: "" };
+  };
+  const validateName = (value) => {
+    if (!value.match(/^[A-Za-zÁ-ú\s]+$/)) {
+      return {
+        isValid: false,
+        errorMessage: "Solo debe contener letras y espacios.",
+      };
+    }
+    return { isValid: true, errorMessage: "" };
+  };
+  const validateLastName = (value) => {
+    if (!value.match(/^[A-Za-zÁ-ú\s]+$/)) {
+      return {
+        isValid: false,
+        errorMessage: "Solo debe contener letras y espacios.",
+      };
+    }
+    return { isValid: true, errorMessage: "" };
+  };
+  const validatenumber = (value) => {
+    if (!value.match(/^[0-9]+$/)) {
+      return {
+        isValid: false,
+        errorMessage: "Solo numeros",
+      };
+    }
+    return { isValid: true, errorMessage: "" };
+  };const validatephone = (value) => {
+    if (!value.match(/^[0-9]+$/)) {
+      return {
+        isValid: false,
+        errorMessage: "Solo numeros",
+      };
+    }
+    return { isValid: true, errorMessage: "" };
+  };
+  const validateEmail = (value) => {
+    if (!value.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
+      return {
+        isValid: false,
+        errorMessage: "Formato inválido.",
+      };
+    }
+    return { isValid: true, errorMessage: "" };
+  };
+  const [nameValidation, setNameValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  });
+  const [lastnameValidation, setlastnameValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  });
+  const [numberValidation, setnumberValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  }); 
+  const [phoneValidation, setphoneValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  });
+  const [emailValidation, setEmailValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  });
+  const [AddressValidation, setAddressValidation] = useState({
+    isValid: true,
+    errorMessage: "",
+  });
   const handleRegister = async (e) => {
+    if (password.length < 5 || password.length > 20) {
+      setNotification({
+        msg: "5-20 caracteres, min 1 mayúscula",
+        color: "primary",
+        buttons: false,
+        timeout: 2800,
+      });
+      return; // Salir de la función sin enviar la petición
+    }
     if (password !== confirmPassword) {
-      // Mostrar mensaje de error porque las contraseñas no coinciden
+
       setNotification({
         msg: "Las contraseñas no coinciden",
         color: "primary",
@@ -85,21 +170,57 @@ const RegisterForm = () => {
       setTimeout(() => {
         window.location.href = "/";
       }, 2000); // Reemplaza "/login" con la URL correcta de tu vista de inicio de sesión
-    } catch (error) {
-      if (error.response.status == 400) {
-        return setNotification({
-          msg: "Ya existe este usuario!",
+    } catch(error) {
+      const errorMessages = {
+        name: "El nombre sobrepasa los 50 caracteres!",
+        lastname: "El apellido sobrepasa los 50 caracteres!",
+        document: "El documento sobrepasa los 10 caracteres!",
+        phone: "El teléfono sobrepasa los 10 caracteres!"
+      };
+    
+      let errorMessage = "Hubo un error en la creación del usuario.";
+    
+      if (error.response && error.response.data) {
+        const errorData = error.response.data;
+        console.log("errorData:", errorData);
+        if (errorData.username) {
+          if (errorData.username[0].includes("already exists")) {
+            errorMessage = "Ya existe este usuario!";
+          } else if (errorData.username[0].includes("no more than 50 characters")) {
+            errorMessage = "El usuario sobrepasa los 50 caracteres!";
+          }
+        }else if (errorData.email){
+          if (errorData.email[0].includes("already exists")) {
+            errorMessage = "Ya existe este Correo!";
+          } else if (errorData.email[0].includes(" valid email address.")) {
+            errorMessage = "El correo ingresado es inválido";
+          }
+        }
+    
+        for (const key in errorData) {
+          const ErrorMessage = errorMessages[key];
+    
+          if (ErrorMessage) {
+            errorMessage = ErrorMessage;
+            break;
+          }
+        }
+        
+        setNotification({
+          msg: errorMessage,
           color: "primary",
           buttons: false,
           timeout: 3000,
-        })}
-      console.error(error);
-      setNotification({
-        msg: "Rellene de manera correcta todos los campos",
-        color: "info",
-        buttons: false,
-        timeout: 1000,
-      });
+        });
+      } else {
+        console.log(errorData);
+        setNotification({
+          msg: errorMessage,
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      }
     }
   };
   return (
@@ -140,8 +261,7 @@ const RegisterForm = () => {
                         <div className=" is half">
                           <div className="p-2">
                             <input
-                              className={`input ${
-                                errors.document ? "is-primary" : ""
+                              className={`input ${ errors.document||!numberValidation.isValid? "is-primary" : ""
                               }`}
                               type="text"
                               name="document"
@@ -150,13 +270,24 @@ const RegisterForm = () => {
                               })}
                               placeholder="Identificación"
                               value={document}
-                              onChange={(e) => setDocument(e.target.value)}
+                              onChange={(e) => {
+                                setDocument(e.target.value);
+                                const validation = validatenumber(
+                                  e.target.value
+                                );
+                                setnumberValidation(validation);
+                              }}
                             />
+                            {numberValidation.isValid ? null : (
+                              <p className="help is-danger">
+                                {numberValidation.errorMessage}
+                              </p>
+                            )}
                           </div>
                           <div className="p-2">
                             <input
                               className={`input ${
-                                errors.name ? "is-primary" : ""
+                                errors.name ||!nameValidation.isValid ? "is-primary" : ""
                               }`}
                               type="text"
                               {...register("name", {
@@ -165,13 +296,23 @@ const RegisterForm = () => {
                               name="name"
                               placeholder=" Primer nombre"
                               value={name}
-                              onChange={(e) => setName(e.target.value)}
-                            />
+                              onChange={(e) => {
+                                setName(e.target.value);
+                                const validation = validateName(
+                                  e.target.value
+                                );
+                                setNameValidation(validation);
+                              }}
+                            />{nameValidation.isValid? null : (
+                              <p className="help is-danger">
+                                {nameValidation.errorMessage}
+                              </p>
+                            )}
                           </div>
                           <div className="p-2">
                             <input
                               className={`input ${
-                                errors.email ? "is-primary" : ""
+                                errors.email ||!emailValidation.isValid? "is-primary" : ""
                               }`}
                               type="text"
                               {...register("email", {
@@ -180,8 +321,20 @@ const RegisterForm = () => {
                               name="email"
                               placeholder="Correo"
                               value={email}
-                              onChange={(e) => setEmail(e.target.value)}
+                              onChange={(e) => {
+                                setEmail(e.target.value);
+                                const validation = validateEmail(
+                                  e.target.value
+                                );
+                                setEmailValidation(validation);
+                              }}
+                              
                             />
+                            {emailValidation.isValid ? null : (
+                              <p className="help is-danger">
+                                {emailValidation.errorMessage}
+                              </p>
+                            )}
                           </div>
                         </div>
                         <div className=" is half">
@@ -199,11 +352,17 @@ const RegisterForm = () => {
                               value={username}
                               onChange={(e) => setUsername(e.target.value)}
                             />
+                            {errors.username ? (
+                              <p className="help is-danger">
+                                {errors.username.message}
+                              </p>
+                            ):null}
                           </div>
+                          
                           <div className="p-2">
                             <input
                               className={`input ${
-                                errors.lastname ? "is-primary" : ""
+                                !lastnameValidation.isValid ? "is-primary" : ""
                               }`}
                               type="text"
                               {...register("lastname", {
@@ -212,13 +371,24 @@ const RegisterForm = () => {
                               name="lastname"
                               placeholder="Apellidos"
                               value={lastname}
-                              onChange={(e) => setLastname(e.target.value)}
+                              onChange={(e) => {
+                                setLastname(e.target.value);
+                                const validation = validateLastName(
+                                  e.target.value
+                                );
+                                setlastnameValidation(validation);
+                              }}
                             />
+                            {lastnameValidation.isValid ? null : (
+                              <p className="help is-danger">
+                                {lastnameValidation.errorMessage}
+                              </p>
+                            )}
                           </div>
                           <div className="p-2">
                             <input
                               className={`input ${
-                                errors.phone ? "is-primary" : ""
+                                !phoneValidation.isValid ? "is-primary" : ""
                               }`}
                               type="text"
                               {...register("phone", {
@@ -227,8 +397,19 @@ const RegisterForm = () => {
                               name="phone"
                               placeholder="Telefono"
                               value={phone}
-                              onChange={(e) => setPhone(e.target.value)}
+                              onChange={(e) => {
+                                setPhone(e.target.value);
+                                const validation = validatephone(
+                                  e.target.value
+                                );
+                                setphoneValidation(validation);
+                              }}
                             />
+                            {phoneValidation.isValid ? null : (
+                              <p className="help is-danger">
+                                {phoneValidation.errorMessage}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -279,17 +460,18 @@ const RegisterForm = () => {
                                 name="confirmPassword"
                                 placeholder="confirmar contraseña"
                                 value={confirmPassword}
-                                onChange={(e) => setconfirmPassword(e.target.value)}
+                                onChange={(e) =>
+                                  setconfirmPassword(e.target.value)
+                                }
                               />
                             </div>
                           </div>
-                          
                         </div>
                       </div>
                     </div>
                   </div>
                   <button className="button is-primary" type="submit">
-                    Registrar Usuario
+                    Enviar
                   </button>
                   <br />
                   <br />

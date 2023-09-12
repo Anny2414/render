@@ -18,8 +18,10 @@ function TableRow({
   onStatusClick,
   onEditClick,
   onDeleteClick,
+  detail,
+  onDetail,
   count,
-  currentUser
+  currentUser,
 }) {
   const [statusSlider, setStatus] = useState(row.status);
   const [permisos, setPermisos] = useState([]);
@@ -67,7 +69,7 @@ function TableRow({
       {edit && (
         <td>
           <Button
-            colorHTML = "#FFC436"
+            colorHTML="#FFC436"
             type="button "
             text={
               <span className="icon has-text-white">
@@ -75,12 +77,12 @@ function TableRow({
               </span>
             }
             action={() => {
-              row.indexer != undefined 
+              row.indexer != undefined
                 ? onEditClick(row, row.indexer)
                 : onEditClick(row.id);
             }}
             disabled={isAdministradorOrCliente || currentUser === row.username}
-            
+
           />
         </td>
       )}
@@ -103,6 +105,22 @@ function TableRow({
           />
         </td>
       )}
+      {detail && (
+        <td>
+          <Button
+            color="info"
+            type="button"
+            text={
+              <span className="icon">
+                <i class="fa-solid fa-info"></i>              </span>
+            }
+            action={() => {
+                 onDetail(row.id);
+            }}
+            disabled={isAdministradorOrCliente || currentUser === row.username}
+          />
+        </td>
+      )}
     </tr>
   );
 }
@@ -119,6 +137,8 @@ export function Table(props) {
     onEditClick,
     onDeleteClick,
     itemsPorPage,
+    detail,
+    onDetail
   } = props;
 
   const [count, setCount] = useState(1);
@@ -157,6 +177,7 @@ export function Table(props) {
               {status && <th>Estado</th>}
               {edit && <th>Editar</th>}
               {showDelete && <th>Eliminar</th>}
+              {detail && <th>Detalle</th>}
             </tr>
           </thead>
           <tbody>
@@ -171,6 +192,8 @@ export function Table(props) {
                 onStatusClick={onStatusClick}
                 onEditClick={onEditClick}
                 onDeleteClick={onDeleteClick}
+                onDetail={onDetail}
+                detail={detail}
                 count={count + index + offset}
                 currentUser={username}
               />
@@ -182,7 +205,7 @@ export function Table(props) {
       <div className="container mt-5">
         <div className="columns is-vcentered">
           <div className="column is-full">
-            <ul className="pagination-list" style={{justifyContent: "center"}}>
+            <ul className="pagination-list" style={{ justifyContent: "center" }}>
               {Array.from({ length: pageCount }, (_, index) => {
                 const page = index + 1;
 

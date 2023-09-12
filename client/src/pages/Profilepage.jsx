@@ -14,6 +14,7 @@ import { getUser, editUser } from "../api/users.api";
 import "../assets/css/accesos.css";
 
 export function Profile() {
+  const [showPassword, setShowPassword] = useState(false);
   const [mostrarCarga, setMostrarCarga] = useState(false);
   const [mensajeCarga, setMensajeCarga] = useState("");
   const [camposHabilitados, setCamposHabilitados] = useState(false);
@@ -46,7 +47,7 @@ export function Profile() {
     email: "",
     phone: "",
     address: "",
-    password: "", // Agregamos un campo para la contraseña
+    password: "",
   });
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -179,6 +180,15 @@ export function Profile() {
   };
 
   const cambiarClave = async () => {
+    if (newPassword === '' || confirmPassword === '') {
+      setNotification({
+        msg: "Campos Vacíos",
+        color: "primary",
+        buttons: false,
+        timeout: 3000,
+      });
+      return;
+    }
     setNotification({
       msg: "¿Seguro deseas cambiar la contraseña?",
       color: "warning",
@@ -189,7 +199,6 @@ export function Profile() {
           setNotification(null);
           mostrarPantallaDeCarga("Realizando Cambios...");
           if (
-            profileData.password === oldPassword &&
             newPassword === confirmPassword
           ) {
             if (datosProvenientesDeClientsAPI) {
@@ -211,7 +220,7 @@ export function Profile() {
             }, 2000);
           } else {
             setNotification({
-              msg: "La contraseña actual es incorrecta o las nuevas contraseñas no coinciden",
+              msg: "Las nuevas contraseñas no coinciden",
               color: "primary",
               buttons: false,
               timeout: 3000,
@@ -243,7 +252,7 @@ export function Profile() {
     }
 
     setNotification({
-      msg: "¿Seguro deseas cambiar Los datos del perfil ?",
+      msg: "¿cambiar Los datos del perfil?",
       color: "warning",
       buttons: true,
       timeout: 0,
@@ -298,7 +307,7 @@ export function Profile() {
     setCamposHabilitados(!mostrarCambiarClave);
   };
   return (
-    <div>
+    <div className="main-container3 ">
       <Navbar />
 
       <div className="hero-body z">
@@ -348,7 +357,7 @@ export function Profile() {
                 )}
               </div>
             </div>
-            <div className="column is-half m-2 y">
+            <div className="column is-half m-1 y">
               <div className=" has-text-centered">
                 {!notification && (
                   <div
@@ -479,34 +488,16 @@ export function Profile() {
                 </div>
               ) : null}
 
-              {mostrarCambiarClave && (
-
-                  <div className="column is-full mt-6">
-                    <div className="">
-                      <Input
-                        placeholder="Antigua contraseña"
-                        holder="Antigua Clave"
-                        icon="lock"
-                        type="password"
-                        name="oldPassword"
-                        value={oldPassword}
-                        error={false}
-                        onChange={(e) => setOldPassword(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                
-                
-              )}
+        
 
               {mostrarCambiarClave && (
-                <div className="column is-full">
-                  <div className="mb-3">
+                <div className="column is-full mt-6">
+                  <div className="mb-5 mt-5">
                     <Input
                       placeholder="Nueva Clave"
                       holder="Nueva Contraseña "
                       icon="lock"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       name="newPassword"
                       value={newPassword}
                       error={false}
@@ -518,13 +509,14 @@ export function Profile() {
                         placeholder="Confirmar Contraseña"
                         holder="Confirmar Contraseña "
                         icon="lock"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         name="confirmPassword"
                         value={confirmPassword}
                         error={false}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                       />
                     </div>
+                    <a className="contra" style={{ fontSize: '13px' }} href="#"onClick={() => setShowPassword(!showPassword)}>Mostrar Contraseñas</a>
                 </div>
               )}
             </div>

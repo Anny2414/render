@@ -11,6 +11,11 @@ import "../assets/css/OrderPage.css";
 import { getUsers } from "../api/users.api";
 import { getProducts, getProduct } from "../api/products.api.js";
 
+
+
+import { getUsers as getclients } from "../api/clients.api.js";
+import { createSale } from "../api/sales.api.js";
+
 import {
   getDetail,
   createDetail,
@@ -45,8 +50,6 @@ export function SalePage() {
       try {
         const resUser = await getUsers();
         const resclient = await getclients();
-        console.log(resclient.data);
-        console.log(resUser.data);
         setUsers(resUser.data);
         setClientes(resclient.data);
         setIsLoading(false); // Los datos han cargado, establece isLoading a false
@@ -84,7 +87,6 @@ export function SalePage() {
   }, [users, clientes, isLoading]);
   useEffect(() => {
     const currentIngredients = ingredientes;
-    console.log(users);
   }, [ingredientes, users]);
 
   const handleOptionChange = (event) => {
@@ -153,7 +155,6 @@ export function SalePage() {
 
   const handleCreateProduct = async (data) => {
     try {
-      console.log(users);
 
       const orderData = { user: username, total: total, status: "Pago" };
       const respOrder = await createSale(orderData);
@@ -254,7 +255,6 @@ export function SalePage() {
     ];
     const handleEditSale = async (data) => {
       try {
-        console.log(data);
         // closeModal(); // Close the modal after updating
       } catch (error) {
         console.error("Error al editar la venta:", error);
