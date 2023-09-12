@@ -6,7 +6,8 @@ import { Button } from "../components/Form/Button.jsx";
 import { Input } from "../components/Form/Input.jsx";
 
 // CONEXION CON LA API DE USERS Y ROLES
-import { getUsers } from "../api/users.api";
+import { getUser, getUsers } from "../api/users.api";
+import { getUser as getclient, getclients } from "../api/clients.api.js";
 import { createSale, deleteSale, editSale, getSale, getSales } from "../api/sales.api.js";
 import { Modal } from "../components/Modal.jsx";
 import { Link } from "react-router-dom";
@@ -14,11 +15,15 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import Logo from "../assets/img/Logo.png"; // Imagen que sera usada en el PDF
 import { Notification } from "../components/Notification.jsx";
+import { getDetails } from "../api/detail.api.js";
 
 
 export function SalesPage() {
   const [users, setUsers] = useState([]);
+  const [client , setClient] = useState([])
   const [sales, setSales] = useState([]);
+  const [details, setDetails] = useState([])
+
   //
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -151,7 +156,11 @@ export function SalesPage() {
   useEffect(() => {
     async function fetchData() {
       const resUser = await getUsers();
+      const resClient = await getclients();
       const res = await getSales();
+      const resDetail = await getDetails()
+      setDetails(resDetail.data)
+      setClient(resClient.data)
       setSales(res.data);
       setUsers(resUser.data);
     }
@@ -168,6 +177,44 @@ export function SalesPage() {
       console.error("Error al crear la venta:", error);
     }
   };
+
+  
+  const onContentClick = async (SalesId) => {
+    const sale = sales.find((order) => order.id == SalesId)
+    let dato 
+    const  user = users.filter((user) => user.id == sale.user)
+    const  clien = client.filter((user) => user.id == sale.user)
+    if (user.length > 0) {
+      dato =user[0].address
+    }else{
+      dato = clien[0].address
+    }
+    const res =details.filter((detail) => detail.order == SalesId) 
+
+    console.log(res);
+    const fieldsEdit = [
+      {
+        title: "Dirección",
+        type: "text",
+        name: "name",
+        icon: "",
+        col: "full",
+        required: "true",
+        value: dato || "No especificado ",
+        readonly: true,
+      },
+      {
+        type : "list",
+        columns: ["Producto", "Cantidad" , "Precio"],
+        headers: ["product","amount", "price"],
+        data : res,
+
+      },
+
+    ];
+
+    openModal("Detalle pedido" , fieldsEdit , false , false,false,false)
+  }
 
   const handleEditClick = async (SalesId) => {
     const res = await getSale(SalesId);
@@ -290,6 +337,8 @@ export function SalesPage() {
             delete
             onEditClick={handleEditClick}
             onDeleteClick={handleDeleteClick}
+            onDetail = {onContentClick}
+            detail = {true}
             data={filteredUsers}
           />) : (
           <div className="notification has-text-centered mt-4">

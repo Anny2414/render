@@ -21,6 +21,7 @@ import {
 import { createDetail } from "../api/detail.api";
 import { createContentO } from "../api/contentdetail.api";
 import { Notification } from "../components/Notification";
+import { Modal } from "../components/Modal";
 
 export function OrderPage() {
   const [products, setProducts] = useState([]);
@@ -29,15 +30,19 @@ export function OrderPage() {
   const [ingredientes, setIngredientes] = useState([]);
   const [supplies, setSupplies] = useState([]);
   const [contents, setContents] = useState([]);
-  const [detail, setDetail] = useState([]);
   const [total, setTotal] = useState(0);
   const [username, setUsername] = useState("");
-  const [rol, setRol] = useState();
   const [users, setUsers] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [notification, setNotification] = useState(null);
-
   const [isLoading, setIsLoading] = useState(true);
+  const selectedOptionRef = useRef();
+  const selectedOptionRef2 = useRef();
+  const ingredienteedit = useRef();
+  const adicionRef = useRef([]);
+  function removeAccents(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -65,10 +70,8 @@ export function OrderPage() {
       if (name) {
         if (user) {
           setUsername(user.id);
-          setRol(user.rol);
         } else if (cliente) {
           setUsername(cliente.id);
-          setRol(cliente.rol);
         }
       } else {
         window.location.replace("/");
@@ -80,16 +83,28 @@ export function OrderPage() {
     const calculateTotal = () => {
       let sum = 0;
       products.forEach((product) => {
-        const tota = parseInt(product.price) * parseInt(product.amount);
-        sum += tota || 0;
+        const totalProduct = parseInt(product.price) * parseInt(product.amount);
+        let totaladitions = 0;
+  
+        // Suma el precio de las adiciones en el campo "aditions" si contienen la palabra "adicion"
+        if (product.aditions && product.aditions.length > 0) {
+          product.aditions.forEach((adition) => {
+            // Comprueba si el nombre de la adición contiene la palabra "adicion" (sin importar mayúsculas/acentos)
+            if (removeAccents(adition.name.toLowerCase()).includes("adicion")) {
+              totaladitions += parseInt(adition.price);
+            }
+          });
+        }
+  
+        sum += totalProduct + totaladitions || 0;
       });
       setTotal(sum);
     };
-
+  
     calculateTotal();
   }, [products]);
+
   // const ingredientes = useRef([]);
-  const selectedOptionRef = useRef();
   const a = [];
   const num = (number) => {
     a.push(number);
@@ -98,19 +113,15 @@ export function OrderPage() {
     a.length = 0;
   };
   useEffect(() => {
-    const ingredient = ingredientes;
-    setDetail(ingredient);
-  });
-  useEffect(() => {
     const currentIngredients = ingredientes;
     const fech = async () => {
       const res = await getContents();
       // Obtiene una matriz de promesas que resuelven los nombres de los roles
       const rolePromises = res.data.map((user) => getSupplieName(user.supplies));
-  
+
       // Espera a que todas las promesas se resuelvan
       const roleNames = await Promise.all(rolePromises);
-  
+
       // Combina los datos de usuario con los nombres de roles resueltos
       const usersWithRoles = res.data.map((user, index) => ({
         ...user,
@@ -134,9 +145,8 @@ export function OrderPage() {
   }, []);
 
   const handleOptionChange = (event) => {
-    console.log("entra");
     const option = supplies.find(
-      (supplie) => supplie.name === event.target.value
+      (supplie) => supplie.id === parseInt(event.target.value)
     );
     selectedOptionRef.current = option;
   };
@@ -201,7 +211,6 @@ export function OrderPage() {
 
           for (let index = 0; index < order.supplies.length; index++) {
             const supplies = order.supplies[index];
-            console.log(supplies)
             const suplie = {
               supplies: supplies.supplies,
               detail: resDetail.data.id,
@@ -233,7 +242,6 @@ export function OrderPage() {
   };
 
   const handleAmountChange = (productId, event) => {
-    console.log("entro");
     const updatedProducts = products.map((product) => {
       if (product.id === productId) {
         return { ...product, amount: parseInt(event.target.value) };
@@ -247,6 +255,8 @@ export function OrderPage() {
   };
 
   const EditP = async (product) => {
+
+
     const clickDelete = (ingredientId) => {
       setNotification({
         msg: "¿Seguro deseas eliminar el ingrediente?",
@@ -262,34 +272,130 @@ export function OrderPage() {
                 if (prod.id === product.id) {
                   // Filtrar los ingredientes y eliminar el que coincida con ingredientId
                   prod.supplies = prod.supplies.filter(
-                    (supplie) => supplie.id !== ingredientId
+                    (supplie) => supplie.supplies !== ingredientId
                   );
                 }
                 return prod;
               });
-              setProducts(updatedProducts);
+              const ingredie = ingredienteedit.current
+              const i = ingredie.findIndex(
+                (supplie) => supplie.supplies === ingredientId
+              );
+              ingredienteedit.current.splice(i, 1)
+
               Cookies.set("orderDetail", JSON.stringify(updatedProducts));
               reloadDataTable();
+              const produ = updatedProducts.find((prod) => prod.id == product.id)
+
+              // Actualiza la lista de ingredientes usando la función
+
               setNotification({
-                msg: "ingrediente eliminado exitosamente!",
+                msg: "Ingrediente eliminado exitosamente!",
                 color: "success",
                 buttons: false,
                 timeout: 3000,
               });
             }
           } catch (error) {
-            console.error("Error al cambiar el estado:", error);
+            console.error("Error al eliminar:", error);
           }
         },
       });
     };
 
+
+    const handleOptionChangeaditions = (event) => {
+      const option = supplies.find(
+        (supplie) => supplie.name === event.target.value,
+      );
+      console.log(option);
+      selectedOptionRef2.current = option;
+    };
+    const anadiradicion = () => {
+      setIngredientes([]);
+      if (selectedOptionRef2.current != undefined) {
+        ingredientes.push(selectedOptionRef2.current);
+        const storedDetail = Cookies.get("orderDetail");
+        if (storedDetail) {
+          const orderDetail = JSON.parse(storedDetail);
+          const updatedOrderDetail = orderDetail.map((producto) => {
+            if (producto.id === producto.id) {
+              // Verificar si el ingrediente ya existe en product.supplies
+              const ingredien = producto.aditions.some(
+                (supplie) => supplie.name === selectedOptionRef2.current.name
+              );
+              if (!ingredien) {
+                const { name, price, id, status, stock } = selectedOptionRef2.current
+                const dat = {
+                  name,
+                  price,
+                  supplies: id,
+                  status,
+                  stock
+                }
+                producto.aditions.push(selectedOptionRef2.current);
+                // Actualizar el estado de products
+                adicionRef.current = producto.aditions
+                console.log(producto.aditions);
+                setProducts([...orderDetail]);
+                product.aditions.push(selectedOptionRef2.current);
+              }
+            }
+            return product;
+          });
+          Cookies.set("orderDetail", JSON.stringify(updatedOrderDetail));
+          reloadDataTable();
+        }
+      } else {
+        setNotification({
+          msg: "No has selecionado un ingrediente",
+          color: "primary",
+          buttons: false,
+          timeout: 3000,
+        });
+      }
+    };
+
+    const clickDeleteAdition = (ingredientId) => {
+          try {
+            const storedDetail = Cookies.get("orderDetail");
+            if (storedDetail) {
+              const orderDetail = JSON.parse(storedDetail);
+              const updatedProducts = orderDetail.map((prod) => {
+                if (prod.id === product.id) {
+                  // Filtrar los ingredientes y eliminar el que coincida con ingredientId
+                  prod.aditions = prod.supplies.filter(
+                    (supplie) => supplie.supplies !== ingredientId
+                  );
+                }
+                return prod;
+              });
+              const ingredie = adicionRef.current
+              const i = ingredie.findIndex(
+                (supplie) => supplie.supplies === ingredientId
+              );
+              adicionRef.current.splice(i, 1)
+
+              Cookies.set("orderDetail", JSON.stringify(updatedProducts));
+              reloadDataTable();
+
+              // Actualiza la lista de ingredientes usando la función
+
+              setNotification({
+                msg: "Ingrediente eliminado exitosamente!",
+                color: "success",
+                buttons: false,
+                timeout: 3000,
+              });
+            }
+          } catch (error) {
+            console.error("Error al eliminar:", error);
+          }
+
+    }
+
     const anadirIngrediente = () => {
       setIngredientes([]);
-      const ingredien = product.supplies.filter(
-        (supplie) => supplie.name === ingredientes.name
-      );
-      console.log(product.supplies);
       if (selectedOptionRef.current != undefined) {
         ingredientes.push(selectedOptionRef.current);
         setIngredientes([...ingredientes]); // Actualiza el estado de ingredientes
@@ -303,8 +409,10 @@ export function OrderPage() {
                 (supplie) => supplie.name === selectedOptionRef.current.name
               );
               if (!ingredien) {
+                const { name, price, id, status, stock } = selectedOptionRef.current
                 producto.supplies.push(selectedOptionRef.current);
                 // Actualizar el estado de products
+                ingredienteedit.current = producto.supplies
                 setProducts([...orderDetail]);
                 product.supplies.push(selectedOptionRef.current);
               }
@@ -325,24 +433,16 @@ export function OrderPage() {
     };
 
     setIngredientes([]);
-    console.log(product);
-    const ingredient = product.supplies;
-    console.log(ingredient);
+    ingredienteedit.current = (products.find((prod) => prod.id == product.id)).supplies
+    adicionRef.current = (products.find((prod) => prod.id == product.id)).aditions
+    console.log(adicionRef.current);
     const content = contents.filter(
       (content) => content.product == product.id
     );
-    console.log(content);
-
+    console.log(products);
+    const adiciones = supplies.filter((content) => removeAccents(content.name.toLowerCase()).includes("adicion"));
 
     const FieldsEdit = [
-      {
-        type: "list",
-        columns: ["Nombre", "Precio"],
-        headers: ["name", "price"],
-        data: ingredient,
-        delete: true,
-        onDeleteClick: clickDelete,
-      },
       {
         title: "Ingredientes",
         hasButton: true,
@@ -358,9 +458,40 @@ export function OrderPage() {
         handleOptionChange: handleOptionChange,
         actionButton: anadirIngrediente,
       },
+      {
+        type: "list",
+        columns: ["Nombre"],
+        headers: ["name"],
+        data: ingredienteedit.current,
+        delete: true,
+        onDeleteClick: clickDelete,
+      },
+      {
+        title: "Adiciónes",
+        hasButton: true,
+        textButton: "+",
+        type: "select",
+        name: "supplies",
+        icon: "list",
+        required: "false",
+        col: "full",
+        customOptions: [{ name: "no seleccionado" }, ...adiciones],
+        nameSelect: "name",
+        keySelect: "supplies",
+        handleOptionChange: handleOptionChangeaditions,
+        actionButton: anadiradicion,
+      },
+      {
+        type: "list",
+        columns: ["Nombre", "Precio"],
+        headers: ["name", "price"],
+        data: adicionRef.current,
+        delete: true,
+        onDeleteClick: clickDeleteAdition,
+      },
     ];
 
-    const submitEditar = () => {
+    const submitEditar = (data) => {
       closeModal();
     };
 
@@ -528,7 +659,7 @@ export function OrderPage() {
         </div>
       </div>
       {isOpen && (
-        <ModalSale
+        <Modal
           title={modalConfig.title}
           fields={modalConfig.fields}
           dataSelect={modalConfig.dataSelect}

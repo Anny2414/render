@@ -10,48 +10,77 @@ export function Navbar() {
   const [username, setUsername] = useState('');
   const [rol, setRol] = useState();
   const [permisos, setPermisos] = useState();
+  const [bandera1, setBandera1] = useState(false)
   const encryptionKey = 'Yourburger';
   const encryptedUserData = localStorage.getItem('Token');
+  if (!encryptedUserData) {
+    window.location.replace("/login")
+
+  }
   const decryptedBytes = CryptoJS.AES.decrypt(encryptedUserData, encryptionKey);
   const decryptedUserDataJSON = decryptedBytes.toString(CryptoJS.enc.Utf8);
   const userData = JSON.parse(decryptedUserDataJSON);
-  useEffect(() => {
-const id = userData.token.user_id;
-    const api = async () => {
-      try {
-        const resUser = await getUsers();
-        const user = resUser.data.filter((user) => user.id === id);
-        
-        if (user.length > 0) { // Check if the 'user' array has any elements
-          setUsername(user[0].username);
-          setRol(user[0].role);
-          const resPermiso = await getPermissions(user[0].role);
-          setPermisos(resPermiso);
-          localStorage.setItem('username', user[0].username); 
-          
-        } else {
-          const resClient = await getclients();
-          const client = resClient.data.filter((client) => client.id === id);
-    
-          if (client.length > 0) { // Check if the 'client' array has any elements
-            setUsername(client[0].username);
-            setRol(client[0].role);
-            const resPermiso = await getPermissions(client[0].role);
-            setPermisos(resPermiso);
-          localStorage.setItem('username', client[0].username); 
+useEffect(() => {
+  const id = userData.token.user_id;
+  const api = async () => {
+    try {
+      const resUser = await getUsers();
+      const user = resUser.data.filter((user) => user.id === id);
 
-          } else {
-            window.location.replace("/login");
-          }
+      if (user.length > 0) {
+        setUsername(user[0].username);
+        setRol(user[0].role);
+        const resPermiso = await getPermissions(user[0].role);
+        setPermisos(resPermiso);
+        localStorage.setItem('username', user[0].username);
+      } else {
+        const resClient = await getclients();
+        const client = resClient.data.filter((client) => client.id === id);
+
+        if (client.length > 0) {
+          setUsername(client[0].username);
+          setRol(client[0].role);
+          const resPermiso = await getPermissions(client[0].role);
+          setPermisos(resPermiso);
+          setBandera1(true)
+          localStorage.setItem('username', client[0].username);
+        } else {
+          window.location.replace("/login");
         }
-      } catch (error) {
-        // Handle any errors that occur during the API calls
-        console.error("Error:", error);
-        // Optionally, you might want to redirect to an error page or display an error message.
       }
-    };
-    api()
-  }, []);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  api();
+}, []);
+  useEffect(() => {
+    const base = {
+      Usuarios: "/users",
+      Clientes: "/clients",
+      Productos: "/products",
+      Ingredientes: "/supplies",
+      Pedidos: "/order",
+      Roles: "/roles",
+      Ventas: "/sales",
+    }
+    const pathname = window.location.pathname
+    var bandera = true
+    if (permisos) {
+        console.log(pathname);
+        permisos.forEach(element => {
+          if (base[element] == pathname || pathname == "/" || pathname == "/home" || pathname == "/profile" || pathname == "/orders" || pathname == "/sale") {
+            bandera = false
+          }
+        })
+        console.log(bandera);
+        if (bandera) {
+          window.location.replace("/login")
+        }
+      }
+  }, [permisos, bandera1])
+
   function cerrarSesion() {
     localStorage.removeItem('Token')
     localStorage.removeItem('name')
@@ -92,6 +121,7 @@ const id = userData.token.user_id;
           {permisos && (
             permisos.map((obj) => {
               if (obj === "Usuarios") {
+
                 return (
                   <Link to="/users" className="navbar-item" key="Usuarios">
                     Usuarios
@@ -136,7 +166,7 @@ const id = userData.token.user_id;
               }
               return null; // Return null for cases where obj does not match any condition
             })
-          ) }
+          )}
 
         </div>
 
@@ -146,7 +176,7 @@ const id = userData.token.user_id;
 
             <div className="navbar-dropdown">
               <Link to="/profile" className="navbar-item">
-               Perfil
+                Perfil
               </Link>
               <Link to="/" className="navbar-item" onClick={cerrarSesion}>
                 Cerrar sesión
