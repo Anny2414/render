@@ -14,15 +14,24 @@ export function Navbar() {
   const [rol, setRol] = useState();
   const [permisos, setPermisos] = useState();
   const [bandera1, setBandera1] = useState(false)
+<<<<<<< HEAD
 
   const encryptionKey = "Yourburger";
   const encryptedUserData = localStorage.getItem("Token");
   if (!encryptedUserData) {
     window.location.replace("/login")
+=======
+  const encryptionKey = 'Yourburger';
+  const encryptedUserData = localStorage.getItem('Token');
+  if (!encryptedUserData) {
+    window.location.replace("/login")
+
+>>>>>>> a78edde2b1ec19108e1bfdb5a8b89bc26462b0bf
   }
   const decryptedBytes = CryptoJS.AES.decrypt(encryptedUserData, encryptionKey);
   const decryptedUserDataJSON = decryptedBytes.toString(CryptoJS.enc.Utf8);
   const userData = JSON.parse(decryptedUserDataJSON);
+<<<<<<< HEAD
   useEffect(() => {
     const id = userData.token.user_id;
     const api = async () => {
@@ -81,6 +90,69 @@ export function Navbar() {
           }
         }
     }, [permisos, bandera1])
+=======
+useEffect(() => {
+  const id = userData.token.user_id;
+  const api = async () => {
+    try {
+      const resUser = await getUsers();
+      const user = resUser.data.filter((user) => user.id === id);
+
+      if (user.length > 0) {
+        setUsername(user[0].username);
+        setRol(user[0].role);
+        const resPermiso = await getPermissions(user[0].role);
+        setPermisos(resPermiso);
+        localStorage.setItem('username', user[0].username);
+      } else {
+        const resClient = await getclients();
+        const client = resClient.data.filter((client) => client.id === id);
+
+        if (client.length > 0) {
+          setUsername(client[0].username);
+          setRol(client[0].role);
+          const resPermiso = await getPermissions(client[0].role);
+          setPermisos(resPermiso);
+          setBandera1(true)
+          localStorage.setItem('username', client[0].username);
+        } else {
+          window.location.replace("/login");
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  api();
+}, []);
+  useEffect(() => {
+    const base = {
+      Usuarios: "/users",
+      Clientes: "/clients",
+      Productos: "/products",
+      Ingredientes: "/supplies",
+      Pedidos: "/order",
+      Roles: "/roles",
+      Ventas: "/sales",
+    }
+    const pathname = window.location.pathname
+    var bandera = true
+    if (permisos) {
+        console.log(pathname);
+        permisos.forEach(element => {
+          if (base[element] == pathname || pathname == "/" || pathname == "/home" || pathname == "/profile" || pathname == "/orders" || pathname == "/sale") {
+            bandera = false
+          }
+        })
+        console.log(bandera);
+        if (bandera) {
+          window.location.replace("/login")
+        }
+      }
+  }, [permisos, bandera1])
+
+>>>>>>> a78edde2b1ec19108e1bfdb5a8b89bc26462b0bf
   function cerrarSesion() {
     localStorage.removeItem("Token");
     localStorage.removeItem("name");
@@ -122,6 +194,7 @@ export function Navbar() {
             permisos.map((obj) => {
               
               if (obj === "Usuarios") {
+
                 return (
                   <Link to="/users" className="navbar-item" key="Usuarios">
                     Usuarios
@@ -169,7 +242,13 @@ export function Navbar() {
                 );
               }
               return null; // Return null for cases where obj does not match any condition
+<<<<<<< HEAD
             })}
+=======
+            })
+          )}
+
+>>>>>>> a78edde2b1ec19108e1bfdb5a8b89bc26462b0bf
         </div>
 
         <div className="navbar-end">

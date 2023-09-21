@@ -66,19 +66,27 @@ export const ModalSale = (props) => {
                                                                         </thead>
                                                                         <tbody>
                                                                             {field.data.map((ingrediente) => {
-                                                                                console.log(ingrediente);
                                                                                 return (
                                                                                     <tr key={ingrediente.id}>
                                                                                         <td>{ingrediente.name}</td>
                                                                                         <td>{ingrediente.price}</td>
                                                                                         <td>
-                                                                                            <Button
-                                                                                                text={ <span className="icon">
-                                                                                                <i className="fa-solid fa-trash"></i>
-                                                                                              </span>}
+                                                                                            {/* <Button
+                                                                                                text={<span className="icon">
+                                                                                                    <i className="fa-solid fa-trash"></i>
+                                                                                                </span>}
                                                                                                 color="primary"
                                                                                                 action={() => field.onDeleteClick(ingrediente.id)} // Llamar a la función onDeleteClick con el ID del ingrediente
-                                                                                            />
+                                                                                            /> */}
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                className={`button is-primary`}
+                                                                                                onClick={() => field.onDeleteClick(ingrediente.supplies || ingrediente.id)}
+                                                                                            >
+                                                                                                <span className="icon">
+                                                                                                    <i className="fa-solid fa-trash"></i> </span>
+
+                                                                                            </button>
                                                                                         </td>
                                                                                     </tr>
                                                                                 );

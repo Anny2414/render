@@ -896,15 +896,13 @@ export function ProductsPage() {
           description,
           image: idP[0].image,
           supplies: [],
-          aditions: adicion,
           amount: 1,
         };
         if (ingredientes.length > 0) {
           data2.supplies = ingredientes;
         } else {
-          data2.supplies = suppliesProduct;
+          data2.supplies = content
         }
-    
         setOrder((prevOrder) => {
           Cookies.remove("orderDetail");
           const newOrder = [...prevOrder, data2];
