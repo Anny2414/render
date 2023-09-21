@@ -243,7 +243,7 @@ export function OrderPage() {
 
   const handleAmountChange = (productId, event) => {
     const updatedProducts = products.map((product) => {
-      if (product.id === productId) {
+      if (product.indexer === productId) {
         return { ...product, amount: parseInt(event.target.value) };
       }
       return product;
@@ -505,7 +505,7 @@ export function OrderPage() {
     );
   };
 
-  const removeProduct = (productId) => {
+  const removeProduct = (productIndexer) => {
     setNotification({
       msg: "¿Seguro deseas elminar el producto?",
       color: "warning",
@@ -514,7 +514,7 @@ export function OrderPage() {
       onConfirm: async () => {
         try {
           const updatedProducts = products.filter(
-            (product) => product.id != productId
+            (product) => product.indexer != productIndexer
           );
           Cookies.set("orderDetail", JSON.stringify(updatedProducts));
           reloadDataTable();

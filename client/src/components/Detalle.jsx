@@ -27,7 +27,7 @@ export function Detalle(props) {
                             className="input"
                             type="number"
                             defaultValue={product.amount}
-                            onChange={(event) => handleAmountChange(product.id, event)}
+                            onChange={(event) => handleAmountChange(product.indexer, event)}
                             min={1}
                         />
                     </div>
@@ -46,7 +46,7 @@ export function Detalle(props) {
                             text={<span className="icon">
                                 <i className="fa-solid fa-trash"></i>
                             </span>}
-                            action={() => deleteP(product.id)}
+                            action={() => deleteP(product.indexer)}
                         />
                     </div>
                 </div>

@@ -860,45 +860,71 @@ export function ProductsPage() {
 
     const handleAdd = (data) => {
       const { name, price, description } = data;
-      const idP = products.filter((product) => product.name == name);
-
-      console.log(idP[0].id);
-
+      const idP = products.filter((product) => product.name === name);
+    
       try {
+        let existingOrderArray = [];
+        const existingOrder = Cookies.get("orderDetail");
+        if (existingOrder) {
+          existingOrderArray = JSON.parse(existingOrder);
+          // Verificar si un producto con los mismos ingredientes y adiciones ya existe
+          const isProductInCart = existingOrderArray.some((item) => {
+            return (
+              item.id === idP[0].id &&
+              item.aditions === adicion &&
+              JSON.stringify(item.supplies) === JSON.stringify(ingredientes)
+            );
+          });
+          if (isProductInCart) {
+            setNotification({
+              msg: "El producto con los mismos ingredientes y adiciones ya existe en el carrito.",
+              color: "primary", // Cambiar el color a "primary"
+              buttons: false,
+              timeout: 3000,
+            });
+            return; // No agrega el producto nuevamente y sale de la función
+          }
+        }
+    
+        const newIndex = existingOrderArray ? existingOrderArray.length : 0;
+    
         const data2 = {
-          id: idP[0].id,
+          id: idP[0].id, // Usar un índice único para diferenciar los productos
+          indexer: newIndex, // Agregar el campo indexer
           name,
           price,
           description,
           image: idP[0].image,
           supplies: [],
-          aditions : adicion,
+          aditions: adicion,
           amount: 1,
         };
         if (ingredientes.length > 0) {
-          data2.supplies = ingredientes
+          data2.supplies = ingredientes;
         } else {
-          data2.supplies = suppliesProduct
+          data2.supplies = suppliesProduct;
         }
-
+    
         setOrder((prevOrder) => {
           Cookies.remove("orderDetail");
           const newOrder = [...prevOrder, data2];
           Cookies.set("orderDetail", JSON.stringify(newOrder));
           return newOrder;
         });
-
+    
         closeModal();
         setNotification({
-          msg: " El Producto fue añadido al Carrito!",
+          msg: "El Producto fue añadido al Carrito!",
           color: "warning",
           buttons: false,
           timeout: 3000,
         });
       } catch (error) {
-        console.log("Error al añadir a carito" + error);
+        console.log("Error al añadir al carrito: " + error);
       }
     };
+    
+    
     openModal(
       "Añadir al Carrito",
       fieldsAdd,
